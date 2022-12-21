@@ -1,6 +1,6 @@
 import React from 'react';
-import { RouterProvider } from "react-router-dom";
-import ReactDOM from 'react-dom';
+import { RouterProvider } from 'react-router-dom';
+import { createRoot } from 'react-dom/client';
 import router from './routes'
 
 const Root = () => (
@@ -10,7 +10,9 @@ const Root = () => (
 );
 
 // local development
-ReactDOM.render(<Root />, document.getElementById("app"));
+const container = document.getElementById('app')
+const root = createRoot(container!)
+root.render(<Root />)
 
 // online 
 // export default Root;
