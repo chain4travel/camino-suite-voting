@@ -1,7 +1,7 @@
-import React from "react";
-import ProposalNavbar from "../../components/ProposalNavbar"
+import React from 'react';
+import ProposalNavbar from '../../components/ProposalNavbar';
 
-function ProposalList() {  
+function ProposalList() {
   return (
     <div>
       <ProposalNavbar />

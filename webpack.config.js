@@ -1,14 +1,14 @@
-const HtmlWebPackPlugin = require("html-webpack-plugin");
-const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
-const path = require("path");
-const deps = require("./package.json").dependencies;
+const HtmlWebPackPlugin = require('html-webpack-plugin');
+const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
+const path = require('path');
+const deps = require('./package.json').dependencies;
 module.exports = {
   output: {
-    publicPath: "http://localhost:3005/",
+    publicPath: 'http://localhost:3005/',
   },
 
   resolve: {
-    extensions: [".vue", ".tsx", ".ts", ".jsx", ".js", ".json"],
+    extensions: ['.vue', '.tsx', '.ts', '.jsx', '.js', '.json'],
   },
 
   devServer: {
@@ -20,20 +20,20 @@ module.exports = {
     rules: [
       {
         test: /\.m?js/,
-        type: "javascript/auto",
+        type: 'javascript/auto',
         resolve: {
           fullySpecified: false,
         },
       },
       {
         test: /\.(css|s[ac]ss)$/i,
-        use: ["style-loader", "css-loader", "postcss-loader"],
+        use: ['style-loader', 'css-loader', 'postcss-loader'],
       },
       {
         test: /\.(ts|tsx|js|jsx)$/,
         exclude: /node_modules/,
         use: {
-          loader: "babel-loader",
+          loader: 'babel-loader',
         },
       },
     ],
@@ -41,8 +41,8 @@ module.exports = {
 
   plugins: [
     new ModuleFederationPlugin({
-      name: "vote",
-      filename: "remoteEntry.js",
+      name: 'vote',
+      filename: 'remoteEntry.js',
       remotes: {},
       exposes: {
         './vote': './src/App.tsx',
@@ -53,16 +53,16 @@ module.exports = {
           singleton: true,
           requiredVersion: deps.react,
         },
-        "react-dom": {
+        'react-dom': {
           singleton: true,
-          requiredVersion: deps["react-dom"],
+          requiredVersion: deps['react-dom'],
         },
       },
     }),
     new HtmlWebPackPlugin({
-      template: path.resolve(__dirname, "public/index.html"),
-      favicon: "./public/favicon.ico",
-      manifest: "./public/manifest.json",
-    })
+      template: path.resolve(__dirname, 'public/index.html'),
+      favicon: './public/favicon.ico',
+      manifest: './public/manifest.json',
+    }),
   ],
 };
