@@ -1,7 +1,7 @@
 import React from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
-import router from './routes'
+import router from './routes';
 
 const Root = () => (
   <React.StrictMode>
@@ -10,9 +10,9 @@ const Root = () => (
 );
 
 // local development
-const container = document.getElementById('app')
-const root = createRoot(container!)
-root.render(<Root />)
+const container = document.getElementById('app');
+const root = createRoot(container!);
+root.render(<Root />);
 
-// online 
+// online
 // export default Root;
