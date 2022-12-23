@@ -4,6 +4,7 @@ import { createBrowserRouter, redirect } from 'react-router-dom';
 import Vote from '@/pages/Vote';
 import { CreateProposal, ProposalList } from '@/pages/Proposals';
 import ProposalDetail from '@/pages/Proposals/ProposalDetail';
+import ProposalContainer from '../pages/Proposals/ProposalContainer';
 
 export const routes = [
   {
@@ -16,15 +17,22 @@ export const routes = [
   },
   {
     path: '/vote/:category',
-    element: <ProposalList />,
-  },
-  {
-    path: '/vote/:category/create',
-    element: <CreateProposal />,
-  },
-  {
-    path: '/vote/:category/:id',
-    element: <ProposalDetail />,
+    element: <ProposalContainer />,
+    children: [
+      {
+        path: '',
+        element: <ProposalList />,
+        index: true,
+      },
+      {
+        path: 'create',
+        element: <CreateProposal />,
+      },
+      {
+        path: ':id',
+        element: <ProposalDetail />,
+      },
+    ],
   },
 ];
 const router = createBrowserRouter(routes);

@@ -1,30 +1,20 @@
 import React from 'react';
-import {
-  Container,
-  Divider,
-  Grid,
-  IconButton,
-  Typography,
-} from '@mui/material';
+import { Divider, Grid, IconButton, Typography } from '@mui/material';
 import { CheckBox, DisabledByDefault } from '@mui/icons-material';
 import { useParams } from 'react-router-dom';
 
 import { useProposal } from '@/hooks/proposals';
-import ProposalNavbar from '../../components/ProposalNavbar';
 
 const ProposalDetail = () => {
   const { category, id } = useParams();
-  console.log('type: ', category, 'id: ', id);
   const proposal = useProposal(category, id);
 
   return (
-    <Container>
-      <ProposalNavbar />
-
-      <Typography variant="h6" marginTop={4} paddingX={2}>
+    <>
+      <Typography variant="h6" paddingY={2} paddingX={2}>
         Vote for new members to be part of the consortium
       </Typography>
-      <Divider sx={{ marginY: 3 }} />
+      <Divider sx={{ marginBottom: 3 }} />
       <Typography variant="h5" marginBottom={4} paddingX={2}>
         {proposal?.title}
       </Typography>
@@ -41,7 +31,7 @@ const ProposalDetail = () => {
           <Typography>Decline</Typography>
         </IconButton>
       </Grid>
-    </Container>
+    </>
   );
 };
 

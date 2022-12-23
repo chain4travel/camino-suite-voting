@@ -4,7 +4,6 @@ import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import Container from '@mui/material/Container';
 import TextareaAutosize from '@mui/base/TextareaAutosize';
-import ProposalNavbar from '../../components/ProposalNavbar';
 
 function CreateProposal() {
   const top100Films = [
@@ -18,7 +17,6 @@ function CreateProposal() {
   ];
   return (
     <>
-      <ProposalNavbar />
       <Container sx={{ py: 2, px: { md: 1 } }}>
         <Box>
           Please select wallet address of the consortium memeber you want to

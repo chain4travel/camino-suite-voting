@@ -1,6 +1,5 @@
 import React, { ChangeEvent, useState } from 'react';
 import {
-  Container,
   Grid,
   IconButton,
   Table,
@@ -40,9 +39,7 @@ const ProposalList = () => {
   };
 
   return (
-    <Container>
-      <ProposalNavbar />
-
+    <>
       <TableContainer>
         <Table stickyHeader>
           <TableHead>
@@ -144,7 +141,7 @@ const ProposalList = () => {
         onRowsPerPageChange={handleChangeRowsPerPage}
         sx={{ width: '100%' }}
       />
-    </Container>
+    </>
   );
 };
 
