@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
 const path = require('path');
@@ -9,6 +10,11 @@ module.exports = {
 
   resolve: {
     extensions: ['.vue', '.tsx', '.ts', '.jsx', '.js', '.json'],
+    alias: {
+      '@apis': path.resolve(__dirname, 'src/apis'),
+      '@hooks': path.resolve(__dirname, 'src/hooks'),
+      '@utils': path.resolve(__dirname, 'src/utils'),
+    },
   },
 
   devServer: {
