@@ -1,6 +1,7 @@
 import * as React from 'react';
 import ProposalCard from '../components/ProposalCard';
 import Grid from '@mui/material/Grid';
+import { Link } from 'react-router-dom';
 
 export default function App() {
   type Proposal = {
@@ -15,7 +16,7 @@ export default function App() {
       title: 'New Validator',
       ctx: 'Has been admitted as a validator by the validator consortia via a vote The last condition is omitted for Validators who secure the network from the start.',
       btnCtx: 'New Validator',
-      url: 'validators',
+      url: 'new_consortium_member',
     },
     {
       title: 'Vote for exclusion of consortium member',
@@ -28,13 +29,14 @@ export default function App() {
   return (
     <Grid container direction="row" alignItems="center">
       {ProposalList.map(v => (
-        <ProposalCard
-          key={v.url}
-          title={v.title}
-          ctx={v.ctx}
-          btnCtx={v.btnCtx}
-          url={v.url}
-        />
+        <Link to={`/vote/${v.url}`} key={v.url}>
+          <ProposalCard
+            title={v.title}
+            ctx={v.ctx}
+            btnCtx={v.btnCtx}
+            url={v.url}
+          />
+        </Link>
       ))}
     </Grid>
   );
