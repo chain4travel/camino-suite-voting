@@ -1,6 +1,6 @@
 import { useQuery } from 'react-query';
 
-import { fetchProposalList } from '@apis/proposals';
+import { fetchProposalList } from '@/apis/proposals';
 
 export const useProposals = (type: string, page = 0) => {
   console.log('proposal type: ', type);

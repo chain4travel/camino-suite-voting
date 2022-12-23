@@ -1,4 +1,4 @@
-import { get } from '@utils/http';
+import { get } from '@/utils/http';
 
 export interface Proposal {
   id: number;

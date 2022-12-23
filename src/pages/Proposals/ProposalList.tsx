@@ -16,8 +16,8 @@ import { CheckBox, DisabledByDefault } from '@mui/icons-material';
 import { useParams } from 'react-router-dom';
 import { DateTime } from 'luxon';
 
-import { Proposal } from '@apis/proposals';
-import { useProposals } from '@hooks/proposals';
+import { Proposal } from '@/apis/proposals';
+import { useProposals } from '@/hooks/proposals';
 import ProposalNavbar from '../../components/ProposalNavbar';
 
 const ProposalList = () => {
