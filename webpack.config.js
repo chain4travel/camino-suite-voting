@@ -52,7 +52,7 @@ module.exports = {
       filename: 'remoteEntry.js',
       remotes: {},
       exposes: {
-        './vote': './src/remoteEntry.ts',
+        './vote': './src/root.tsx',
       },
       shared: {
         ...deps,

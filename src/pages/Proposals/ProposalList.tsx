@@ -40,7 +40,7 @@ const ProposalList = () => {
       <ProposalNavbar />
 
       <TableContainer>
-        <Table stickyHeader>
+        <Table stickyHeader sx={{ backgroundColor: 'white' }}>
           <TableHead>
             <TableRow>
               <TableCell>
@@ -120,7 +120,7 @@ const ProposalList = () => {
         count={totalCount}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
-        sx={{ width: '100%' }}
+        sx={{ width: '100%', backgroundColor: 'white' }}
       />
     </Container>
   );

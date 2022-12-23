@@ -26,7 +26,6 @@ const ProposalCard: React.FC<ProposalCardProps> = (
       sx={{ maxWidth: 400, height: 270, marginTop: '60px', marginLeft: '60px' }}
     >
       <CardActionArea>
-        123
         <CardContent>
           <Typography
             gutterBottom

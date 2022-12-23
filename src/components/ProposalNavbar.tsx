@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 function ProposalNavbar() {
   const { category } = useParams();
   return (
-    <div style={{ width: '100%', marginTop: '20px' }}>
+    <div style={{ width: '100%', marginTop: 20, marginBottom: 20 }}>
       <Box
         component="div"
         sx={{
