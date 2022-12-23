@@ -3,6 +3,7 @@ const HtmlWebPackPlugin = require('html-webpack-plugin');
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
 const path = require('path');
 const deps = require('./package.json').dependencies;
+console.log('luxon: ', deps['luxon']);
 module.exports = {
   output: {
     publicPath: 'http://localhost:3005/',
@@ -51,7 +52,7 @@ module.exports = {
       filename: 'remoteEntry.js',
       remotes: {},
       exposes: {
-        './vote': './src/App.tsx',
+        './vote': './src/remoteEntry.ts',
       },
       shared: {
         ...deps,
@@ -62,6 +63,9 @@ module.exports = {
         'react-dom': {
           singleton: true,
           requiredVersion: deps['react-dom'],
+        },
+        luxon: {
+          version: deps['luxon'],
         },
       },
     }),
