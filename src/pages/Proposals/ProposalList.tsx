@@ -13,19 +13,23 @@ import {
   Typography,
 } from '@mui/material';
 import { CheckBox, DisabledByDefault } from '@mui/icons-material';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { DateTime } from 'luxon';
 
-import { Proposal } from '@/apis/proposals';
+import { Proposal } from '@/types';
 import { useProposals } from '@/hooks/proposals';
-import ProposalNavbar from '../../components/ProposalNavbar';
+import { useProposalState, ProposalState } from '@/store';
+import ProposalNavbar from '@/components/ProposalNavbar';
 
 const ProposalList = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const { category } = useParams();
-  console.log('type: ', category);
+  const navigate = useNavigate();
   const { proposals, totalCount } = useProposals(category, page, rowsPerPage);
+  const setCurrentProposal = useProposalState(
+    (state: ProposalState) => state.setCurrentProposal
+  );
 
   const handleChangePage = (event: unknown, toPage: number) => {
     setPage(toPage);
@@ -40,7 +44,7 @@ const ProposalList = () => {
       <ProposalNavbar />
 
       <TableContainer>
-        <Table stickyHeader sx={{ backgroundColor: 'white' }}>
+        <Table stickyHeader>
           <TableHead>
             <TableRow>
               <TableCell>
@@ -59,18 +63,25 @@ const ProposalList = () => {
               const verifiedLevel = proposal.verifiedLevel ? (
                 <Grid container direction="row" item xs={2}>
                   <CheckBox />
-                  <Typography variant="body2">{`Verfied Level ${proposal.verifiedLevel}`}</Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontWeight: 600 }}
+                  >{`Verfied Level ${proposal.verifiedLevel}`}</Typography>
                 </Grid>
               ) : null;
               const stakeLocked = proposal.stakeLocked ? (
-                <Grid container direction="row" item xs={2}>
+                <Grid container direction="row" item xs={3}>
                   <CheckBox />
-                  <Typography variant="body2">Stake Locked</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    Stake Locked
+                  </Typography>
                 </Grid>
               ) : (
-                <Grid container direction="row" item xs={2}>
+                <Grid container direction="row" item xs={3}>
                   <DisabledByDefault />
-                  <Typography variant="body2">Stake Locked</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    Stake Locked
+                  </Typography>
                 </Grid>
               );
               const end = DateTime.fromSeconds(proposal.endTime);
@@ -82,10 +93,21 @@ const ProposalList = () => {
                 diff.minutes
               }m ${Math.floor(diff.seconds)}s`;
               return (
-                <TableRow key={proposal.id} hover>
+                <TableRow
+                  key={proposal.id}
+                  hover
+                  onClick={() => {
+                    setCurrentProposal(proposal);
+                    navigate(`/vote/${category}/${proposal.id}`);
+                  }}
+                >
                   <TableCell key="content" sx={{ maxWidth: 600 }}>
                     <Typography>{proposal.title}</Typography>
-                    <Typography noWrap={true}>
+                    <Typography
+                      color="text.secondary"
+                      noWrap={true}
+                      sx={{ fontWeight: 600 }}
+                    >
                       {proposal.description}
                     </Typography>
                     <Grid container direction="row">
@@ -94,7 +116,7 @@ const ProposalList = () => {
                     </Grid>
                   </TableCell>
                   <TableCell key="endsIn">
-                    <Typography>{endsIn}</Typography>
+                    <Typography sx={{ fontWeight: 600 }}>{endsIn}</Typography>
                   </TableCell>
                   <TableCell key="action">
                     <Grid container direction="row">
@@ -120,7 +142,7 @@ const ProposalList = () => {
         count={totalCount}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
-        sx={{ width: '100%', backgroundColor: 'white' }}
+        sx={{ width: '100%' }}
       />
     </Container>
   );

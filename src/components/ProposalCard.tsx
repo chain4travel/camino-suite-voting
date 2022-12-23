@@ -23,7 +23,15 @@ const ProposalCard: React.FC<ProposalCardProps> = (
   const navigate = useNavigate();
   return (
     <Card
-      sx={{ maxWidth: 400, height: 270, marginTop: '60px', marginLeft: '60px' }}
+      sx={{
+        maxWidth: 400,
+        height: 270,
+        marginTop: '60px',
+        marginLeft: '60px',
+        borderWidth: 1,
+        borderStyle: 'solid',
+        borderColor: 'text.secondary',
+      }}
     >
       <CardActionArea>
         <CardContent>
