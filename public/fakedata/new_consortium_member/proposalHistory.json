@@ -1,0 +1,56 @@
+{
+  "proposals": [
+    {
+      "id": 1,
+      "title": "New Validator 1",
+      "description": "Vote to include a new member to the consortium. As a consortium member, you are entitled to run a validator node and thus, participate in governing the network via vote. An inclusion vote is successful, if more than 50% of the current consortium members vote for the inclusion. The application to become a member of the consortium can be performed at any time",
+      "endTime": 1684754430,
+      "executionTime": 1682680830,
+      "status": "inactive",
+      "votes": {
+        "yes": 10,
+        "no": 5
+      }
+    },
+    {
+      "id": 2,
+      "title": "New Validator 2",
+      "description": "Vote to include a new member to the consortium. As a consortium member, you are entitled to run a validator node and thus, participate in governing the network via vote. An inclusion vote is successful, if more than 50% of the current consortium members vote for the inclusion. The application to become a member of the consortium can be performed at any time",
+      "endTime": 1682162430,
+      "executionTime": 1682680830,
+      "status": "inactive",
+      "votes": {
+        "yes": 5,
+        "no": 10
+      }
+    },
+    {
+      "id": 3,
+      "title": "New Validator 3",
+      "description": "Vote to include a new member to the consortium. As a consortium member, you are entitled to run a validator node and thus, participate in governing the network via vote. An inclusion vote is successful, if more than 50% of the current consortium members vote for the inclusion. The application to become a member of the consortium can be performed at any time",
+      "endTime": 1682680830,
+      "executionTime": 1682680830,
+      "status": "inactive",
+      "votes": {
+        "option 1": 10,
+        "option 2": 5,
+        "option 3": 5
+      }
+    },
+    {
+      "id": 4,
+      "title": "New Validator 4",
+      "description": "Vote to include a new member to the consortium. As a consortium member, you are entitled to run a validator node and thus, participate in governing the network via vote. An inclusion vote is successful, if more than 50% of the current consortium members vote for the inclusion. The application to become a member of the consortium can be performed at any time",
+      "endTime": 1679484030,
+      "executionTime": 1682680830,
+      "status": "inactive",
+      "votes": {
+        "option 1": 10,
+        "option 2": 5,
+        "option 3": 2,
+        "option 4": 3
+      }
+    }
+  ],
+  "totalCount": 4
+}

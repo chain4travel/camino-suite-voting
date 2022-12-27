@@ -22,6 +22,8 @@ specifiers:
   '@typescript-eslint/parser': ^5.47.0
   axios: ^1.2.1
   babel-loader: ^9.1.0
+  chart.js: ^4.1.1
+  chartjs-plugin-datalabels: ^2.2.0
   copy-webpack-plugin: ^11.0.0
   css-loader: ^6.7.2
   eslint: ^8.30.0
@@ -37,7 +39,9 @@ specifiers:
   path: ^0.12.7
   postcss-loader: ^7.0.2
   prettier: 2.8.1
+  randomcolor: ^0.6.2
   react: ^18.2.0
+  react-chartjs-2: ^5.1.0
   react-dom: ^18.2.0
   react-i18next: ^12.1.1
   react-query: ^3.39.2
@@ -61,11 +65,15 @@ dependencies:
   '@mui/material': 5.11.1_lskpmcsdi7ipu6qpuapyu56ihm
   '@mui/styled-engine-sc': 5.11.0_styled-components@5.3.6
   axios: 1.2.1
+  chart.js: 4.1.1
+  chartjs-plugin-datalabels: 2.2.0_chart.js@4.1.1
   i18next: 22.4.6
   i18next-browser-languagedetector: 7.0.1
   i18next-scanner: 4.1.0
   luxon: 3.1.1
+  randomcolor: 0.6.2
   react: 18.2.0
+  react-chartjs-2: 5.1.0_dxa6kz4w32vmgoazz4fv7vwm2e
   react-dom: 18.2.0_react@18.2.0
   react-i18next: 12.1.1_6vygckh2jgtx4nucc3no6lnm3y
   react-query: 3.39.2_biqbaboplfbrettd7655fr4n2y
@@ -3025,6 +3033,10 @@ packages:
       '@jridgewell/resolve-uri': 3.1.0
       '@jridgewell/sourcemap-codec': 1.4.14
 
+  /@kurkle/color/0.3.1:
+    resolution: {integrity: sha512-hW0GwZj06z/ZFUW2Espl7toVDjghJN+EKqyXzPSV8NV89d5BYp5rRMBJoc+aUN0x5OXDMeRQHazejr2Xmqj2tw==}
+    dev: false
+
   /@leichtgewicht/ip-codec/2.0.4:
     resolution: {integrity: sha512-Hcv+nVC0kZnQ3tD9GVu5xSMR4VVYOteQIr/hwFPVEvPdlXqgGEuRjiheChHgdM+JyqdgNcmzZOX/tnl0JOiI7A==}
     dev: true
@@ -5040,6 +5052,21 @@ packages:
     resolution: {integrity: sha512-oSvEeo6ZUD7NepqAat3RqoucZ5SeqLJgOvVIwkafu6IP3V0pO38s/ypdVUmDDK6qIIHNlYHJAKX9E7R7HoKElw==}
     engines: {node: '>=12.20'}
     dev: true
+
+  /chart.js/4.1.1:
+    resolution: {integrity: sha512-P0pCosNXp+LR8zO/QTkZKT6Hb7p0DPFtypEeVOf+6x06hX13NIb75R0DXUA4Ksx/+48chDQKtCCmRCviQRTqsA==}
+    engines: {pnpm: ^7.0.0}
+    dependencies:
+      '@kurkle/color': 0.3.1
+    dev: false
+
+  /chartjs-plugin-datalabels/2.2.0_chart.js@4.1.1:
+    resolution: {integrity: sha512-14ZU30lH7n89oq+A4bWaJPnAG8a7ZTk7dKf48YAzMvJjQtjrgg5Dpk9f+LbjCF6bpx3RAGTeL13IXpKQYyRvlw==}
+    peerDependencies:
+      chart.js: '>=3.0.0'
+    dependencies:
+      chart.js: 4.1.1
+    dev: false
 
   /check-types/11.2.2:
     resolution: {integrity: sha512-HBiYvXvn9Z70Z88XKjz3AEKd4HJhBXsa3j7xFnITAzoS8+q6eIGi8qDB8FKPBAjtuxjI/zFpwuiCb8oDtKOYrA==}
@@ -10249,6 +10276,10 @@ packages:
       safe-buffer: 5.2.1
     dev: true
 
+  /randomcolor/0.6.2:
+    resolution: {integrity: sha512-Mn6TbyYpFgwFuQ8KJKqf3bqqY9O1y37/0jgSK/61PUxV4QfIMv0+K2ioq8DfOjkBslcjwSzRfIDEXfzA9aCx7A==}
+    dev: false
+
   /range-parser/1.2.0:
     resolution: {integrity: sha512-kA5WQoNVo4t9lNx2kQNFCxKeBl5IbbSNBl1M/tLkw9WCn+hxNBAW5Qh8gdhs63CJnhjJ2zQWFoqPJP2sK1AV5A==}
     engines: {node: '>= 0.6'}
@@ -10290,6 +10321,16 @@ packages:
       regenerator-runtime: 0.13.11
       whatwg-fetch: 3.6.2
     dev: true
+
+  /react-chartjs-2/5.1.0_dxa6kz4w32vmgoazz4fv7vwm2e:
+    resolution: {integrity: sha512-Gt76b7+p7nMQq0MvkWfUSNAzIm/TLAnAO32zIpSzrQyc9JWRbVCtq8qOzPJmfpDzPcIJ7Y9Gp5g+VdTRrGITsQ==}
+    peerDependencies:
+      chart.js: ^4.1.1
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      chart.js: 4.1.1
+      react: 18.2.0
+    dev: false
 
   /react-dev-utils/12.0.1_az3o33dww67cevji5ejlhmxqnq:
     resolution: {integrity: sha512-84Ivxmr17KjUupyqzFode6xKhjwuEJDROWKJy/BthkL7Wn6NJ8h4WE6k/exAv6ImS+0oZLRRW5j/aINMHyeGeQ==}

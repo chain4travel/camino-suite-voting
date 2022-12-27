@@ -18,7 +18,6 @@ import { DateTime } from 'luxon';
 import { Proposal } from '@/types';
 import { useProposals } from '@/hooks/proposals';
 import { useProposalState, ProposalState } from '@/store';
-import ProposalNavbar from '@/components/ProposalNavbar';
 
 const ProposalList = () => {
   const [page, setPage] = useState(0);
@@ -58,28 +57,19 @@ const ProposalList = () => {
           <TableBody>
             {proposals.map((proposal: Proposal) => {
               const verifiedLevel = proposal.verifiedLevel ? (
-                <Grid container direction="row" item xs={2}>
+                <Grid container direction="row" item xs={3} alignItems="center">
                   <CheckBox />
                   <Typography
                     variant="body2"
-                    sx={{ fontWeight: 600 }}
+                    fontWeight={600}
+                    marginLeft={1}
                   >{`Verfied Level ${proposal.verifiedLevel}`}</Typography>
                 </Grid>
               ) : null;
-              const stakeLocked = proposal.stakeLocked ? (
-                <Grid container direction="row" item xs={3}>
-                  <CheckBox />
-                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                    Stake Locked
-                  </Typography>
-                </Grid>
+              const stakeLockedIcon = proposal.stakeLocked ? (
+                <CheckBox />
               ) : (
-                <Grid container direction="row" item xs={3}>
-                  <DisabledByDefault />
-                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                    Stake Locked
-                  </Typography>
-                </Grid>
+                <DisabledByDefault />
               );
               const end = DateTime.fromSeconds(proposal.endTime);
               const diff = end
@@ -88,7 +78,7 @@ const ProposalList = () => {
                 .toObject();
               const endsIn = `${diff.days}d ${diff.hours}h ${
                 diff.minutes
-              }m ${Math.floor(diff.seconds)}s`;
+              }m ${Math.floor(diff.seconds!)}s`;
               return (
                 <TableRow
                   key={proposal.id}
@@ -103,17 +93,33 @@ const ProposalList = () => {
                     <Typography
                       color="text.secondary"
                       noWrap={true}
-                      sx={{ fontWeight: 600 }}
+                      fontWeight={600}
+                      paddingY={1}
                     >
                       {proposal.description}
                     </Typography>
                     <Grid container direction="row">
                       {verifiedLevel}
-                      {stakeLocked}
+                      <Grid
+                        container
+                        direction="row"
+                        item
+                        xs={3}
+                        alignItems="center"
+                      >
+                        {stakeLockedIcon}
+                        <Typography
+                          variant="body2"
+                          fontWeight={600}
+                          marginLeft={1}
+                        >
+                          Stake Locked
+                        </Typography>
+                      </Grid>
                     </Grid>
                   </TableCell>
                   <TableCell key="endsIn">
-                    <Typography sx={{ fontWeight: 600 }}>{endsIn}</Typography>
+                    <Typography fontWeight={600}>{endsIn}</Typography>
                   </TableCell>
                   <TableCell key="action">
                     <Grid container direction="row">

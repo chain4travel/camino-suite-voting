@@ -2,9 +2,14 @@ import React from 'react';
 import { createBrowserRouter, redirect } from 'react-router-dom';
 
 import Vote from '@/pages/Vote';
-import { CreateProposal, ProposalList } from '@/pages/Proposals';
-import ProposalDetail from '@/pages/Proposals/ProposalDetail';
-import ProposalContainer from '../pages/Proposals/ProposalContainer';
+import {
+  ProposalContainer,
+  CreateProposal,
+  ProposalList,
+  ProposalDetail,
+  ProposalHistory,
+  ProposalHistoryDetail,
+} from '@/pages/Proposals';
 
 export const routes = [
   {
@@ -29,8 +34,16 @@ export const routes = [
         element: <CreateProposal />,
       },
       {
+        path: 'history',
+        element: <ProposalHistory />,
+      },
+      {
         path: ':id',
         element: <ProposalDetail />,
+      },
+      {
+        path: 'history/:id',
+        element: <ProposalHistoryDetail />,
       },
     ],
   },
