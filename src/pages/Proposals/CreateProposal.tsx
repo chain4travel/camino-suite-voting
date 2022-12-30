@@ -1,40 +1,105 @@
 import React from 'react';
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import Autocomplete from '@mui/material/Autocomplete';
-import Container from '@mui/material/Container';
-import TextareaAutosize from '@mui/base/TextareaAutosize';
+import {
+  Container,
+  Divider,
+  Button,
+  Typography,
+  Autocomplete,
+  Box,
+  TextField,
+} from '@mui/material';
+import { useParams } from 'react-router-dom';
+import ProposalNavbar from '../../components/ProposalNavbar';
+import TextEditor from '../../components/TextEditor';
 
 function CreateProposal() {
-  const top100Films = [
-    { label: 'The Shawshank Redemption', year: 1994 },
-    { label: 'The Godfather', year: 1972 },
-    { label: 'The Godfather: Part II', year: 1974 },
-    { label: 'The Dark Knight', year: 2008 },
-    { label: '12 Angry Men', year: 1957 },
-    { label: "Schindler's List", year: 1993 },
-    { label: 'Pulp Fiction', year: 1994 },
+  const { category } = useParams();
+  const userAddress = [{ label: '3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy' }];
+  const typeOfCompany = [
+    { label: 'Tech Partners' },
+    { label: 'Consulting' },
+    { label: 'Distribution' },
+    { label: 'Finance' },
+    { label: 'Aerospace' },
+    { label: 'Hospitality' },
+    { label: 'Data Insights' },
+    { label: 'Loyalty Reviews' },
+    { label: 'Customer Engagement' },
+    { label: 'OTHERS' },
   ];
   return (
     <>
-      <Container sx={{ py: 2, px: { md: 1 } }}>
-        <Box>
-          Please select wallet address of the consortium memeber you want to
-          vote exclude out of the consortium: Create Proposal
-          <Autocomplete
-            disablePortal
-            id="combo-box-demo"
-            options={top100Films}
-            sx={{ width: 300 }}
-            renderInput={params => <TextField {...params} label="Movie" />}
-          />
-          <TextareaAutosize
-            aria-label="minimum height"
-            minRows={3}
-            placeholder="Minimum 3 rows"
-            style={{ width: 200 }}
-          />
-        </Box>
+      <Container>
+        <ProposalNavbar />
+        {category === 'new_consortium_member' && (
+          <Box sx={{ mt: 5 }}>
+            <Typography>
+              Please select wallet address of the consortium memeber you want to
+              vote exclude out of the consortium
+            </Typography>
+            <Autocomplete
+              disablePortal
+              id="combo-box-demo"
+              options={userAddress}
+              sx={{ width: 500, mt: 1, mb: 1, borderRadius: '4px' }}
+              renderInput={params => (
+                <TextField {...params} label="Wallet Address" />
+              )}
+            />
+
+            <Box sx={{ mt: 5 }}>
+              <Typography variant="h4">Define</Typography>
+              <Typography sx={{ mt: 1, mb: 1 }}>
+                Please explain in detail why you want to propose an exclusion of
+                that particular member from the consortium.
+              </Typography>
+              <TextEditor />
+              <Typography sx={{ mb: 2 }}>
+                <Button variant="outlined">submit</Button>
+              </Typography>
+            </Box>
+          </Box>
+        )}
+
+        {category === 'exclusions' && (
+          <Box sx={{ mt: 5 }}>
+            <Typography variant="h6" marginTop={4} paddingX={2}>
+              Vote for new members to be part of the consortium
+            </Typography>
+            <Divider sx={{ marginY: 3 }} />
+
+            <Container>
+              <Typography variant="h5" sx={{ mt: 1, mb: 1 }}>
+                Application Text
+              </Typography>
+              <Typography variant="body2">
+                Why do you want to join the Camino Consortium? Please specify
+                here
+              </Typography>
+              <TextEditor />
+              <Box sx={{ display: 'flex', mb: 2 }}>
+                <Autocomplete
+                  disablePortal
+                  id="combo-box-demo"
+                  options={typeOfCompany}
+                  sx={{ width: 300 }}
+                  renderInput={params => (
+                    <TextField {...params} label="Type of Company" />
+                  )}
+                />
+                <TextField
+                  sx={{ width: '300px', marginLeft: '200px' }}
+                  id="outlined-basic"
+                  label="Enter Node ID (not public)"
+                  variant="outlined"
+                />
+              </Box>
+              <Typography sx={{ mb: 2 }}>
+                <Button variant="outlined">submit</Button>
+              </Typography>
+            </Container>
+          </Box>
+        )}
       </Container>
     </>
   );
