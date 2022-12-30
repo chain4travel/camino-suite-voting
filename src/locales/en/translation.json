@@ -1,3 +1,9 @@
 {
-  "title": "welcome"
+  "proposals": {
+    "active": {
+      "title_new_consortium_vote": "Vote for new members to be part of the consortium",
+      "title_voting_ends_in": "voting ends in:",
+      "stake_locked": "Stake Locked"
+    }
+  }
 }

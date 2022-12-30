@@ -18,8 +18,10 @@ import { DateTime } from 'luxon';
 import { Proposal } from '@/types';
 import { useProposals } from '@/hooks/proposals';
 import { useProposalState, ProposalState } from '@/store';
+import { useTranslation } from 'react-i18next';
 
 const ProposalList = () => {
+  const { t } = useTranslation();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const { category } = useParams();
@@ -45,11 +47,13 @@ const ProposalList = () => {
             <TableRow>
               <TableCell>
                 <Typography variant="h6">
-                  Vote for new members to be part of the consortium
+                  {t('proposals.active.title_new_consortium_vote')}
                 </Typography>
               </TableCell>
               <TableCell>
-                <Typography variant="h6">voting ends in:</Typography>
+                <Typography variant="h6">
+                  {t('proposals.active.title_voting_ends_in')}
+                </Typography>
               </TableCell>
               <TableCell></TableCell>
             </TableRow>
@@ -113,7 +117,7 @@ const ProposalList = () => {
                           fontWeight={600}
                           marginLeft={1}
                         >
-                          Stake Locked
+                          {t('proposals.active.stake_locked')}
                         </Typography>
                       </Grid>
                     </Grid>
