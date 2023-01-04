@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Box, Divider, Grid, Typography } from '@mui/material';
+import { Box, Divider, Grid, Typography, useTheme } from '@mui/material';
 import { CheckBox, DisabledByDefault } from '@mui/icons-material';
 import { useParams } from 'react-router-dom';
 import { Pie } from 'react-chartjs-2';
@@ -9,12 +9,15 @@ import { DateTime } from 'luxon';
 import randomcolor from 'randomcolor';
 
 import { useProposal } from '@/hooks/proposals';
+import { useTranslation } from 'react-i18next';
 
 ChartJS.register(ArcElement, Tooltip, ChartDataLabels);
 
 const ProposalHistoryDetail = () => {
   const { category, id } = useParams();
   const proposal = useProposal(category, id);
+  const theme = useTheme();
+  const { t } = useTranslation();
   const options = Object.keys(proposal.votes);
   const result = options.reduce((a, b) =>
     proposal.votes[a] > proposal.votes[b] ? a : b
@@ -54,6 +57,7 @@ const ProposalHistoryDetail = () => {
             font: {
               size: 14,
             },
+            color: theme.palette.text.primary,
           },
         },
       },
@@ -63,7 +67,7 @@ const ProposalHistoryDetail = () => {
   return (
     <>
       <Typography variant="h6" paddingY={2} paddingX={2}>
-        Vote for new members to be part of the consortium
+        {t(`proposals.history.title_${category}`)}
       </Typography>
       <Grid container direction="row" alignItems="center">
         <Typography variant="h5" paddingX={2}>
@@ -76,7 +80,7 @@ const ProposalHistoryDetail = () => {
       </Grid>
       <Divider sx={{ marginBottom: 3, marginTop: 2 }} />
       <Typography variant="subtitle1" paddingX={2}>
-        Date of execution
+        {t('proposals.history.header_date_of_execution')}
       </Typography>
       <Typography variant="body2" paddingX={2} paddingY={2}>
         {DateTime.fromSeconds(proposal?.executionTime).toFormat(
@@ -84,7 +88,7 @@ const ProposalHistoryDetail = () => {
         )}
       </Typography>
       <Typography variant="h5" paddingX={2} paddingY={2}>
-        Description
+        {t('proposals.history.header_description')}
       </Typography>
       <Typography variant="body2" paddingX={2} padding={2}>
         {proposal?.description}

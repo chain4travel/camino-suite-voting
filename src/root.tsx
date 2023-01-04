@@ -2,9 +2,10 @@ import React from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
+import { createTheme, ThemeProvider } from '@mui/material';
 
 import router from './routes';
-import { createTheme, ThemeProvider } from '@mui/material';
+import './locales/i18n';
 
 const queryClient = new QueryClient();
 

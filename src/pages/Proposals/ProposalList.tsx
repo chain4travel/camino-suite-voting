@@ -47,7 +47,7 @@ const ProposalList = () => {
             <TableRow>
               <TableCell>
                 <Typography variant="h6">
-                  {t('proposals.active.title_new_consortium_vote')}
+                  {t(`proposals.active.title_${category}`)}
                 </Typography>
               </TableCell>
               <TableCell>

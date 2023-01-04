@@ -17,6 +17,7 @@ import {
   DisabledByDefault,
 } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { DateTime } from 'luxon';
 
 import { Proposal } from '@/types';
@@ -27,6 +28,7 @@ const ProposalHistoyr = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const { category } = useParams();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { proposals, totalCount } = useProposalHistory(
     category,
@@ -53,7 +55,7 @@ const ProposalHistoyr = () => {
             <TableRow>
               <TableCell colSpan={2}>
                 <Typography variant="h6">
-                  Previous Votes - full history
+                  {t('proposals.history.title_previous_votes')}
                 </Typography>
               </TableCell>
               <TableCell></TableCell>
