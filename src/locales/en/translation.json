@@ -1,3 +1,21 @@
 {
-  "title": "welcome"
+  "proposals": {
+    "active": {
+      "title_new_consortium_member": "Vote for new members to be part of the consortium",
+      "title_exclude_consortium_member": "Vote for the exclusion of a member of the consortium",
+      "title_voting_ends_in": "voting ends in:",
+      "stake_locked": "Stake Locked"
+    },
+    "history": {
+      "title_new_consortium_member": "Vote for new members to be part of the consortium",
+      "title_exclude_consortium_member": "Vote for the exclusion of a member of the consortium",
+      "title_previous_votes": "Previous Votes - full history",
+      "header_date_of_execution": "Date of execution",
+      "header_description": "Description"
+    }
+  },
+  "common": {
+    "accept": "Accept",
+    "decline": "Decline"
+  }
 }

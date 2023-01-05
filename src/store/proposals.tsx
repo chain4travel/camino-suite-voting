@@ -9,5 +9,5 @@ export interface ProposalState {
 
 export const useProposalState = create<ProposalState>(set => ({
   currentProposal: null,
-  setCurrentProposal: proposal => set(state => ({ currentProposal: proposal })),
+  setCurrentProposal: proposal => set({ currentProposal: proposal }),
 }));

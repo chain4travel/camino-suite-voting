@@ -1,0 +1,37 @@
+{
+  "proposals": [
+    {
+      "id": 1,
+      "title": "Exclude Validator 1",
+      "description": "Voting for exclusion of consortium member can also be implemented when seeing the list of all validators- this will then link to the page where a Vote for exclusion of consortium member can be started and the wallet address of that member who belongs to that Node ID is automatically filled for the proposal. ",
+      "endTime": 1684754430,
+      "verifiedLevel": 3,
+      "stakeLocked": true
+    },
+    {
+      "id": 2,
+      "title": "Exclude Validator 2",
+      "description": "Voting for exclusion of consortium member can also be implemented when seeing the list of all validators- this will then link to the page where a Vote for exclusion of consortium member can be started and the wallet address of that member who belongs to that Node ID is automatically filled for the proposal. ",
+      "endTime": 1682162430,
+      "verifiedLevel": 2,
+      "stakeLocked": true
+    },
+    {
+      "id": 3,
+      "title": "Exclude Validator 3",
+      "description": "Voting for exclusion of consortium member can also be implemented when seeing the list of all validators- this will then link to the page where a Vote for exclusion of consortium member can be started and the wallet address of that member who belongs to that Node ID is automatically filled for the proposal. ",
+      "endTime": 1682680830,
+      "verifiedLevel": 3,
+      "stakeLocked": false
+    },
+    {
+      "id": 4,
+      "title": "Exclude Validator 4",
+      "description": "Voting for exclusion of consortium member can also be implemented when seeing the list of all validators- this will then link to the page where a Vote for exclusion of consortium member can be started and the wallet address of that member who belongs to that Node ID is automatically filled for the proposal. ",
+      "endTime": 1679484030,
+      "verifiedLevel": 3,
+      "stakeLocked": true
+    }
+  ],
+  "totalCount": 4
+}
