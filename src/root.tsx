@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import { createTheme, ThemeProvider } from '@mui/material';
 
+import Toast from '@/components/Toast';
 import router from './routes';
 import './locales/i18n';
 
@@ -16,6 +17,8 @@ const Root = (props: { theme: object }) => {
       <ThemeProvider theme={theme}>
         <QueryClientProvider client={queryClient}>
           <RouterProvider router={router} />
+          <Toast />
+
           <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
       </ThemeProvider>

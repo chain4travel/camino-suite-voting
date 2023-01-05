@@ -17,6 +17,7 @@ import { DateTime } from 'luxon';
 
 import { Proposal } from '@/types';
 import { useProposals } from '@/hooks/proposals';
+import useToast from '@/hooks/toast';
 import { useProposalState, ProposalState } from '@/store';
 import { useTranslation } from 'react-i18next';
 
@@ -30,6 +31,7 @@ const ProposalList = () => {
   const setCurrentProposal = useProposalState(
     (state: ProposalState) => state.setCurrentProposal
   );
+  const toast = useToast();
 
   const handleChangePage = (event: unknown, toPage: number) => {
     setPage(toPage);
@@ -127,10 +129,20 @@ const ProposalList = () => {
                   </TableCell>
                   <TableCell key="action">
                     <Grid container direction="row">
-                      <IconButton>
+                      <IconButton
+                        onClick={e => {
+                          e.stopPropagation();
+                          toast.success('voted');
+                        }}
+                      >
                         <CheckBox color="success" />
                       </IconButton>
-                      <IconButton>
+                      <IconButton
+                        onClick={e => {
+                          e.stopPropagation();
+                          toast.error('failed to vote');
+                        }}
+                      >
                         <DisabledByDefault color="error" />
                       </IconButton>
                     </Grid>
