@@ -1,13 +1,9 @@
 import create from 'zustand';
 
-import { Proposal } from '@/types';
-
-export interface ProposalState {
-  currentProposal: Proposal;
-  setCurrentProposal: (proposal: Proposal) => void;
-}
+import type { Proposal, ProposalState } from '@/types';
 
 export const useProposalState = create<ProposalState>(set => ({
   currentProposal: null,
-  setCurrentProposal: proposal => set({ currentProposal: proposal }),
+  setCurrentProposal: (proposal: Proposal) =>
+    set({ currentProposal: proposal }),
 }));

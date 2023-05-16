@@ -1,8 +1,8 @@
 import { useQuery } from 'react-query';
 
 import { fetchProposalList, fetchProposalHistory } from '@/apis/proposals';
-import { useProposalState, ProposalState } from '@/store';
-import { Proposal } from '@/types';
+import { useProposalState } from '@/store';
+import type { Proposal, ProposalState } from '@/types';
 import { useEffect } from 'react';
 
 export const useProposals = (type: string, page = 0) => {

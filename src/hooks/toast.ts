@@ -1,7 +1,8 @@
 import { SyntheticEvent } from 'react';
 
 import { useToastStore } from '@/store';
-import { Severity, ToastState } from '@/types';
+import type { ToastState } from '@/types';
+import { Severity } from '@/types';
 
 const useToast = () => {
   const { option, setOption } = useToastStore();

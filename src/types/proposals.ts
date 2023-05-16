@@ -6,3 +6,8 @@ export interface Proposal {
   stakeLocked: boolean;
   verifiedLevel?: number;
 }
+
+export interface ProposalState {
+  currentProposal: Proposal;
+  setCurrentProposal: (proposal: Proposal) => void;
+}

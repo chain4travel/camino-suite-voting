@@ -20,9 +20,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { DateTime } from 'luxon';
 
-import { Proposal } from '@/types';
+import type { Proposal, ProposalState } from '@/types';
 import { useProposalHistory } from '@/hooks/proposals';
-import { useProposalState, ProposalState } from '@/store';
+import { useProposalState } from '@/store';
 
 const ProposalHistoyr = () => {
   const [page, setPage] = useState(0);

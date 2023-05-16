@@ -14,12 +14,12 @@ import {
 import { CheckBox, DisabledByDefault } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import { DateTime } from 'luxon';
+import { useTranslation } from 'react-i18next';
 
-import { Proposal } from '@/types';
+import type { Proposal, ProposalState } from '@/types';
 import { useProposals } from '@/hooks/proposals';
 import useToast from '@/hooks/toast';
-import { useProposalState, ProposalState } from '@/store';
-import { useTranslation } from 'react-i18next';
+import { useProposalState } from '@/store';
 
 const ProposalList = () => {
   const { t } = useTranslation();

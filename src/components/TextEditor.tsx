@@ -11,7 +11,7 @@ import {
 import { withHistory } from 'slate-history';
 import Box from '@mui/material/Box';
 import { Button, Icon, Toolbar } from './Toolbar';
-import { CustomElement } from '../custom-types';
+import type { CustomElement } from '../custom-types';
 
 const LIST_TYPES = ['numbered-list', 'bulleted-list'];
 const TEXT_ALIGN_TYPES = ['left', 'center', 'right', 'justify'];
