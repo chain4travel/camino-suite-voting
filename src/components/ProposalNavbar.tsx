@@ -64,7 +64,7 @@ function ProposalNavbar() {
           fontWeight: '700',
         }}
       >
-        <NavLink to="/vote">Previous votes</NavLink>
+        <NavLink to={`/vote/${category}/history`}>Previous votes</NavLink>
       </Box>
     </div>
   );

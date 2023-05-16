@@ -21,8 +21,8 @@ export default function App() {
     {
       title: 'Vote for exclusion of consortium member',
       ctx: 'CAM is the native token of Camino. It’s a hard-capped, scarce asset that is used to pay for fees, secure the platform through staking, and provide a basic unit of account between the multiple subnets created on Camino.',
-      btnCtx: 'Transaction',
-      url: 'exclusions',
+      btnCtx: 'New Proposal',
+      url: 'exclude_consortium_member',
     },
   ];
 

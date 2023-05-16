@@ -1,6 +1,5 @@
 import React, { ChangeEvent, useState } from 'react';
 import {
-  Container,
   Grid,
   IconButton,
   Table,
@@ -15,13 +14,15 @@ import {
 import { CheckBox, DisabledByDefault } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import { DateTime } from 'luxon';
+import { useTranslation } from 'react-i18next';
 
-import { Proposal } from '@/types';
+import type { Proposal, ProposalState } from '@/types';
 import { useProposals } from '@/hooks/proposals';
-import { useProposalState, ProposalState } from '@/store';
-import ProposalNavbar from '@/components/ProposalNavbar';
+import useToast from '@/hooks/toast';
+import { useProposalState } from '@/store';
 
 const ProposalList = () => {
+  const { t } = useTranslation();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const { category } = useParams();
@@ -30,6 +31,7 @@ const ProposalList = () => {
   const setCurrentProposal = useProposalState(
     (state: ProposalState) => state.setCurrentProposal
   );
+  const toast = useToast();
 
   const handleChangePage = (event: unknown, toPage: number) => {
     setPage(toPage);
@@ -40,20 +42,20 @@ const ProposalList = () => {
   };
 
   return (
-    <Container>
-      <ProposalNavbar />
-
+    <>
       <TableContainer>
         <Table stickyHeader>
           <TableHead>
             <TableRow>
               <TableCell>
                 <Typography variant="h6">
-                  Vote for new members to be part of the consortium
+                  {t(`proposals.active.title_${category}`)}
                 </Typography>
               </TableCell>
               <TableCell>
-                <Typography variant="h6">voting ends in:</Typography>
+                <Typography variant="h6">
+                  {t('proposals.active.title_voting_ends_in')}
+                </Typography>
               </TableCell>
               <TableCell></TableCell>
             </TableRow>
@@ -61,28 +63,19 @@ const ProposalList = () => {
           <TableBody>
             {proposals.map((proposal: Proposal) => {
               const verifiedLevel = proposal.verifiedLevel ? (
-                <Grid container direction="row" item xs={2}>
+                <Grid container direction="row" item xs={3} alignItems="center">
                   <CheckBox />
                   <Typography
                     variant="body2"
-                    sx={{ fontWeight: 600 }}
+                    fontWeight={600}
+                    marginLeft={1}
                   >{`Verfied Level ${proposal.verifiedLevel}`}</Typography>
                 </Grid>
               ) : null;
-              const stakeLocked = proposal.stakeLocked ? (
-                <Grid container direction="row" item xs={3}>
-                  <CheckBox />
-                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                    Stake Locked
-                  </Typography>
-                </Grid>
+              const stakeLockedIcon = proposal.stakeLocked ? (
+                <CheckBox />
               ) : (
-                <Grid container direction="row" item xs={3}>
-                  <DisabledByDefault />
-                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                    Stake Locked
-                  </Typography>
-                </Grid>
+                <DisabledByDefault />
               );
               const end = DateTime.fromSeconds(proposal.endTime);
               const diff = end
@@ -91,7 +84,7 @@ const ProposalList = () => {
                 .toObject();
               const endsIn = `${diff.days}d ${diff.hours}h ${
                 diff.minutes
-              }m ${Math.floor(diff.seconds)}s`;
+              }m ${Math.floor(diff.seconds!)}s`;
               return (
                 <TableRow
                   key={proposal.id}
@@ -106,24 +99,50 @@ const ProposalList = () => {
                     <Typography
                       color="text.secondary"
                       noWrap={true}
-                      sx={{ fontWeight: 600 }}
+                      fontWeight={600}
+                      paddingY={1}
                     >
                       {proposal.description}
                     </Typography>
                     <Grid container direction="row">
                       {verifiedLevel}
-                      {stakeLocked}
+                      <Grid
+                        container
+                        direction="row"
+                        item
+                        xs={3}
+                        alignItems="center"
+                      >
+                        {stakeLockedIcon}
+                        <Typography
+                          variant="body2"
+                          fontWeight={600}
+                          marginLeft={1}
+                        >
+                          {t('proposals.active.stake_locked')}
+                        </Typography>
+                      </Grid>
                     </Grid>
                   </TableCell>
                   <TableCell key="endsIn">
-                    <Typography sx={{ fontWeight: 600 }}>{endsIn}</Typography>
+                    <Typography fontWeight={600}>{endsIn}</Typography>
                   </TableCell>
                   <TableCell key="action">
                     <Grid container direction="row">
-                      <IconButton>
+                      <IconButton
+                        onClick={e => {
+                          e.stopPropagation();
+                          toast.success('voted');
+                        }}
+                      >
                         <CheckBox color="success" />
                       </IconButton>
-                      <IconButton>
+                      <IconButton
+                        onClick={e => {
+                          e.stopPropagation();
+                          toast.error('failed to vote');
+                        }}
+                      >
                         <DisabledByDefault color="error" />
                       </IconButton>
                     </Grid>
@@ -144,7 +163,7 @@ const ProposalList = () => {
         onRowsPerPageChange={handleChangeRowsPerPage}
         sx={{ width: '100%' }}
       />
-    </Container>
+    </>
   );
 };
 

@@ -9,7 +9,6 @@ import {
   TextField,
 } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import ProposalNavbar from '../../components/ProposalNavbar';
 import TextEditor from '../../components/TextEditor';
 
 function CreateProposal() {
@@ -30,7 +29,6 @@ function CreateProposal() {
   return (
     <>
       <Container>
-        <ProposalNavbar />
         {category === 'new_consortium_member' && (
           <Box sx={{ mt: 5 }}>
             <Typography>
