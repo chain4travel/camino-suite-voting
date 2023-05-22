@@ -9,7 +9,7 @@ import {
   TextField,
 } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import TextEditor from '../../components/TextEditor';
+import TextEditor from '../../../components/TextEditor';
 
 function CreateProposal() {
   const { category } = useParams();

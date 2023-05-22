@@ -21,7 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { DateTime } from 'luxon';
 
 import type { Proposal, ProposalState } from '@/types';
-import { useProposalHistory } from '@/hooks/proposals';
+import { useProposalHistory } from '@/hooks/useProposals';
 import { useProposalState } from '@/store';
 
 const ProposalHistoyr = () => {

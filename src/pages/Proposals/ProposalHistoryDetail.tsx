@@ -8,7 +8,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { DateTime } from 'luxon';
 import randomcolor from 'randomcolor';
 
-import { useProposal } from '@/hooks/proposals';
+import { useProposal } from '@/hooks/useProposals';
 import { useTranslation } from 'react-i18next';
 
 ChartJS.register(ArcElement, Tooltip, ChartDataLabels);

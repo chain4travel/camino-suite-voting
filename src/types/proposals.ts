@@ -1,13 +1,30 @@
-export interface Proposal {
+export type Option = {
+  option: number;
+  value: number | boolean;
+  label?: string;
+};
+export type Vote = {
+  option: number;
+};
+export type Proposal = {
   id: number;
-  title: string;
+  type: string;
   description: string;
-  endTime: number;
-  stakeLocked: boolean;
-  verifiedLevel?: number;
-}
+  startDateTime: number;
+  endDateTime: number;
+  options: Option[];
+  voted: Vote[];
+  status: string;
+  forumLink?: string;
+  target?: string;
+};
+export type Group = {
+  type: string;
+  name: string;
+  data: Proposal[];
+};
 
 export interface ProposalState {
-  currentProposal: Proposal;
+  currentProposal: Proposal | null;
   setCurrentProposal: (proposal: Proposal) => void;
 }

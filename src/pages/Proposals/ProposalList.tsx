@@ -17,9 +17,9 @@ import { DateTime } from 'luxon';
 import { useTranslation } from 'react-i18next';
 
 import type { Proposal, ProposalState } from '@/types';
-import { useProposals } from '@/hooks/proposals';
 import useToast from '@/hooks/toast';
 import { useProposalState } from '@/store';
+import { useActiveVotings } from '../../hooks/useProposals';
 
 const ProposalList = () => {
   const { t } = useTranslation();
@@ -27,7 +27,7 @@ const ProposalList = () => {
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const { category } = useParams();
   const navigate = useNavigate();
-  const { proposals, totalCount } = useProposals(category, page, rowsPerPage);
+  const { proposals } = useActiveVotings(page);
   const setCurrentProposal = useProposalState(
     (state: ProposalState) => state.setCurrentProposal
   );
@@ -158,7 +158,7 @@ const ProposalList = () => {
         rowsPerPageOptions={[10, 25, 50, 100]}
         rowsPerPage={rowsPerPage}
         page={page}
-        count={totalCount}
+        count={100}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
         sx={{ width: '100%' }}

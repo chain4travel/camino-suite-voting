@@ -4,7 +4,7 @@ import { CheckBox, DisabledByDefault } from '@mui/icons-material';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-import { useProposal } from '@/hooks/proposals';
+import { useProposal } from '@/hooks/useProposals';
 
 const ProposalDetail = () => {
   const { category, id } = useParams();

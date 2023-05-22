@@ -1,44 +1,43 @@
 import React from 'react';
 import { createBrowserRouter, redirect } from 'react-router-dom';
 
-import Vote from '@/pages/Vote';
+import ActiveVotings from '@/pages/vote/active';
+import CreateProposal from '@/pages/vote/create';
 import {
-  ProposalContainer,
-  CreateProposal,
-  ProposalList,
   ProposalDetail,
   ProposalHistory,
   ProposalHistoryDetail,
 } from '@/pages/Proposals';
+import Layout from '@/components/Layout';
+import { get } from '../helpers/http';
 
 export const routes = [
   {
     path: '/',
-    loader: () => redirect('/vote'),
+    loader: () => redirect('/vote/active'),
   },
   {
     path: '/vote',
-    element: <Vote />,
-  },
-  {
-    path: '/vote/:category',
-    element: <ProposalContainer />,
+    element: <Layout />,
     children: [
-      {
-        path: '',
-        element: <ProposalList />,
-        index: true,
-      },
       {
         path: 'create',
         element: <CreateProposal />,
       },
       {
-        path: 'history',
+        path: 'active',
+        element: <ActiveVotings />,
+        index: true,
+        loader: async () => {
+          return get('voting_types.json');
+        },
+      },
+      {
+        path: 'completed',
         element: <ProposalHistory />,
       },
       {
-        path: ':id',
+        path: 'active/:id',
         element: <ProposalDetail />,
       },
       {

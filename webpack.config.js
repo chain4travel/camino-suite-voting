@@ -5,7 +5,7 @@ const path = require('path');
 const deps = require('./package.json').dependencies;
 module.exports = {
   output: {
-    publicPath: 'auto',
+    publicPath: '/',
   },
 
   resolve: {
@@ -16,7 +16,7 @@ module.exports = {
   },
 
   devServer: {
-    port: 3005,
+    port: 5005,
     historyApiFallback: true,
   },
 
