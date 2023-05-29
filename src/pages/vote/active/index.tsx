@@ -12,10 +12,15 @@ import {
 import { VotingType } from '@/types';
 import VotingList from './VotingList';
 import GroupHeader from './GroupHeader';
+import ConfirmDialog from '@/components/ConfirmDialog';
+import { useDialogStore } from '@/store';
 
 const ActiveVotings = () => {
   const { data: votingTypes } = useLoaderData() as { data: VotingType[] };
   const { proposals, isError, isLoading } = useActiveVotings();
+  const { option: dialogOption } = useDialogStore(state => ({
+    option: state.option,
+  }));
   const groupedProposals = useMemo(() => {
     return proposals.reduce((result: any, proposal: any) => {
       const votingType = votingTypes.find(
@@ -69,6 +74,7 @@ const ActiveVotings = () => {
           </Accordion>
         )
       )}
+      <ConfirmDialog {...dialogOption} />
     </Container>
   );
 };

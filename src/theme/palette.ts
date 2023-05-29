@@ -1,17 +1,5 @@
 import { alpha } from '@mui/material/styles';
 
-declare module '@mui/material/styles/createPalette' {
-  interface ColorTypes {
-    primary: string;
-  }
-  interface Palette {
-    logo: ColorTypes;
-  }
-  interface TypeBackground {
-    secondary: string;
-  }
-}
-
 const GREY = {
   50: '#F8FAFC',
   100: '#F1F5F9',
@@ -35,14 +23,16 @@ const ACTION = {
   disabledOpacity: 0.48,
 };
 
-const PRIMARY = '#0085FF';
-const SKY = '#B5E3FD';
-const ACCENT = '#35E9AD';
+export const PRIMARY = '#0085FF';
+export const SECONDARY = '#B440FC';
+export const SKY = '#B5E3FD';
+export const ACCENT = '#35E9AD';
+export const GRADIENT_ACCENT = '#149EED';
 
 const COMMON = {
   common: { black: '#000', white: '#fff' },
-  primary: { main: '#0085FF', contrastText: '#fff' },
-  secondary: { main: '#B440FC', contrastText: '#fff' },
+  primary: { main: PRIMARY, contrastText: '#fff' },
+  secondary: { main: SECONDARY, contrastText: '#fff' },
   info: { light: SKY, main: '#66C9E8', contrastText: '#fff' },
   success: { light: '#4ADE80', main: '#59B755', contrastText: GREY[800] },
   warning: { main: '#EAC254', contrastText: GREY[800] },
@@ -59,11 +49,9 @@ const palette = {
       paper: '#fff',
       default: GREY[200],
       neutral: GREY[200],
-      secondary: '#fff',
     },
     action: { ...ACTION, active: GREY[600] },
     button: { primary: GREY[200], secondary: GREY[100] },
-    logo: { primary: PRIMARY },
   },
   dark: {
     ...COMMON,
@@ -72,11 +60,9 @@ const palette = {
       paper: GREY[900],
       default: GREY[900],
       neutral: GREY[500],
-      secondary: GREY[800],
     },
     action: { ...ACTION, active: GREY[500] },
     button: { primary: GREY[700], secondary: GREY[800] },
-    logo: { primary: PRIMARY },
   },
 };
 

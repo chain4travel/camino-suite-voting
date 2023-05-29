@@ -3,7 +3,7 @@ import { ThemeOptions, createTheme } from '@mui/material/styles';
 import palette from './palette';
 import typography from './typography';
 import breakpoints from './breakpoints';
-import shadows, { customShadows } from './shadows';
+import shadows from './shadows';
 import overrides from './overrides';
 import { PaletteMode } from '@mui/material';
 
@@ -23,13 +23,11 @@ export default class CaminoTheme {
       ...this._commonThemeOptions,
       palette: { ...palette.light, mode: 'light' },
       shadows: shadows.light,
-      customShadows: customShadows.light,
     },
     dark: {
       ...this._commonThemeOptions,
       palette: { ...palette.dark, mode: 'dark' },
       shadows: shadows.dark,
-      customShadows: customShadows.dark,
     },
   };
   private static _muiThemes = {

@@ -7,6 +7,7 @@ import {
 
 const Accordion = styled(MuiAccordion)({
   background: 'transparent',
+  boxShadow: 'none',
 });
 const AccordionSummary = styled(MuiAccordionSummary)(({ theme }) => ({
   borderRadius: theme.shape.borderRadius,

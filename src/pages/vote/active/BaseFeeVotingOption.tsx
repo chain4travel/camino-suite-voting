@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import type { VotingOption } from '@/types';
 import Button from '@/components/Button';
+import useDialog from '@/hooks/dialog';
 
 interface StyledCardProps {
   isSelected?: boolean;
@@ -52,6 +53,7 @@ const BaseFeeVotingOption = ({
   onVote,
 }: BaseFeeVotingOptionProps) => {
   const [disableRipple, setDisableRipple] = useState(false);
+  const { show } = useDialog();
 
   const toggleSelected = () => {
     onSelect(data.option);
@@ -59,7 +61,13 @@ const BaseFeeVotingOption = ({
   };
   const confirmSelection = () => {
     // setDisableRipple(true);
-    onVote();
+    show({
+      title: 'Are you sure?',
+      message:
+        'We will forword your proposal to the members connected to your multisig wallet for approval.',
+      onConfirm: onVote,
+    });
+    // onVote();
   };
   return (
     <StyledCard

@@ -1,33 +1,6 @@
 import { alpha } from '@mui/material/styles';
 import { Shadows } from '@mui/material/styles/shadows';
-import palette from './palette';
-
-interface CustomShadowOptions {
-  z1: string;
-  z8: string;
-  z12: string;
-  z16: string;
-  z20: string;
-  z24: string;
-  primary: string;
-  secondary: string;
-  info: string;
-  success: string;
-  warning: string;
-  error: string;
-}
-
-declare module '@mui/material/styles' {
-  interface Theme {
-    customShadows: CustomShadowOptions;
-  }
-  interface ThemeOptions {
-    customShadows?: CustomShadowOptions;
-  }
-}
-
-const LIGHT_MODE = palette.light.grey[200];
-const DARK_MODE = '#424242';
+import palette, { SECONDARY, GRADIENT_ACCENT } from './palette';
 
 const createShadow = (color: string): Shadows => {
   const transparent1 = alpha(color, 0.2);
@@ -58,39 +31,25 @@ const createShadow = (color: string): Shadows => {
     `0px 10px 13px -6px ${transparent1},0px 21px 33px 3px ${transparent2},0px 8px 40px 7px ${transparent3}`,
     `0px 10px 14px -6px ${transparent1},0px 22px 35px 3px ${transparent2},0px 8px 42px 7px ${transparent3}`,
     `0px 11px 14px -7px ${transparent1},0px 23px 36px 3px ${transparent2},0px 9px 44px 8px ${transparent3}`,
-    `0px 11px 15px -7px ${transparent1},0px 24px 38px 3px ${transparent2},0px 9px 46px 8px ${transparent3}`,
+    `-11.76px -11.76px 23.52px ${alpha(
+      GRADIENT_ACCENT,
+      0.3
+    )}, 11.76px 11.76px 23.52px ${alpha(
+      SECONDARY,
+      0.3
+    )}, inset -11.76px -11.76px 35.28px ${alpha(
+      SECONDARY,
+      0.75
+    )}, inset 11.76px 11.76px 35.28px ${alpha(GRADIENT_ACCENT, 0.75)}`,
   ];
-};
-
-const createCustomShadow = (color: string) => {
-  const transparent = alpha(color, 0.14);
-  return {
-    z1: `0 1px 3px 0 ${transparent}`,
-    z8: `0 8px 16px 0 ${transparent}`,
-    z12: `0 0 2px 0 ${transparent}, 0 12px 24px 0 ${transparent}`,
-    z16: `0 0 2px 0 ${transparent}, 0 16px 32px -4px ${transparent}`,
-    z20: `0 0 2px 0 ${transparent}, 0 20px 40px -4px ${transparent}`,
-    z24: `0 0 4px 0 ${transparent}, 0 24px 48px 0 ${transparent}`,
-    primary: `0 8px 16px 0 ${alpha(palette.light.primary.main, 0.24)}`,
-    info: `0 8px 16px 0 ${alpha(palette.light.info.main, 0.24)}`,
-    secondary: `0 8px 16px 0 ${alpha(palette.light.secondary.main, 0.24)}`,
-    success: `0 8px 16px 0 ${alpha(palette.light.success.main, 0.24)}`,
-    warning: `0 8px 16px 0 ${alpha(palette.light.warning.main, 0.24)}`,
-    error: `0 8px 16px 0 ${alpha(palette.light.error.main, 0.24)}`,
-  };
-};
-
-export const customShadows = {
-  light: createCustomShadow(LIGHT_MODE),
-  dark: createCustomShadow(DARK_MODE),
 };
 
 const shadows: {
   light: Shadows;
   dark: Shadows;
 } = {
-  light: createShadow(LIGHT_MODE),
-  dark: createShadow(DARK_MODE),
+  light: createShadow(palette.light.grey[200]),
+  dark: createShadow(palette.dark.grey[200]),
 };
 
 export default shadows;

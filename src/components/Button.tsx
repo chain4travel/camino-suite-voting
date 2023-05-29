@@ -3,6 +3,9 @@ import { alpha, styled } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 
 const Button = styled(LoadingButton)(({ theme }) => ({
+  '&, &.MuiButton-root': {
+    boxShadow: 'none',
+  },
   '&.MuiButton-containedInherit': {
     backgroundColor: theme.palette.grey[700],
 

@@ -32,14 +32,14 @@ const typography = {
   fontWeightBold: 700,
   h1: {
     fontFamily: FONT_PRIMARY,
-    fontWeight: 700,
+    fontWeight: 500,
     lineHeight: 80 / 64,
     fontSize: pxToRem(40),
     ...responsiveFontSizes({ sm: 52, md: 58, lg: 64 }),
   },
   h2: {
     fontFamily: FONT_PRIMARY,
-    fontWeight: 700,
+    fontWeight: 500,
     lineHeight: 64 / 48,
     fontSize: pxToRem(32),
     ...responsiveFontSizes({ sm: 32, md: 36, lg: 40 }),
@@ -87,13 +87,13 @@ const typography = {
   body1: {
     fontFamily: FONT_SECONDARY,
     lineHeight: 1.5,
-    fontWeight: 500,
+    fontWeight: 400,
     fontSize: pxToRem(16),
   },
   body2: {
     fontFamily: FONT_SECONDARY,
     lineHeight: 22 / 14,
-    fontWeight: 500,
+    fontWeight: 400,
     fontSize: pxToRem(14),
   },
   caption: {
