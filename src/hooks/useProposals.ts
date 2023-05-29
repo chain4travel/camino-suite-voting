@@ -12,7 +12,7 @@ export const useActiveVotings = (page = 0) => {
     async () => fetchActiveVotings(page)
   );
 
-  console.log('data: ', data, isLoading, isError, isSuccess);
+  console.debug('useActiveVotings data: ', data, isLoading, isError, isSuccess);
 
   return {
     isLoading,

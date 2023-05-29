@@ -23,6 +23,9 @@ export const routes = [
       {
         path: 'create',
         element: <CreateProposal />,
+        loader: async () => {
+          return get('voting_types.json');
+        },
       },
       {
         path: 'active',

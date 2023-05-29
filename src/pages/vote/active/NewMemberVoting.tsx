@@ -1,23 +1,17 @@
 import React from 'react';
 import { Check, Close } from '@mui/icons-material';
-import {
-  Button,
-  ListItemText,
-  Stack,
-  Typography,
-  useTheme,
-} from '@mui/material';
+import { ListItemText, Stack, Typography } from '@mui/material';
 import type { Proposal } from '@/types';
+import Button from '@/components/Button';
 
 interface NewMemberVotingProps {
   data: Proposal;
-  disableParentRipple: (disabled: boolean) => void;
+  disableParentRipple?: (disabled: boolean) => void;
 }
 const NewMemberVoting = ({
   data,
   disableParentRipple,
 }: NewMemberVotingProps) => {
-  const { palette } = useTheme();
   return (
     <>
       <ListItemText
@@ -32,6 +26,7 @@ const NewMemberVoting = ({
               overflow: 'hidden',
               WebkitBoxOrient: 'vertical',
             }}
+            variant="body2"
           >
             {data.description}
           </Typography>
@@ -42,25 +37,21 @@ const NewMemberVoting = ({
         }}
       />
       <Stack direction="row" sx={{ marginRight: '24px' }} spacing="12px">
-        {data.options.map(opt => (
-          <Button
-            key={opt.option}
-            variant="contained"
-            startIcon={opt.value ? <Check /> : <Close />}
-            sx={{
-              backgroundColor: opt.value
-                ? 'primary'
-                : palette.mode === 'dark'
-                ? 'grey.200'
-                : 'grey.700',
-            }}
-            onClick={() => {
-              disableParentRipple(true);
-            }}
-          >
-            {opt.label}
-          </Button>
-        ))}
+        {data.options
+          .map(opt => (
+            <Button
+              key={opt.option}
+              variant="contained"
+              startIcon={opt.value ? <Check /> : <Close />}
+              onClick={() => {
+                disableParentRipple && disableParentRipple(true);
+              }}
+              color={opt.value ? 'primary' : 'inherit'}
+            >
+              {opt.label}
+            </Button>
+          ))
+          .reverse()}
       </Stack>
     </>
   );

@@ -1,27 +1,19 @@
 import React, { useMemo } from 'react';
 import { NavLink, useLoaderData } from 'react-router-dom';
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Button,
-  Container,
-  Stack,
-  Typography,
-  useTheme,
-} from '@mui/material';
+import { Button, Container } from '@mui/material';
 import { ExpandMore } from '@mui/icons-material';
 import { useActiveVotings } from '@/hooks/useProposals';
 import Header from '@/components/Header';
-import Votings from './Votings';
+import {
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+} from '@/components/Accordion';
+import { VotingType } from '@/types';
+import VotingList from './VotingList';
 import GroupHeader from './GroupHeader';
 
-type VotingType = {
-  id: string;
-  name: string;
-};
 const ActiveVotings = () => {
-  const { palette } = useTheme();
   const { data: votingTypes } = useLoaderData() as { data: VotingType[] };
   const { proposals, isError, isLoading } = useActiveVotings();
   const groupedProposals = useMemo(() => {
@@ -64,14 +56,15 @@ const ActiveVotings = () => {
             <AccordionSummary
               expandIcon={<ExpandMore />}
               sx={{
-                backgroundColor:
-                  palette.mode === 'dark' ? 'grey.800' : 'grey.200',
+                backgroundColor: 'grey.800',
+                border: 1,
+                borderColor: 'grey.700',
               }}
             >
               <GroupHeader group={group} />
             </AccordionSummary>
             <AccordionDetails style={{ padding: 0 }}>
-              <Votings data={group} />
+              <VotingList data={group} />
             </AccordionDetails>
           </Accordion>
         )

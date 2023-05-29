@@ -66,7 +66,10 @@ module.exports = {
           requiredVersion: deps['react-dom'],
         },
         luxon: {
-          version: deps['luxon'],
+          singleton: true,
+          eager: true,
+          version: deps.luxon,
+          requiredVersion: deps.luxon,
         },
       },
     }),

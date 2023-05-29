@@ -1,5 +1,7 @@
-import { useQuery } from 'react-query';
-import { getTxFee } from '@/helpers/rpc';
+import { useMutation, useQuery } from 'react-query';
+import { getTxFee, vote } from '@/helpers/rpc';
+import { VotingOption } from '@/types';
+import useToast from './toast';
 
 // TODO: base RPC call
 
@@ -9,11 +11,35 @@ export const useBaseFee = () => {
     async () => getTxFee()
   );
 
-  console.log('data: ', data, isLoading, isError, isSuccess);
+  console.debug('useBaseFee data: ', data, isLoading, isError, isSuccess);
 
   return {
     isLoading,
     isError,
     baseFee: data ?? 0,
   };
+};
+
+export const useVote = ({ onSettled }: { onSettled: () => void }) => {
+  const toast = useToast();
+  const mutation = useMutation({
+    mutationFn: ({
+      proposalId,
+      votingType,
+      votes,
+    }: {
+      proposalId: string | number;
+      votingType: string;
+      votes: VotingOption[];
+    }) => vote(proposalId, votingType, votes),
+    onSuccess: _data => toast.success('Successfully voted'),
+    onError: (error: any) => toast.error('Failed to vote: ', error),
+    onSettled: () => {
+      onSettled && onSettled();
+    },
+  });
+
+  console.debug('mutation: ', mutation);
+
+  return mutation;
 };

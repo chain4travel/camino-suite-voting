@@ -1,5 +1,9 @@
-export type Option = {
-  option: number;
+export type VotingType = {
+  id: string;
+  name: string;
+};
+export type VotingOption = {
+  option: number | string;
   value: number | boolean;
   label?: string;
 };
@@ -7,12 +11,12 @@ export type Vote = {
   option: number;
 };
 export type Proposal = {
-  id: number;
+  id: number | string;
   type: string;
   description: string;
   startDateTime: number;
   endDateTime: number;
-  options: Option[];
+  options: VotingOption[];
   voted: Vote[];
   status: string;
   forumLink?: string;
