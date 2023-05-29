@@ -61,12 +61,12 @@ dependencies:
   react-query:
     specifier: ^3.39.2
     version: 3.39.2(react-dom@18.2.0)(react@18.2.0)
+  react-quill:
+    specifier: ^2.0.0
+    version: 2.0.0(react-dom@18.2.0)(react@18.2.0)
   react-router-dom:
     specifier: ^6.4.5
     version: 6.5.0(react-dom@18.2.0)(react@18.2.0)
-  styled-components:
-    specifier: ^5.3.6
-    version: 5.3.6(react-dom@18.2.0)(react-is@18.2.0)(react@18.2.0)
   zustand:
     specifier: ^4.1.5
     version: 4.1.5(react@18.2.0)
@@ -171,15 +171,6 @@ devDependencies:
   serve:
     specifier: ^14.1.2
     version: 14.1.2
-  slate:
-    specifier: ^0.87.0
-    version: 0.87.0
-  slate-history:
-    specifier: ^0.86.0
-    version: 0.86.0(slate@0.87.0)
-  slate-react:
-    specifier: ^0.88.0
-    version: 0.88.0(react-dom@18.2.0)(react@18.2.0)(slate@0.87.0)
   style-loader:
     specifier: ^3.3.1
     version: 3.3.1(webpack@5.75.0)
