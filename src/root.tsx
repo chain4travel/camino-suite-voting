@@ -7,7 +7,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
 
 import Toast from '@/components/Toast';
-import router from './routes';
+import { getRoutes } from './routes';
 import './locales/i18n';
 import CaminoTheme from './theme';
 
@@ -22,7 +22,7 @@ const Root = (props: { theme?: object }) => {
         <CssBaseline enableColorScheme />
         <LocalizationProvider dateAdapter={AdapterLuxon}>
           <QueryClientProvider client={queryClient}>
-            <RouterProvider router={router} />
+            <RouterProvider router={getRoutes(queryClient)} />
             <Toast />
 
             <ReactQueryDevtools initialIsOpen={false} />

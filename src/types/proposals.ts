@@ -1,6 +1,9 @@
+import { ReactElement } from 'react';
+
 export type VotingType = {
   id: string;
   name: string;
+  abbr?: string;
 };
 export type VotingOption = {
   option: number | string;
@@ -26,6 +29,7 @@ export type Group = {
   type: string;
   name: string;
   data: Proposal[];
+  icon?: ReactElement;
 };
 
 export interface ProposalState {

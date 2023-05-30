@@ -1,55 +1,49 @@
 import React from 'react';
 import { createBrowserRouter, redirect } from 'react-router-dom';
+import { QueryClient } from 'react-query';
 
 import ActiveVotings from '@/pages/vote/active';
 import CreateProposal from '@/pages/vote/create';
-import {
-  ProposalDetail,
-  ProposalHistory,
-  ProposalHistoryDetail,
-} from '@/pages/Proposals';
+import CompletedVotes from '@/pages/vote/completed';
 import Layout from '@/components/Layout';
-import { get } from '../helpers/http';
+import { votingTypeLoader } from './loaders';
 
-export const routes = [
-  {
-    path: '/',
-    loader: () => redirect('/vote/active'),
-  },
-  {
-    path: '/vote',
-    element: <Layout />,
-    children: [
-      {
-        path: 'create',
-        element: <CreateProposal />,
-        loader: async () => {
-          return get('voting_types.json');
+export const getRoutes = (queryClient: QueryClient) => {
+  const routes = [
+    {
+      path: '/',
+      loader: () => redirect('/vote/active'),
+    },
+    {
+      path: '/vote',
+      element: <Layout />,
+      children: [
+        {
+          path: 'create',
+          element: <CreateProposal />,
+          loader: votingTypeLoader(queryClient),
         },
-      },
-      {
-        path: 'active',
-        element: <ActiveVotings />,
-        index: true,
-        loader: async () => {
-          return get('voting_types.json');
+        {
+          path: 'active',
+          element: <ActiveVotings />,
+          index: true,
+          loader: votingTypeLoader(queryClient),
         },
-      },
-      {
-        path: 'completed',
-        element: <ProposalHistory />,
-      },
-      {
-        path: 'active/:id',
-        element: <ProposalDetail />,
-      },
-      {
-        path: 'history/:id',
-        element: <ProposalHistoryDetail />,
-      },
-    ],
-  },
-];
-const router = createBrowserRouter(routes);
-
-export default router;
+        {
+          path: 'completed',
+          element: <CompletedVotes />,
+          loader: votingTypeLoader(queryClient),
+        },
+        // {
+        //   path: 'active/:id',
+        //   element: <ProposalDetail />,
+        // },
+        // {
+        //   path: 'history/:id',
+        //   element: <ProposalHistoryDetail />,
+        // },
+      ],
+    },
+  ];
+  return createBrowserRouter(routes);
+};
