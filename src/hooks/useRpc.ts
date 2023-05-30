@@ -20,7 +20,7 @@ export const useBaseFee = () => {
   };
 };
 
-export const useVote = ({ onSettled }: { onSettled: () => void }) => {
+export const useVote = (option?: { onSettled?: () => void }) => {
   const toast = useToast();
   const mutation = useMutation({
     mutationFn: ({
@@ -34,9 +34,7 @@ export const useVote = ({ onSettled }: { onSettled: () => void }) => {
     }) => vote(proposalId, votingType, votes),
     onSuccess: _data => toast.success('Successfully voted'),
     onError: (error: any) => toast.error('Failed to vote: ', error),
-    onSettled: () => {
-      onSettled && onSettled();
-    },
+    onSettled: option && option.onSettled,
   });
 
   console.debug('mutation: ', mutation);

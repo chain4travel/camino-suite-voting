@@ -55,11 +55,13 @@ const BaseFeeVotingOption = ({
   const [disableRipple, setDisableRipple] = useState(false);
   const { show } = useDialog();
 
-  const toggleSelected = () => {
+  const toggleSelected = (event: MouseEvent) => {
+    event.stopPropagation();
     onSelect(data.option);
     disableRipple && setDisableRipple(false);
   };
-  const confirmSelection = () => {
+  const confirmSelection = (event: MouseEvent) => {
+    event.stopPropagation();
     // setDisableRipple(true);
     show({
       title: 'Are you sure?',

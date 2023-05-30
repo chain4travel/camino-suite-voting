@@ -17,12 +17,14 @@ interface HeaderProps {
   variant?: HeaderVariant;
   children?: ReactNode;
   fontFamily?: string | undefined;
+  sx?: SxProps<Theme>;
 }
 const Header = ({
   headline,
   variant = 'h3',
   fontFamily,
   children,
+  sx: overrideSx,
 }: HeaderProps) => {
   let sx = {};
   switch (variant) {
@@ -35,6 +37,7 @@ const Header = ({
       sx = { marginTop: '40px', marginBottom: '40px' };
       break;
   }
+  sx = { ...sx, ...overrideSx };
   return (
     <Stack direction="row" justifyContent="space-between" sx={sx}>
       <Typography variant={variant} sx={{ fontFamily }}>

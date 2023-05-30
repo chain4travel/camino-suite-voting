@@ -13,7 +13,7 @@ const ListItemDuration = styled(
     const isNotStartYet =
       startDateTime.startOf('day') > DateTime.now().startOf('day');
     const duration = isNotStartYet
-      ? startDateTime.toFormat('dd MM yyyy hh:mm:ss a')
+      ? startDateTime.toFormat('dd.MM.yyyy hh:mm:ss a')
       : endDateTime
           .diffNow(['days', 'hours', 'minutes'])
           .toFormat("dd'd' hh'h' mm'm'");

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { NavLink, useLoaderData } from 'react-router-dom';
-import { Button, Container } from '@mui/material';
+import { Container } from '@mui/material';
 import { ExpandMore } from '@mui/icons-material';
 import { useActiveVotings } from '@/hooks/useProposals';
 import Header from '@/components/Header';
@@ -9,6 +9,7 @@ import {
   AccordionSummary,
   AccordionDetails,
 } from '@/components/Accordion';
+import Button from '@/components/Button';
 import { VotingType } from '@/types';
 import VotingList from './VotingList';
 import GroupHeader from './GroupHeader';
@@ -17,7 +18,7 @@ import { useDialogStore } from '@/store';
 
 const ActiveVotings = () => {
   const { data: votingTypes } = useLoaderData() as { data: VotingType[] };
-  const { proposals, isError, isLoading } = useActiveVotings();
+  const { proposals, error, isLoading } = useActiveVotings();
   const { option: dialogOption } = useDialogStore(state => ({
     option: state.option,
   }));
@@ -35,6 +36,7 @@ const ActiveVotings = () => {
           [votingType.id]: {
             type: votingType.id,
             name: votingType.name,
+            icon: votingType.icon,
             data: [...currentData, proposal],
           },
         };
@@ -48,7 +50,7 @@ const ActiveVotings = () => {
   }, [proposals]);
   return (
     <Container>
-      <Header headline="Active Votings">
+      <Header headline="Active Votings" variant="h4">
         <NavLink to="/vote/create">
           <Button variant="contained" color="primary">
             Create Vote

@@ -4,7 +4,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  alpha,
   styled,
 } from '@mui/material';
 import Button from './Button';
