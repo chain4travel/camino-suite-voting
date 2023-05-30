@@ -4,6 +4,7 @@ export type VotingType = {
   id: string;
   name: string;
   abbr?: string;
+  icon?: ReactElement;
 };
 export type VotingOption = {
   option: number | string;
