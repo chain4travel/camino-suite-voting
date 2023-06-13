@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useLoaderData } from 'react-router-dom';
 import {
   Container,
   FormControlLabel,
-  ListItem,
+  List,
+  ListItemButton,
   RadioGroup,
   Stack,
 } from '@mui/material';
@@ -13,9 +14,10 @@ import { Proposal, VotingType } from '@/types';
 import { useCompletedVotes } from '@/hooks/useProposals';
 import useToast from '@/hooks/toast';
 import { DatePicker } from '@mui/x-date-pickers';
-import { PersonAdd } from '@mui/icons-material';
 import ListItemDuration from '@/components/ListItemDuration';
 import RadioButton from '@/components/RadioButton';
+import NewMemberVote from './NewMemberVote';
+import { ArrowForwardIos } from '@mui/icons-material';
 
 const CompletedVotes = () => {
   const { data: votingTypes } = useLoaderData() as { data: VotingType[] };
@@ -28,6 +30,30 @@ const CompletedVotes = () => {
       toast.error('Failed to fetch votes');
     }
   }, [error]);
+
+  const { voteTypeName, voteItem } = useMemo(() => {
+    const selectedVotingType = votingTypes.find(
+      vtype => vtype.id === votingType
+    );
+    const voteTypeName = selectedVotingType?.abbr ?? selectedVotingType?.name;
+    let voteItem = (_data: Proposal): JSX.Element | null => null;
+    switch (votingType) {
+      case 'NEW_MEMBER':
+        voteItem = (data: Proposal) => (
+          <NewMemberVote data={data} voteTypeName={voteTypeName} />
+        );
+        break;
+      case 'BASE_FEE':
+        // voteItem =
+        break;
+      default:
+        console.warn(`Unsupport voting type ${votingType}`);
+    }
+    return {
+      voteTypeName,
+      voteItem,
+    };
+  }, [votingType]);
 
   return (
     <Container>
@@ -63,14 +89,20 @@ const CompletedVotes = () => {
           ))}
         </RadioGroup>
       </Stack>
-      {votes.map((vote: Proposal) => (
-        <ListItem key={vote.id}>
-          <ListItemDuration
-            startTimestamp={vote.startDateTime}
-            endTimestamp={vote.endDateTime}
-          />
-        </ListItem>
-      ))}
+      <List>
+        {votes.map((vote: Proposal) => {
+          return (
+            <ListItemButton key={vote.id}>
+              <ListItemDuration
+                startTimestamp={vote.startDateTime}
+                endTimestamp={vote.endDateTime}
+              />
+              {voteItem(vote)}
+              <ArrowForwardIos />
+            </ListItemButton>
+          );
+        })}
+      </List>
     </Container>
   );
 };

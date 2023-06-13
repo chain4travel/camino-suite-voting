@@ -2,8 +2,8 @@
   {
     "id": 11,
     "type": "BASE_FEE",
-    "startDateTime": 1685462400,
-    "endDateTime": 1688054400,
+    "startDateTime": 1688054400,
+    "endDateTime": 1690646400,
     "forumLink": "https://twitter.com",
     "options": [
       { "option": 1, "value": 100 },
@@ -11,15 +11,14 @@
       { "option": 3, "value": 80 }
     ],
     "voted": [],
-    "target": "Some Validator Applicant 1",
     "description": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus.",
     "status": "COMPLETED"
   },
   {
     "id": 12,
     "type": "BASE_FEE",
-    "startDateTime": 1685462400,
-    "endDateTime": 1688054400,
+    "startDateTime": 1688054400,
+    "endDateTime": 1690646400,
     "forumLink": "https://apple.com",
     "options": [
       { "option": 1, "value": 100 },
@@ -27,15 +26,14 @@
       { "option": 3, "value": 80 }
     ],
     "voted": [{ "option": 2 }],
-    "target": "Some Validator Applicant 2",
     "description": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus.",
     "status": "COMPLETED"
   },
   {
     "id": 13,
     "type": "BASE_FEE",
-    "startDateTime": 1685462400,
-    "endDateTime": 1688054400,
+    "startDateTime": 1688054400,
+    "endDateTime": 1690646400,
     "forumLink": "https://twitter.com",
     "options": [
       { "option": 1, "value": 100 },
@@ -49,8 +47,8 @@
   {
     "id": 14,
     "type": "BASE_FEE",
-    "startDateTime": 1685462400,
-    "endDateTime": 1688054400,
+    "startDateTime": 1688054400,
+    "endDateTime": 1690646400,
     "forumLink": "https://twitter.com",
     "options": [
       { "option": 1, "value": 100 },
@@ -58,15 +56,14 @@
       { "option": 3, "value": 80 }
     ],
     "voted": [],
-    "target": "Some Validator Applicant 1",
     "description": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus.",
     "status": "COMPLETED"
   },
   {
     "id": 15,
     "type": "BASE_FEE",
-    "startDateTime": 1685462400,
-    "endDateTime": 1688054400,
+    "startDateTime": 1688054400,
+    "endDateTime": 1690646400,
     "forumLink": "https://apple.com",
     "options": [
       { "option": 1, "value": 100 },
@@ -74,15 +71,14 @@
       { "option": 3, "value": 80 }
     ],
     "voted": [{ "option": 2 }],
-    "target": "Some Validator Applicant 2",
     "description": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus.",
     "status": "COMPLETED"
   },
   {
     "id": 16,
     "type": "BASE_FEE",
-    "startDateTime": 1685462400,
-    "endDateTime": 1688054400,
+    "startDateTime": 1688054400,
+    "endDateTime": 1690646400,
     "forumLink": "https://twitter.com",
     "options": [
       { "option": 1, "value": 100 },
