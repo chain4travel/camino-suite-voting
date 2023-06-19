@@ -49,11 +49,11 @@ module.exports = {
 
   plugins: [
     new ModuleFederationPlugin({
-      name: 'vote',
+      name: 'proposal',
       filename: 'remoteEntry.js',
       remotes: {},
       exposes: {
-        './vote': './src/root.tsx',
+        './proposal': './src/root.tsx',
       },
       shared: {
         ...deps,

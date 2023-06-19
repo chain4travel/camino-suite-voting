@@ -2,9 +2,9 @@ import React from 'react';
 import { createBrowserRouter, redirect } from 'react-router-dom';
 import { QueryClient } from 'react-query';
 
-import ActiveVotings from '@/pages/vote/active';
-import CreateProposal from '@/pages/vote/create';
-import CompletedVotes from '@/pages/vote/completed';
+import ActiveVotings from '@/pages/proposal/active';
+import CreateProposal from '@/pages/proposal/create';
+import CompletedVotes from '@/pages/proposal/completed';
 import Layout from '@/components/Layout';
 import { votingTypeLoader } from './loaders';
 
@@ -12,10 +12,10 @@ export const getRoutes = (queryClient: QueryClient) => {
   const routes = [
     {
       path: '/',
-      loader: () => redirect('/vote/active'),
+      loader: () => redirect('/proposal/active'),
     },
     {
-      path: '/vote',
+      path: '/proposal',
       element: <Layout />,
       children: [
         {

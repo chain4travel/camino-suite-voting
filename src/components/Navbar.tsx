@@ -10,7 +10,7 @@ const NavItem = ({ to, text }: NavItemProps) => {
   const theme = useTheme();
   return (
     <NavLink
-      to={`/vote/${to}`}
+      to={`/proposal/${to}`}
       style={{
         marginLeft: '24px',
         paddingTop: '16px',
@@ -40,8 +40,8 @@ const NavItem = ({ to, text }: NavItemProps) => {
 function ProposalNavbar() {
   return (
     <Stack direction="row">
-      <NavItem to="active" text="Active Votings" />
-      <NavItem to="completed" text="Completed Votes" />
+      <NavItem to="active" text="Ongoing proposals" />
+      <NavItem to="completed" text="Completed proposals" />
     </Stack>
   );
 }

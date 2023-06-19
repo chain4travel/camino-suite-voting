@@ -57,7 +57,7 @@ const CompletedVotes = () => {
 
   return (
     <Container>
-      <Header headline="Completed votes" variant="h4" />
+      <Header headline="Completed Proposals" variant="h4" />
       <Stack spacing="16px">
         <Stack direction="row" spacing="12px">
           <DatePicker sx={{ flex: 1 }} />

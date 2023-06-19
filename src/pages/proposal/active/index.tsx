@@ -50,8 +50,8 @@ const ActiveVotings = () => {
   }, [proposals]);
   return (
     <Container>
-      <Header headline="Active Votings" variant="h4">
-        <NavLink to="/vote/create">
+      <Header headline="Ongoing Proposals" variant="h4">
+        <NavLink to="/proposal/create">
           <Button variant="contained" color="primary">
             Create Vote
           </Button>
