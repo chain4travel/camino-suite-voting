@@ -2,11 +2,11 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 
-import { routes } from '../../routes';
+import { getRoutes } from '..';
 
 describe('render routes', () => {
   test('test click button to skip page', () => {
-    const router = createMemoryRouter(routes, {
+    const router = createMemoryRouter(getRoutes(), {
       initialEntries: ['/proposal'],
     });
     render(<RouterProvider router={router} />);

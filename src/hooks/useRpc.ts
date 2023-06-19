@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from 'react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { getTxFee, vote } from '@/helpers/rpc';
 import { VotingOption } from '@/types';
 import useToast from './toast';

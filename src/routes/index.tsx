@@ -1,6 +1,6 @@
 import React from 'react';
 import { createBrowserRouter, redirect } from 'react-router-dom';
-import { QueryClient } from 'react-query';
+import { QueryClient } from '@tanstack/react-query';
 
 import ActiveVotings from '@/pages/proposal/active';
 import CreateProposal from '@/pages/proposal/create';
