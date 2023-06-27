@@ -29,12 +29,12 @@ const Header = ({
   let sx = {};
   switch (variant) {
     case 'h6':
-      sx = { marginBottom: '8px' };
+      sx = { marginBottom: 1 };
       break;
     case 'h2':
     case 'h3':
     default:
-      sx = { marginTop: '40px', marginBottom: '40px' };
+      sx = { marginTop: 5, marginBottom: 5 };
       break;
   }
   sx = { ...sx, ...overrideSx };

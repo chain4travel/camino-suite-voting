@@ -12,9 +12,8 @@ const NavItem = ({ to, text }: NavItemProps) => {
     <NavLink
       to={`/proposal/${to}`}
       style={{
-        marginLeft: '24px',
-        paddingTop: '16px',
-        paddingBottom: '16px',
+        paddingTop: 2,
+        paddingBottom: 2,
         textDecoration: 'none',
       }}
     >
@@ -39,7 +38,7 @@ const NavItem = ({ to, text }: NavItemProps) => {
 
 function ProposalNavbar() {
   return (
-    <Stack direction="row">
+    <Stack direction="row" spacing={3}>
       <NavItem to="active" text="Ongoing proposals" />
       <NavItem to="completed" text="Completed proposals" />
     </Stack>
