@@ -19,11 +19,18 @@ const StateButton = styled(
   borderRadius: theme.typography.fontSize + 4,
   '&.Mui-disabled': {
     borderColor: 'inherit',
+    color: theme.palette.grey[50],
+    '&.MuiButton-contained': {
+      backgroundColor: theme.palette.grey[500],
+    },
     '&.StateButton-success': {
       color: theme.palette.success.main,
     },
     '&.StateButton-error': {
-      color: theme.palette.error.main,
+      color: theme.palette.error.light,
+    },
+    '&.StateButton-accent': {
+      color: theme.palette.accent.main,
     },
   },
 }));

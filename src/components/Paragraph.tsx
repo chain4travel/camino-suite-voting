@@ -2,7 +2,7 @@ import { Stack, Divider } from '@mui/material';
 import React, { ReactNode } from 'react';
 
 interface ParagraphProps {
-  children: ReactNode[];
+  children: ReactNode | ReactNode[];
   spacing?: 'lg' | 'md' | 'sm' | number;
   divider?: boolean;
 }
@@ -21,10 +21,10 @@ const Paragraph = ({ children, spacing, divider }: ParagraphProps) => {
     default:
   }
   return (
-    <Stack spacing={margin}>
-      {children}
+    <>
+      <Stack spacing={margin}>{children}</Stack>
       {divider && <Divider sx={{ marginTop: 3 }} />}
-    </Stack>
+    </>
   );
 };
 export default Paragraph;
