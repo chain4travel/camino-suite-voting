@@ -1,5 +1,15 @@
 import { alpha } from '@mui/material/styles';
 
+declare module '@mui/material/styles' {
+  interface Palette {
+    accent: Palette['primary'];
+  }
+
+  interface PaletteOptions {
+    accent: PaletteOptions['primary'];
+  }
+}
+
 const GREY = {
   50: '#F8FAFC',
   100: '#F1F5F9',
@@ -39,6 +49,7 @@ const COMMON = {
   error: { light: '#FCA5A5', main: '#CD3919', contrastText: '#fff' },
   grey: GREY,
   divider: GREY[700],
+  accent: { main: ACCENT, contrastText: '#fff' },
 };
 
 const palette = {
