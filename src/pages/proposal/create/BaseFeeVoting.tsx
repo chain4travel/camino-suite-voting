@@ -1,6 +1,5 @@
 import React, { useState, ChangeEvent } from 'react';
 import {
-  Box,
   Button,
   InputLabel,
   Stack,
@@ -57,11 +56,11 @@ const BaseFeeVoting = () => {
       );
     };
   return (
-    <Box>
+    <Paragraph spacing="lg">
       <Paragraph divider>
         <Header headline="Please select a voting period" variant="h6" />
-        <Stack direction="row" spacing="16px">
-          <Stack direction="row" spacing="8px" alignItems="center">
+        <Stack direction="row" spacing={2}>
+          <Stack direction="row" spacing={1} alignItems="center">
             <InputLabel sx={{ color: 'text.secondary' }}>From</InputLabel>
             <DatePicker
               disablePast
@@ -69,7 +68,7 @@ const BaseFeeVoting = () => {
               onChange={handleStartDateChange}
             />
           </Stack>
-          <Stack direction="row" spacing="8px" alignItems="center">
+          <Stack direction="row" spacing={1} alignItems="center">
             <InputLabel sx={{ color: 'text.secondary' }}>To</InputLabel>
             <DatePicker
               disablePast
@@ -84,17 +83,19 @@ const BaseFeeVoting = () => {
         <Header headline="Add link of forum of discussion" variant="h6" />
         <TextField variant="filled" fullWidth />
       </Paragraph>
-      <Paragraph divider>
-        <Header headline={`Current Base Fee ${baseFee} nCAM`} variant="h6" />
-        <Typography variant="body2" color="text.secondary">
-          Please fill the following changes of the base fee. Once selecting the
-          number, it will automatically be calculated and adjusted to the
-          outcomes.
-        </Typography>
+      <Paragraph divider spacing="md">
+        <Paragraph>
+          <Header headline={`Current Base Fee ${baseFee} nCAM`} variant="h6" />
+          <Typography variant="body2" color="text.secondary">
+            Please fill the following changes of the base fee. Once selecting
+            the number, it will automatically be calculated and adjusted to the
+            outcomes.
+          </Typography>
+        </Paragraph>
         {votingOptions.map(option => (
-          <Stack key={option.option} spacing="8px">
+          <Paragraph key={option.option} spacing="sm">
             <Typography variant="h6">{`${option.value} nCAM`}</Typography>
-            <Stack direction="row" spacing="8px" alignItems="center">
+            <Stack direction="row" spacing={1} alignItems="center">
               <InputLabel>Select Base Fee</InputLabel>
               <TextField
                 type="number"
@@ -118,7 +119,7 @@ const BaseFeeVoting = () => {
               <Typography>Absolute Change</Typography>
               <Typography>{Number(option.value) - baseFee} nCAM</Typography>
             </Stack>
-          </Stack>
+          </Paragraph>
         ))}
         <Button
           variant="text"
@@ -137,7 +138,7 @@ const BaseFeeVoting = () => {
           setDescription(value);
         }}
       />
-    </Box>
+    </Paragraph>
   );
 };
 export default BaseFeeVoting;
