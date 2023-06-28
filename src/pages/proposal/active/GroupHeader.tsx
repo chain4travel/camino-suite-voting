@@ -8,7 +8,7 @@ interface GroupHeaderProps {
 const GroupHeader = styled(
   ({ group, ...props }: GroupHeaderProps & ComponentsProps) => {
     return (
-      <Stack direction="row" alignItems="center" spacing="20px" {...props}>
+      <Stack direction="row" alignItems="center" spacing={2.5} {...props}>
         {group.icon}
         <Typography variant="h6">{group.name}</Typography>
       </Stack>

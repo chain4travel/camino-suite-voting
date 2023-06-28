@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { List, ListItemButton } from '@mui/material';
 import { ArrowForwardIos } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 import type { Proposal } from '@/types';
 import NewMemberVoting from './NewMemberVoting';
 import BaseFeeVoting from './BaseFeeVoting';
@@ -10,7 +11,7 @@ interface VotingListProps {
   data: { type: string; name: string; data: Proposal[] };
 }
 const VotingList = ({ data }: VotingListProps) => {
-  const [disableRipple, setDisableRipple] = useState(false);
+  const navigate = useNavigate();
   return (
     <List disablePadding>
       {data.data.map((proposal: Proposal, index: number) => {
@@ -30,7 +31,7 @@ const VotingList = ({ data }: VotingListProps) => {
             key={proposal.id}
             divider={index !== data.data.length - 1}
             disableRipple
-            onClick={() => console.log('go detail')}
+            onClick={() => navigate(`${proposal.type}/${proposal.id}`)}
           >
             <ListItemDuration
               startTimestamp={proposal.startDateTime}

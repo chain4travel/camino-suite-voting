@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Stack } from '@mui/material';
+import { find } from 'lodash';
 import type { Proposal, VotingOption } from '@/types';
 import { useBaseFee, useVote } from '@/hooks/useRpc';
 import BaseFeeVotingOption from './BaseFeeVotingOption';
@@ -31,11 +32,12 @@ const BaseFeeVoting = ({ data, disableParentRipple }: BaseFeeVotingProps) => {
   };
 
   return (
-    <Stack direction="row" sx={{ marginRight: '24px' }} spacing="24px">
+    <Stack direction="row" sx={{ marginRight: 3 }} spacing={3}>
       {data.options.map(opt => (
         <BaseFeeVotingOption
           key={opt.option}
           data={opt}
+          isVoted={!!find(data.voted, v => v.option === opt.option)}
           selected={selectToVote}
           baseFee={baseFee}
           onSelect={handleSelectChange}
