@@ -1,7 +1,5 @@
 import React, { useMemo, useState } from 'react';
 import {
-  Box,
-  Button,
   Container,
   MenuItem,
   Select,
@@ -13,7 +11,8 @@ import { useLoaderData } from 'react-router-dom';
 import Header from '@/components/Header';
 import type { VotingType } from '@/types';
 import NoVotingType from './NoVotingType';
-import BaseFeeVoting from './BaseFeeVoting';
+import BaseFeeVoting, { baseFeeFormSchema } from './BaseFeeVoting';
+import EssentialForm from './EssentialForm';
 
 const CreateNewVoting = () => {
   const { data: votingTypes } = useLoaderData() as { data: VotingType[] };
@@ -26,14 +25,21 @@ const CreateNewVoting = () => {
     setSelectedVotingType(value);
   };
 
-  const ProposalForm = useMemo(() => {
+  const { ProposalForm, formSchema } = useMemo(() => {
+    let ProposalForm, formSchema;
     switch (selectedVotingType) {
       case 'BASE_FEE':
-        return <BaseFeeVoting />;
+        ProposalForm = <BaseFeeVoting />;
+        formSchema = baseFeeFormSchema;
+        break;
       default:
         console.warn(`Unsupported voting type ${selectedVotingType}`);
-        return <NoVotingType />;
+        ProposalForm = <NoVotingType />;
     }
+    return {
+      ProposalForm,
+      formSchema,
+    };
   }, [selectedVotingType]);
   return (
     <Container>
@@ -69,40 +75,24 @@ const CreateNewVoting = () => {
           </MenuItem>
         ))}
       </Select>
-      <Box
-        display="flex"
+      <Stack
         justifyContent="center"
         alignItems="center"
-        flexDirection="column"
         sx={{
-          marginTop: '20px',
+          marginTop: 2.5,
           minHeight: '300px',
           border: 1,
           borderColor: 'divider',
           borderRadius: '12px',
-          padding: '24px 20px',
+          paddingY: 3,
+          paddingX: 2.5,
         }}
       >
-        {ProposalForm}
-      </Box>
-      <Stack direction="row" spacing="16px" marginTop="20px">
-        <Button
-          variant="outlined"
-          sx={{ paddingTop: '12px', paddingBottom: '12px' }}
-          color="inherit"
-          fullWidth
-        >
-          Cancel
-        </Button>
-        <Button
-          variant="contained"
-          sx={{ paddingTop: '12px', paddingBottom: '12px' }}
-          color="primary"
-          disabled={!selectedVotingType}
-          fullWidth
-        >
-          Create new voting
-        </Button>
+        {formSchema ? (
+          <EssentialForm formSchema={formSchema}>{ProposalForm}</EssentialForm>
+        ) : (
+          ProposalForm
+        )}
       </Stack>
     </Container>
   );

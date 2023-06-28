@@ -5,6 +5,7 @@
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
+    "@hookform/resolvers": "^3.1.1",
     "@mui/base": "5.0.0-alpha.111",
     "@mui/icons-material": "^5.11.0",
     "@mui/lab": "5.0.0-alpha.131",
@@ -26,10 +27,12 @@
     "react": "^18.2.0",
     "react-chartjs-2": "^5.1.0",
     "react-dom": "^18.2.0",
+    "react-hook-form": "^7.45.0",
     "react-i18next": "^12.1.1",
     "react-quill": "^2.0.0",
     "react-router-dom": "^6.4.5",
     "react-virtuoso": "^4.3.11",
+    "zod": "^3.21.4",
     "zustand": "^4.1.5"
   },
   "scripts": {
@@ -76,6 +79,7 @@
     "@tanstack/react-query-devtools": "^4.29.14",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
+    "@types/big.js": "^6.1.6",
     "@types/jest": "^27.5.2",
     "@types/lodash": "^4.14.195",
     "@types/luxon": "^3.1.0",

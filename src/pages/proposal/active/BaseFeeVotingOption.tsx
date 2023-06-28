@@ -18,9 +18,13 @@ interface StyledCardProps {
   isSelected?: boolean;
   isVoted?: boolean;
 }
-const StyledCard = styled((props: StyledCardProps & CardProps) => (
-  <MuiCard {...props} />
-))(({ theme, ...props }) => ({
+const StyledCard = styled(
+  ({
+    isSelected: _isSelected,
+    isVoted: _isVoted,
+    ...props
+  }: StyledCardProps & CardProps) => <MuiCard {...props} />
+)(({ theme, ...props }) => ({
   minWidth: '280px',
   boxShadow: 'none',
   background: 'transparent',
