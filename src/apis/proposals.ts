@@ -1,7 +1,9 @@
-import { get } from '@/utils/http';
+import { get } from '@/helpers/http';
 
-export const fetchProposalList = async (type: string, page = 0) =>
-  get(`${type}/proposals.json`);
+export const fetchActiveVotings = async () => get('active_votings.json');
 
-export const fetchProposalHistory = async (type: string, page = 0) =>
-  get(`${type}/proposalHistory.json`);
+export const fetchCompletedVotes = async (type: string) =>
+  get(`completed_votes/${type.toLowerCase()}.json`);
+
+export const fetchProposalDetail = async (type: string, id: string) =>
+  get(`detail/${type.toLowerCase()}/${id}.json`);

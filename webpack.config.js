@@ -5,7 +5,7 @@ const path = require('path');
 const deps = require('./package.json').dependencies;
 module.exports = {
   output: {
-    publicPath: 'auto',
+    publicPath: '/',
   },
 
   resolve: {
@@ -16,7 +16,7 @@ module.exports = {
   },
 
   devServer: {
-    port: 3005,
+    port: 5005,
     historyApiFallback: true,
   },
 
@@ -49,11 +49,11 @@ module.exports = {
 
   plugins: [
     new ModuleFederationPlugin({
-      name: 'vote',
+      name: 'proposal',
       filename: 'remoteEntry.js',
       remotes: {},
       exposes: {
-        './vote': './src/root.tsx',
+        './proposal': './src/root.tsx',
       },
       shared: {
         ...deps,
@@ -66,7 +66,10 @@ module.exports = {
           requiredVersion: deps['react-dom'],
         },
         luxon: {
-          version: deps['luxon'],
+          singleton: true,
+          eager: true,
+          version: deps.luxon,
+          requiredVersion: deps.luxon,
         },
       },
     }),
