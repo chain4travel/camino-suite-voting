@@ -1,25 +1,9 @@
-import React, { forwardRef, useMemo } from 'react';
-import {
-  Box,
-  Container,
-  Divider,
-  Paper,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-  styled,
-} from '@mui/material';
+import React, { useMemo } from 'react';
+import { Box, Container, Divider, Stack, Typography } from '@mui/material';
 import { useLoaderData, useNavigate, useParams } from 'react-router-dom';
 import { find, countBy, reduce, filter, map } from 'lodash';
 import { DateTime } from 'luxon';
 import Big from 'big.js';
-import { TableVirtuoso, TableComponents } from 'react-virtuoso';
-import { Circle } from '@mui/icons-material';
 
 import { Percentage, Vote, VotingOption, VotingType } from '@/types';
 import Header from '@/components/Header';
@@ -28,40 +12,10 @@ import { useProposal } from '@/hooks/useProposals';
 import { useBaseFee } from '@/hooks/useRpc';
 import DistributionBar from '@/components/DistributionBar';
 import ProposalStatus from './ProposalStatus';
-
-const TablePaper = styled(Paper)(({ theme }) => ({
-  boxShadow: 'none',
-  border: '1px solid',
-  borderColor: theme.palette.divider,
-}));
-
-interface VoteData {
-  id: number;
-  address: string;
-  votedTime: string;
-  votedOption: string;
-}
-const columns = [
-  { dataKey: 'address', label: 'ADDRESS / NAME', width: '100%' },
-  { dataKey: 'votedTime', label: 'TIME OF VOTE', width: 260 },
-  { dataKey: 'votedOption', label: 'VOTE FOR', width: 260 },
-];
-const VirtuosoTableComponents: TableComponents<VoteData> = {
-  Scroller: forwardRef<HTMLDivElement>((props, ref) => (
-    <TableContainer component={TablePaper} {...props} ref={ref} />
-  )),
-  Table: props => (
-    <Table
-      {...props}
-      sx={{ borderCollapse: 'separate', tableLayout: 'fixed' }}
-    />
-  ),
-  TableHead,
-  TableRow: props => <TableRow {...props} />,
-  TableBody: forwardRef<HTMLTableSectionElement>((props, ref) => (
-    <TableBody {...props} ref={ref} />
-  )),
-};
+import VoteResultTable from './VoteResultTable';
+import VoteResult from './VoteResult';
+import { toPastTense } from '@/helpers/string';
+import VoteOptions from './VoteOptions';
 
 const Detail = () => {
   const { data: votingTypes } = useLoaderData() as { data: VotingType[] };
@@ -71,7 +25,7 @@ const Detail = () => {
     proposal,
     error: _error,
     isLoading: _isLoading,
-  } = useProposal(type, id);
+  } = useProposal(type!, id!);
   const { baseFee } = useBaseFee();
 
   const votingType = votingTypes.find(vtype => vtype.id === type);
@@ -113,12 +67,12 @@ const Detail = () => {
         return {
           id: idx,
           address: v.address,
-          votedTime: v.votedDateTime
+          votedDateTime: v.votedDateTime
             ? DateTime.fromSeconds(v.votedDateTime).toFormat(
                 'dd.MM.yyyy - hh:mm:ss a'
               )
             : '-',
-          votedOption: v.option
+          option: v.option
             ? `Future Base Fee ${
                 proposal.options.find(
                   (opt: VotingOption) => opt.option === v.option
@@ -153,7 +107,12 @@ const Detail = () => {
             <Stack spacing={1}>
               <Header
                 variant="h2"
-                headline={votingType?.abbr ?? votingType?.name ?? ''}
+                headline={
+                  votingType?.brief ??
+                  votingType?.abbr ??
+                  votingType?.name ??
+                  ''
+                }
                 sx={{ marginBottom: 0 }}
               />
               <Typography variant="h5" color="text.secondary">
@@ -161,91 +120,22 @@ const Detail = () => {
                   'dd.MM.yyyy hh:mm:ss a'
                 )}
               </Typography>
-              <Box
-                padding={2}
-                border="1px solid"
-                borderColor="accent.main"
-                borderRadius={1}
-              >
-                <Typography variant="h6">Vote Result</Typography>
-                <Stack direction="row" justifyContent="space-between">
-                  <Typography variant="caption" color="text.secondary">
-                    New Base Fee
-                  </Typography>
-                  <Typography color="text.secondary">
-                    {result?.value} nCAM
-                  </Typography>
-                </Stack>
-                <Stack direction="row" justifyContent="space-between">
-                  <Typography variant="caption" color="text.secondary">
-                    Percentage Change
-                  </Typography>
-                  <Typography color="text.secondary">
-                    {((result?.value - baseFee) * 100) / baseFee} %
-                  </Typography>
-                </Stack>
-                <Stack direction="row" justifyContent="space-between">
-                  <Typography variant="caption" color="text.secondary">
-                    Absolute Change
-                  </Typography>
-                  <Typography color="text.secondary">
-                    {result?.value - baseFee} nCAM
-                  </Typography>
-                </Stack>
-              </Box>
+              <VoteResult
+                result={{ ...result, baseFee, target: proposal?.target }}
+                votingType={votingType?.id}
+              />
             </Stack>
             <Stack>
               <Header variant="h6" headline="Vote options" />
-              <Stack direction="row" spacing={1.5}>
-                {filter(proposal?.options, opt => opt.value !== baseFee).map(
-                  opt => (
-                    <Box
-                      key={opt.option}
-                      padding={2}
-                      border="1px solid"
-                      borderColor="divider"
-                      borderRadius={2}
-                    >
-                      <Stack
-                        direction="row"
-                        justifyContent="space-between"
-                        spacing={3}
-                      >
-                        <Typography variant="body2">
-                          Future Base Fee {opt.value} nCAM
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          color={
-                            opt.option === result.option
-                              ? 'accent.main'
-                              : 'text.secondary'
-                          }
-                          textAlign="right"
-                        >
-                          VOTED {statistics.summary[opt.option]?.percent ?? 0}%
-                        </Typography>
-                      </Stack>
-                      <Stack direction="row" justifyContent="space-between">
-                        <Typography variant="caption" color="text.secondary">
-                          Percentage Change
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {((opt.value - baseFee) * 100) / baseFee}%
-                        </Typography>
-                      </Stack>
-                      <Stack direction="row" justifyContent="space-between">
-                        <Typography variant="caption" color="text.secondary">
-                          Absolute Change
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {opt.value - baseFee} nCAM
-                        </Typography>
-                      </Stack>
-                    </Box>
-                  )
-                )}
-              </Stack>
+              <VoteOptions
+                options={proposal?.options.map(opt => ({
+                  ...opt,
+                  percent: statistics?.summary[opt.option].percent,
+                }))}
+                votingType={votingType?.id}
+                result={result}
+                baseFee={baseFee}
+              />
             </Stack>
             <Stack spacing={1.5} alignItems="flex-start">
               <Typography color="text.secondary">
@@ -296,27 +186,39 @@ const Detail = () => {
                 percentage: statistics.summary?.[option.option]?.percent,
               }))}
               renderContent={(option: VotingOption & Percentage) => {
-                const absoluteChange = new Big(option.value)
-                  .minus(baseFee)
-                  .toString();
-                const percentageChange = new Big(absoluteChange)
-                  .times(100)
-                  .div(baseFee)
-                  .toFixed(2);
+                let extraInfo = null;
+                if (votingType?.id === 'BASE_FEE') {
+                  const absoluteChange = new Big(option.value)
+                    .minus(baseFee)
+                    .toString();
+                  const percentageChange = new Big(absoluteChange)
+                    .times(100)
+                    .div(baseFee)
+                    .toFixed(2);
+                  extraInfo = (
+                    <>
+                      <Typography color="text.primary" variant="body2">
+                        {option.value} nCAM
+                      </Typography>
+                      <Typography color="text.primary" variant="body2">
+                        {absoluteChange} nCAM
+                      </Typography>
+                      <Typography color="text.primary" variant="body2">
+                        {percentageChange}%
+                      </Typography>
+                    </>
+                  );
+                }
                 return (
                   <>
+                    {votingType?.id !== 'BASE_FEE' && (
+                      <Typography color="text.primary" variant="body2">
+                        {toPastTense(option.label)}
+                      </Typography>
+                    )}
                     <Typography color="text.primary" fontWeight={700}>
                       {statistics.summary?.[option.option]?.count} /{' '}
                       {statistics.summary?.[option.option]?.percent}%
-                    </Typography>
-                    <Typography color="text.primary" variant="body2">
-                      {option.value} nCAM
-                    </Typography>
-                    <Typography color="text.primary" variant="body2">
-                      {absoluteChange} nCAM
-                    </Typography>
-                    <Typography color="text.primary" variant="body2">
-                      {percentageChange}%
                     </Typography>
                   </>
                 );
@@ -332,14 +234,17 @@ const Detail = () => {
               variant="turnouts"
               data={map(
                 statistics?.turnouts,
-                (t: Percentage, key: boolean) => ({
+                (t: Percentage, key: 'true' | 'false') => ({
                   ...t,
                   isParticipated: key,
                   percentage: t.percent,
                 })
               )}
               renderContent={(
-                turnout: Percentage & { isParticipated: boolean; count: number }
+                turnout: Percentage & {
+                  isParticipated: 'true' | 'false';
+                  count: number;
+                }
               ) => (
                 <>
                   <Typography color="grey.900" variant="body2">
@@ -359,49 +264,7 @@ const Detail = () => {
             <Typography variant="body2" color="text.secondary">
               Eligible validators: {statistics?.eligibleVotes}
             </Typography>
-            <TablePaper sx={{ height: 400, width: '100%' }}>
-              <TableVirtuoso
-                data={votes}
-                components={VirtuosoTableComponents}
-                fixedHeaderContent={() => (
-                  <TableRow>
-                    {columns.map((column, idx) => (
-                      <TableCell
-                        key={column.dataKey}
-                        variant="head"
-                        align="left"
-                        style={{ width: column.width }}
-                        sx={{
-                          backgroundColor: 'grey.800',
-                          borderColor: 'divider',
-                          color: 'grey.500',
-                        }}
-                      >
-                        <Stack direction="row" alignItems="center" spacing={2}>
-                          {idx === 0 ? <Circle /> : null}
-                          <Typography>{column.label}</Typography>
-                        </Stack>
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                )}
-                itemContent={(_index: number, row: VoteData) => {
-                  return (
-                    <>
-                      {columns.map(column => (
-                        <TableCell
-                          key={column.dataKey}
-                          align="left"
-                          sx={{ borderColor: 'divider' }}
-                        >
-                          {row[column.dataKey]}
-                        </TableCell>
-                      ))}
-                    </>
-                  );
-                }}
-              />
-            </TablePaper>
+            <VoteResultTable votes={votes} />
           </Stack>
         </Stack>
       </Container>
