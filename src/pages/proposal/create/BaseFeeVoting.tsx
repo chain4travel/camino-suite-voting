@@ -10,7 +10,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AddCircle } from '@mui/icons-material';
 import type { VotingOption } from '@/types';
 import { useBaseFee } from '@/hooks/useRpc';
-import useToast from '@/hooks/toast';
+import useToast from '@/hooks/useToast';
 import TextEditor from '@/components/TextEditor';
 import { DateTime } from 'luxon';
 import Header from '@/components/Header';

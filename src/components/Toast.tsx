@@ -8,7 +8,7 @@ import {
   styled,
 } from '@mui/material';
 
-import useToast from '@/hooks/toast';
+import useToast from '@/hooks/useToast';
 
 const StyledSnackbar = styled(Snackbar)({
   '.MuiAlert-root': {

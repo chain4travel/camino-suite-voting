@@ -2,6 +2,7 @@
   {
     "id": "NEW_MEMBER",
     "name": "Admittance of new consortium members",
+    "brief": "Admittance of Consortium Member",
     "abbr": "New members"
   },
   {
@@ -14,6 +15,7 @@
   {
     "id": "EXCLUDE_MEMBER",
     "name": "Exlusion of consortium member",
+    "brief": "Exlusion of Consortium Member",
     "abbr": "Exclusion of members"
   }
 ]

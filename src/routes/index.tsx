@@ -36,7 +36,7 @@ export const getRoutes = (queryClient: QueryClient) => {
           loader: votingTypeLoader(queryClient),
         },
         {
-          path: ':type/:id',
+          path: 'completed/:type/:id',
           element: <Detail />,
           loader: votingTypeLoader(queryClient),
         },

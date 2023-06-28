@@ -43,7 +43,7 @@ const ProposalStatus = ({ proposal, extraInfo }: ProposalStatusProps) => {
           >
             <Typography variant="h5">Status</Typography>
             <StateButton variant="contained" sx={{ minWidth: 0 }}>
-              PASSED
+              {proposal?.status}
             </StateButton>
           </Stack>
         </Paragraph>

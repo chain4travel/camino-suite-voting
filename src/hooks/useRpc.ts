@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { getTxFee, vote } from '@/helpers/rpc';
 import { VotingOption } from '@/types';
-import useToast from './toast';
+import useToast from './useToast';
 
 // TODO: base RPC call
 
@@ -32,8 +32,8 @@ export const useVote = (option?: { onSettled?: () => void }) => {
       votingType: string;
       votes: VotingOption[];
     }) => vote(proposalId, votingType, votes),
-    onSuccess: _data => toast.success('Successfully voted'),
-    onError: (error: any) => toast.error('Failed to vote: ', error),
+    onSuccess: () => toast.success('Successfully voted'),
+    onError: (error, any) => toast.error('Failed to vote: ', error),
     onSettled: option && option.onSettled,
   });
 

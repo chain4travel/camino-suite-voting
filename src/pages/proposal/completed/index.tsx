@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useLoaderData } from 'react-router-dom';
+import { useLoaderData, useNavigate } from 'react-router-dom';
 import {
   Container,
   FormControlLabel,
@@ -12,7 +12,7 @@ import Header from '@/components/Header';
 import Button from '@/components/Button';
 import { Proposal, VotingType } from '@/types';
 import { useCompletedVotes } from '@/hooks/useProposals';
-import useToast from '@/hooks/toast';
+import useToast from '@/hooks/useToast';
 import { DatePicker } from '@mui/x-date-pickers';
 import ListItemDuration from '@/components/ListItemDuration';
 import RadioButton from '@/components/RadioButton';
@@ -24,6 +24,7 @@ const CompletedVotes = () => {
   const [votingType, setVotingType] = useState('NEW_MEMBER');
   const { votes, error, isLoading } = useCompletedVotes(votingType);
   const toast = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (error) {
@@ -31,7 +32,7 @@ const CompletedVotes = () => {
     }
   }, [error]);
 
-  const { voteTypeName, voteItem } = useMemo(() => {
+  const { voteItem } = useMemo(() => {
     const selectedVotingType = votingTypes.find(
       vtype => vtype.id === votingType
     );
@@ -50,7 +51,6 @@ const CompletedVotes = () => {
         console.warn(`Unsupport voting type ${votingType}`);
     }
     return {
-      voteTypeName,
       voteItem,
     };
   }, [votingType]);
@@ -92,7 +92,10 @@ const CompletedVotes = () => {
       <List>
         {votes.map((vote: Proposal) => {
           return (
-            <ListItemButton key={vote.id}>
+            <ListItemButton
+              key={vote.id}
+              onClick={() => navigate(`${vote.type}/${vote.id}`)}
+            >
               <ListItemDuration
                 startTimestamp={vote.startDateTime}
                 endTimestamp={vote.endDateTime}

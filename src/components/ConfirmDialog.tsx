@@ -7,7 +7,7 @@ import {
   styled,
 } from '@mui/material';
 import Button from './Button';
-import useDialog from '@/hooks/dialog';
+import useDialog from '@/hooks/useDialog';
 
 const StyledDialog = styled(Dialog)(({ theme }) => ({
   '.MuiDialog-paper': {
