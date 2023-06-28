@@ -38,6 +38,9 @@ dependencies:
   axios:
     specifier: ^1.2.1
     version: 1.2.1
+  big.js:
+    specifier: ^6.2.1
+    version: 6.2.1
   chart.js:
     specifier: ^4.1.1
     version: 4.1.1
@@ -80,6 +83,9 @@ dependencies:
   react-router-dom:
     specifier: ^6.4.5
     version: 6.5.0(react-dom@18.2.0)(react@18.2.0)
+  react-virtuoso:
+    specifier: ^4.3.11
+    version: 4.3.11(react-dom@18.2.0)(react@18.2.0)
   zustand:
     specifier: ^4.1.5
     version: 4.1.5(react@18.2.0)
@@ -4475,6 +4481,10 @@ packages:
   /big.js@5.2.2:
     resolution: {integrity: sha512-vyL2OymJxmarO8gxMr0mhChsO9QGwhynfuu4+MHTAW6czfq9humCB7rKpUjDd9YUiDPU4mzpyupFSvOClAwbmQ==}
     dev: true
+
+  /big.js@6.2.1:
+    resolution: {integrity: sha512-bCtHMwL9LeDIozFn+oNhhFoq+yQ3BNdnsLSASUxLciOb1vgvpHsIO1dsENiGMgbb4SkP5TrzWzRiLddn8ahVOQ==}
+    dev: false
 
   /binary-extensions@2.2.0:
     resolution: {integrity: sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==}
@@ -10821,6 +10831,17 @@ packages:
       dom-helpers: 5.2.1
       loose-envify: 1.4.0
       prop-types: 15.8.1
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
+  /react-virtuoso@4.3.11(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-0YrCvQ5GsIKRcN34GxrzhSJGuMNI+hGxWci5cTVuPQ8QWTEsrKfCyqm7YNBMmV3pu7onG1YVUBo86CyCXdejXg==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      react: '>=16 || >=17 || >= 18'
+      react-dom: '>=16 || >=17 || >= 18'
+    dependencies:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
     dev: false

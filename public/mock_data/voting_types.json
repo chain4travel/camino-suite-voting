@@ -10,7 +10,7 @@
     "abbr": "Grant Program"
   },
   { "id": "FEE_DISTRIBUTION", "name": "Transaction Fee Distribution" },
-  { "id": "BASE_FEE", "name": "Transaction Fees" },
+  { "id": "BASE_FEE", "name": "Transaction Fees", "abbr": "Base Fee" },
   {
     "id": "EXCLUDE_MEMBER",
     "name": "Exlusion of consortium member",

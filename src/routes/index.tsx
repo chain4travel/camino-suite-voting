@@ -7,6 +7,7 @@ import CreateProposal from '@/pages/proposal/create';
 import CompletedVotes from '@/pages/proposal/completed';
 import Layout from '@/components/Layout';
 import { votingTypeLoader } from './loaders';
+import Detail from '@/pages/proposal/detail';
 
 export const getRoutes = (queryClient: QueryClient) => {
   const routes = [
@@ -34,14 +35,11 @@ export const getRoutes = (queryClient: QueryClient) => {
           element: <CompletedVotes />,
           loader: votingTypeLoader(queryClient),
         },
-        // {
-        //   path: 'active/:id',
-        //   element: <ProposalDetail />,
-        // },
-        // {
-        //   path: 'history/:id',
-        //   element: <ProposalHistoryDetail />,
-        // },
+        {
+          path: ':type/:id',
+          element: <Detail />,
+          loader: votingTypeLoader(queryClient),
+        },
       ],
     },
   ];

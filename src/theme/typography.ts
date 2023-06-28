@@ -20,7 +20,7 @@ const responsiveFontSizes = ({
   },
 });
 
-const FONT_PRIMARY = 'ClashDisplay';
+const FONT_PRIMARY = 'Inter';
 const FONT_SECONDARY = 'Inter';
 
 const typography = {

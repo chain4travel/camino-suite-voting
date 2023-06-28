@@ -13,6 +13,8 @@ export type VotingOption = {
 };
 export type Vote = {
   option: number;
+  address?: string;
+  votedDateTime?: number;
 };
 export type Proposal = {
   id: number | string;
@@ -32,6 +34,9 @@ export type Group = {
   data: Proposal[];
   icon?: ReactElement;
 };
+export interface Percentage {
+  percent: number;
+}
 
 export interface ProposalState {
   currentProposal: Proposal | null;

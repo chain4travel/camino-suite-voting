@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { fetchCompletedVotes } from '@/apis/proposals';
+import { fetchProposalDetail, fetchCompletedVotes } from '@/apis/proposals';
 import { fetchActiveVotings } from '@/apis';
 
 export const useActiveVotings = (page = 0) => {
@@ -28,6 +28,22 @@ export const useCompletedVotes = (type: string, page = 0) => {
 
   return {
     votes: data?.data ?? [],
+    error,
+    isLoading,
+    // totalCount: data?.data?.totalCount ?? 0,
+  };
+};
+
+export const useProposal = (type: string, id: string) => {
+  const { data, isLoading, isSuccess, error } = useQuery(
+    ['getActiveProposal', type, id],
+    async () => fetchProposalDetail(type, id)
+  );
+
+  console.debug('useActiveProposal data: ', data, isLoading, error, isSuccess);
+
+  return {
+    proposal: data?.data,
     error,
     isLoading,
     // totalCount: data?.data?.totalCount ?? 0,

@@ -31,7 +31,9 @@ const VotingList = ({ data }: VotingListProps) => {
             key={proposal.id}
             divider={index !== data.data.length - 1}
             disableRipple
-            onClick={() => navigate(`${proposal.type}/${proposal.id}`)}
+            onClick={() =>
+              navigate(`/proposal/${proposal.type}/${proposal.id}`)
+            }
           >
             <ListItemDuration
               startTimestamp={proposal.startDateTime}

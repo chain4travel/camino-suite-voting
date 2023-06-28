@@ -10,7 +10,7 @@ const VOTE_DISTRIBUTION_COLORS = ['#7251B5', '#9163CB', '#B185DB'];
 
 interface DistributionBarProps<T extends Percentage> {
   data: T[];
-  renderContent: (d: T) => ReactNode | ReactNode[] | null;
+  renderContent?: (d: T) => ReactNode | ReactNode[] | null;
   variant?: 'proposal' | 'vote' | 'turnouts';
 }
 const DistributionContainer = styled(ButtonGroup)(() => ({
@@ -45,10 +45,10 @@ const DistributionBar = <T extends Percentage>({
               display: 'block',
               textAlign: 'left',
               textTransform: 'none',
-              width: `${datum.percentage}%`,
+              width: `${datum.percent}%`,
             }}
           >
-            {renderContent(datum)}
+            {renderContent && renderContent(datum)}
           </Button>
         );
       })}
