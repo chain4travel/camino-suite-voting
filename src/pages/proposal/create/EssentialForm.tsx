@@ -20,6 +20,8 @@ import { DatePicker } from '@mui/x-date-pickers';
 import { DateTime } from 'luxon';
 import Button from '@/components/Button';
 import useToast from '@/hooks/useToast';
+import FormContainer from './FormContainer';
+import FormSection from './FormSection';
 
 export const essentialSchema = z.object({
   startDate: z
@@ -42,8 +44,7 @@ interface EssentialFormProps {
   formSchema?: z.ZodRawShape;
 }
 const EssentialForm = ({ children, formSchema = {} }: EssentialFormProps) => {
-  const schema = essentialSchema.extend(formSchema);
-  schema.refine(
+  const schema = essentialSchema.extend(formSchema).refine(
     fields => {
       const diffDays = fields.endDate.diff(fields.startDate, 'days').days;
       return diffDays > 0 && diffDays <= 30;
@@ -75,105 +76,101 @@ const EssentialForm = ({ children, formSchema = {} }: EssentialFormProps) => {
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <Paragraph spacing="lg">
-          <Paragraph spacing="md" divider>
-            <Paragraph>
-              <Header headline="Please select a voting period" variant="h6" />
-              <Typography variant="body2" color="text.secondary">
-                The voting period will be{' '}
-                <Typography variant="body2" component="span" fontWeight={700}>
-                  {'<number of entered days>'}
+        <FormContainer>
+          <Paragraph spacing="lg">
+            <FormSection spacing="md" divider>
+              <Paragraph>
+                <Header headline="Please select a voting period" variant="h6" />
+                <Typography variant="body2" color="text.secondary">
+                  The voting period will be{' '}
+                  <Typography variant="body2" component="span" fontWeight={700}>
+                    {'<number of entered days>'}
+                  </Typography>
+                  . It will start on{' '}
+                  <Typography variant="body2" component="span" fontWeight={700}>
+                    {'<start datetime>'}
+                  </Typography>{' '}
+                  and end on{' '}
+                  <Typography variant="body2" component="span" fontWeight={700}>
+                    {'<end datetime>'}
+                  </Typography>
                 </Typography>
-                . It will start on{' '}
-                <Typography variant="body2" component="span" fontWeight={700}>
-                  {'<start datetime>'}
-                </Typography>{' '}
-                and end on{' '}
-                <Typography variant="body2" component="span" fontWeight={700}>
-                  {'<end datetime>'}
+                <Typography variant="body2" color="text.secondary">
+                  Please note that additional{' '}
+                  <Typography variant="body2" component="span" fontWeight={700}>
+                    {'<threshold -1>'}
+                  </Typography>{' '}
+                  members of your Multisignature Group must sign this voting
+                  proposal before the start datetime of the vote
                 </Typography>
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Please note that additional{' '}
-                <Typography variant="body2" component="span" fontWeight={700}>
-                  {'<threshold -1>'}
-                </Typography>{' '}
-                members of your Multisignature Group must sign this voting
-                proposal before the start datetime of the vote
-              </Typography>
-            </Paragraph>
-            <Stack direction="row" spacing={2}>
-              <Stack direction="row" spacing={1} alignItems="center">
-                <InputLabel sx={{ color: 'text.secondary' }}>From</InputLabel>
-                <Controller
-                  name="startDate"
-                  control={control}
-                  defaultValue={DateTime.now()}
-                  render={({ field, fieldState: { error } }) => (
-                    <>
-                      <DatePicker
-                        {...field}
-                        disablePast
-                        onChange={value => field.onChange(value!)}
-                        minDate={DateTime.now().startOf('day')}
-                      />
-                      {error && (
-                        <FormHelperText error>{error.message}</FormHelperText>
-                      )}
-                    </>
-                  )}
-                />
+              </Paragraph>
+              <Stack direction="row" spacing={2}>
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <InputLabel sx={{ color: 'text.secondary' }}>From</InputLabel>
+                  <Controller
+                    name="startDate"
+                    control={control}
+                    defaultValue={DateTime.now()}
+                    render={({ field, fieldState: { error } }) => (
+                      <>
+                        <DatePicker
+                          {...field}
+                          disablePast
+                          onChange={value => field.onChange(value!)}
+                          minDate={DateTime.now().startOf('day')}
+                        />
+                        {error && (
+                          <FormHelperText error>{error.message}</FormHelperText>
+                        )}
+                      </>
+                    )}
+                  />
+                </Stack>
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <InputLabel sx={{ color: 'text.secondary' }}>To</InputLabel>
+                  <Controller
+                    name="endDate"
+                    control={control}
+                    defaultValue={DateTime.now().plus({ days: 1 })}
+                    render={({ field, fieldState: { error } }) => (
+                      <>
+                        <DatePicker
+                          {...field}
+                          disablePast
+                          onChange={value => field.onChange(value!)}
+                          minDate={getValues('startDate')?.plus({ days: 1 })}
+                          maxDate={getValues('startDate')?.plus({ days: 30 })}
+                        />
+                        {error && (
+                          <FormHelperText error>{error.message}</FormHelperText>
+                        )}
+                      </>
+                    )}
+                  />
+                </Stack>
               </Stack>
-              <Stack direction="row" spacing={1} alignItems="center">
-                <InputLabel sx={{ color: 'text.secondary' }}>To</InputLabel>
-                <Controller
-                  name="endDate"
-                  control={control}
-                  defaultValue={DateTime.now().plus({ days: 1 })}
-                  render={({ field, fieldState: { error } }) => (
-                    <>
-                      <DatePicker
-                        {...field}
-                        disablePast
-                        onChange={value => field.onChange(value!)}
-                        minDate={DateTime.now()
-                          .plus({ days: 1 })
-                          .startOf('day')}
-                        maxDate={getValues('startDate')?.plus({ days: 30 })}
-                      />
-                      {error && (
-                        <FormHelperText error>{error.message}</FormHelperText>
-                      )}
-                    </>
-                  )}
-                />
-              </Stack>
-            </Stack>
-          </Paragraph>
-          <Paragraph spacing="md" divider>
-            <Header headline="Add link of forum of discussion" variant="h6" />
-            <Controller
-              name="forumLink"
-              control={control}
-              defaultValue={''}
-              render={({ field, fieldState: { error } }) => (
-                <>
+            </FormSection>
+            <FormSection spacing="md" divider sx={{ paddingX: 3 }}>
+              <Header headline="Add link of forum of discussion" variant="h6" />
+              <Controller
+                name="forumLink"
+                control={control}
+                defaultValue={''}
+                render={({ field, fieldState: { error } }) => (
                   <TextField
                     {...field}
                     variant="filled"
                     fullWidth
                     error={!!error}
+                    helperText={error?.message}
                   />
-                  {error && (
-                    <FormHelperText error>{error.message}</FormHelperText>
-                  )}
-                </>
-              )}
-            />
+                )}
+              />
+            </FormSection>
+            {children}
           </Paragraph>
-          {children}
-        </Paragraph>
-        <Stack direction="row" spacing={2} marginTop={2.5}>
+        </FormContainer>
+        <Stack direction="row" spacing={2}>
           <Button variant="outlined" sx={{ py: 1.5 }} color="inherit" fullWidth>
             Cancel
           </Button>

@@ -18,6 +18,7 @@ import TextEditor from '@/components/TextEditor';
 import Header from '@/components/Header';
 import Paragraph from '@/components/Paragraph';
 import { VotingOption } from '@/types';
+import FormSection from './FormSection';
 
 const MAX_OPTIONS = 3;
 export const baseFeeFormSchema = {
@@ -61,7 +62,7 @@ const BaseFeeVoting = () => {
 
   return (
     <>
-      <Paragraph divider spacing="md">
+      <FormSection divider spacing="md">
         <Paragraph>
           <Header headline={`Current Base Fee ${baseFee} nCAM`} variant="h6" />
           <Typography variant="body2" color="text.secondary">
@@ -139,23 +140,25 @@ const BaseFeeVoting = () => {
         >
           Add Option
         </Button>
-      </Paragraph>
-      <Controller
-        name="description"
-        control={control}
-        render={({ field, fieldState: { error } }) => (
-          <Stack>
-            <TextEditor
-              {...field}
-              title="Describe the voting"
-              description="Additionally, please provide a detailed description of this voting"
-              onChange={value => field.onChange(value)}
-              error={error}
-            />
-            {error && <FormHelperText error>{error.message}</FormHelperText>}
-          </Stack>
-        )}
-      />
+      </FormSection>
+      <FormSection>
+        <Controller
+          name="description"
+          control={control}
+          render={({ field, fieldState: { error } }) => (
+            <>
+              <TextEditor
+                {...field}
+                title="Describe the voting"
+                description="Additionally, please provide a detailed description of this voting"
+                onChange={value => field.onChange(value)}
+                error={error}
+              />
+              {error && <FormHelperText error>{error.message}</FormHelperText>}
+            </>
+          )}
+        />
+      </FormSection>
     </>
   );
 };

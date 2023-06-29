@@ -13,6 +13,11 @@ import type { VotingType } from '@/types';
 import NoVotingType from './NoVotingType';
 import BaseFeeVoting, { baseFeeFormSchema } from './BaseFeeVoting';
 import EssentialForm from './EssentialForm';
+import NewMemberVoting, { newMemberFormSchema } from './NewMemberVoting';
+import ExcludeMemberVoting, {
+  excludeMemberFormSchema,
+} from './ExcludeMemberVoting';
+import FormContainer from './FormContainer';
 
 const CreateNewVoting = () => {
   const { data: votingTypes } = useLoaderData() as { data: VotingType[] };
@@ -31,6 +36,14 @@ const CreateNewVoting = () => {
       case 'BASE_FEE':
         ProposalForm = <BaseFeeVoting />;
         formSchema = baseFeeFormSchema;
+        break;
+      case 'NEW_MEMBER':
+        ProposalForm = <NewMemberVoting />;
+        formSchema = newMemberFormSchema;
+        break;
+      case 'EXCLUDE_MEMBER':
+        ProposalForm = <ExcludeMemberVoting />;
+        formSchema = excludeMemberFormSchema;
         break;
       default:
         console.warn(`Unsupported voting type ${selectedVotingType}`);
@@ -75,25 +88,11 @@ const CreateNewVoting = () => {
           </MenuItem>
         ))}
       </Select>
-      <Stack
-        justifyContent="center"
-        alignItems="center"
-        sx={{
-          marginTop: 2.5,
-          minHeight: '300px',
-          border: 1,
-          borderColor: 'divider',
-          borderRadius: '12px',
-          paddingY: 3,
-          paddingX: 2.5,
-        }}
-      >
-        {formSchema ? (
-          <EssentialForm formSchema={formSchema}>{ProposalForm}</EssentialForm>
-        ) : (
-          ProposalForm
-        )}
-      </Stack>
+      {formSchema ? (
+        <EssentialForm formSchema={formSchema}>{ProposalForm}</EssentialForm>
+      ) : (
+        ProposalForm
+      )}
     </Container>
   );
 };
