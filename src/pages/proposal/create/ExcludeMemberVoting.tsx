@@ -11,7 +11,10 @@ export const excludeMemberFormSchema = {
   pAddress: z
     .string()
     .refine(addr => addr.startsWith('P-camino'), 'invalid P-address'),
-  description: z.string(),
+  description: z
+    .string()
+    .nonempty()
+    .refine(d => d?.replaceAll(/(<p>|<\/p>|<br>)/g, '') !== '', 'requied'),
 };
 const ExcludeMemberVoting = () => {
   const { control } = useFormContext();

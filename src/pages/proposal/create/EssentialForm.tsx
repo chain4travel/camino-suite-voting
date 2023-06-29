@@ -32,7 +32,7 @@ export const essentialSchema = z.object({
     ),
   endDate: z
     .custom<DateTime>()
-    .refine(d => d.isValid && d.diffNow(['days']).days > 0),
+    .refine(d => d.isValid && d.diffNow(['days']).days > 0, 'invalid end date'),
   forumLink: z.preprocess(url => {
     if (!url || typeof url !== 'string') return undefined;
     return url === '' ? undefined : url;
@@ -46,7 +46,9 @@ interface EssentialFormProps {
 const EssentialForm = ({ children, formSchema = {} }: EssentialFormProps) => {
   const schema = essentialSchema.extend(formSchema).refine(
     fields => {
-      const diffDays = fields.endDate.diff(fields.startDate, 'days').days;
+      const diffDays = fields.endDate
+        .startOf('day')
+        .diff(fields.startDate, 'days').days;
       return diffDays > 0 && diffDays <= 30;
     },
     {
