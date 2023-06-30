@@ -4,9 +4,9 @@ import { map } from 'lodash';
 import { Percentage } from '@/types';
 import Button from './Button';
 
-const PROPOSAL_DISTRIBUTION_COLORS = ['#304275', '#4864AF', '#7D92CA'];
-const TURNOUTS_COLORS = ['#B7C3E1', '#7D92CA'];
-const VOTE_DISTRIBUTION_COLORS = ['#7251B5', '#9163CB', '#B185DB'];
+export const PROPOSAL_DISTRIBUTION_COLORS = ['#304275', '#4864AF', '#7D92CA'];
+export const TURNOUTS_COLORS = ['#B7C3E1', '#7D92CA'];
+export const VOTE_DISTRIBUTION_COLORS = ['#7251B5', '#9163CB', '#B185DB'];
 
 interface DistributionBarProps<T extends Percentage> {
   data: T[];

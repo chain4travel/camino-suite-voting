@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { Stack } from '@mui/material';
-import { find } from 'lodash';
+import { Stack, Typography } from '@mui/material';
+import Big from 'big.js';
 import type { Proposal, VotingOption } from '@/types';
 import { useBaseFee, useVote } from '@/hooks/useRpc';
-import BaseFeeVotingOption from './BaseFeeVotingOption';
 import VotingOptionCard from './VotingOptionCard';
 interface BaseFeeVotingProps {
   data: Proposal;
@@ -39,14 +38,39 @@ const BaseFeeVoting = ({ data, disableParentRipple }: BaseFeeVotingProps) => {
           key={`${opt.option}`}
           option={opt}
           title={`Future Base Fee ${opt.value} nCAM`}
-          isVoted={!!find(data.voted, v => v.option === opt.option)}
+          voted={data.voted}
           selected={selectToVote}
           onSelect={handleSelectChange}
           onVote={() => handleConfirmToVote(opt)}
           isSubmitting={votingOption === opt.option}
-          renderContent={(option: VotingOption) => (
-            <BaseFeeVotingOption option={option} baseFee={baseFee} />
-          )}
+          renderContent={(option: VotingOption) => {
+            if (baseFee <= 0) {
+              console.warn('Invalid number of base fee: ', baseFee);
+              return null;
+            }
+            const absoluteChange = new Big(Number(option.value)).minus(baseFee);
+            const percentageChange = absoluteChange.times(100).div(baseFee);
+            return (
+              <>
+                <Stack direction="row" justifyContent="space-between">
+                  <Typography variant="body2" color="text.secondary">
+                    Percentage Change:
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {percentageChange.toFixed(2)}%
+                  </Typography>
+                </Stack>
+                <Stack direction="row" justifyContent="space-between">
+                  <Typography variant="body2" color="text.secondary">
+                    Absolute Change:
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {absoluteChange.toString()} nCAM
+                  </Typography>
+                </Stack>
+              </>
+            );
+          }}
         />
       ))}
     </Stack>

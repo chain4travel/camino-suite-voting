@@ -1,6 +1,3 @@
-import Button from '@/components/Button';
-import StateButton from '@/components/StateButton';
-import { VotingOption } from '@/types';
 import { Check, CheckCircle, CircleOutlined } from '@mui/icons-material';
 import {
   Card as MuiCard,
@@ -12,6 +9,10 @@ import {
   Stack,
 } from '@mui/material';
 import React, { ReactNode } from 'react';
+import { find } from 'lodash';
+import Button from '@/components/Button';
+import StateButton from '@/components/StateButton';
+import { Vote, VotingOption } from '@/types';
 
 interface StyledCardProps {
   isSelected?: boolean;
@@ -46,7 +47,7 @@ const StyledCardHeader = styled(MuiCardHeader)(({ theme }) => ({
 interface VotingOptionProps {
   option: VotingOption;
   title?: string;
-  isVoted?: boolean;
+  voted?: Vote[];
   isSubmitting?: boolean;
   selected?: string | number | null;
   children?: ReactNode;
@@ -57,16 +58,18 @@ interface VotingOptionProps {
 const VotingOptionCard = ({
   option,
   title,
-  isVoted,
+  voted,
   isSubmitting,
   selected,
   renderContent,
   onSelect,
   onVote,
 }: VotingOptionProps) => {
+  const hadVoted = voted && voted.length > 0;
+  const isVoted = !!find(voted, v => v.option === option.option);
   const toggleSelected = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
-    !isVoted && onSelect && onSelect(option.option);
+    !hadVoted && onSelect && onSelect(option.option);
   };
   const confirmSelection = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
@@ -82,7 +85,7 @@ const VotingOptionCard = ({
         <StyledCardHeader
           title={title}
           action={
-            isVoted ? null : option.option === selected ? (
+            hadVoted ? null : option.option === selected ? (
               <CheckCircle color="primary" />
             ) : (
               <CircleOutlined sx={{ color: 'divider' }} />
