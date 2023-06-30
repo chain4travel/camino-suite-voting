@@ -18,6 +18,9 @@ import ExcludeMemberVoting, {
   excludeMemberFormSchema,
 } from './ExcludeMemberVoting';
 import FormContainer from './FormContainer';
+import FeeDistributionVoting, {
+  feeDistributionFormSchema,
+} from './FeeDistributionVoting';
 
 const CreateNewVoting = () => {
   const { data: votingTypes } = useLoaderData() as { data: VotingType[] };
@@ -44,6 +47,10 @@ const CreateNewVoting = () => {
       case 'EXCLUDE_MEMBER':
         ProposalForm = <ExcludeMemberVoting />;
         formSchema = excludeMemberFormSchema;
+        break;
+      case 'FEE_DISTRIBUTION':
+        ProposalForm = <FeeDistributionVoting />;
+        formSchema = feeDistributionFormSchema;
         break;
       default:
         console.warn(`Unsupported voting type ${selectedVotingType}`);

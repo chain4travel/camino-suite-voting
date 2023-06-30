@@ -47,8 +47,8 @@ const EssentialForm = ({ children, formSchema = {} }: EssentialFormProps) => {
   const schema = essentialSchema.extend(formSchema).refine(
     fields => {
       const diffDays = fields.endDate
-        .startOf('day')
-        .diff(fields.startDate, 'days').days;
+        .endOf('day')
+        .diff(fields.startDate, ['days', 'hours']).days;
       return diffDays > 0 && diffDays <= 30;
     },
     {

@@ -27,7 +27,7 @@ const Paragraph = ({
   }
   return (
     <>
-      <Stack {...props} spacing={margin} sx={{ width: '100%' }}>
+      <Stack width="100%" {...props} spacing={margin}>
         {children}
       </Stack>
       {divider && <Divider sx={{ marginTop: 3 }} />}
