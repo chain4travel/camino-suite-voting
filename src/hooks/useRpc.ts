@@ -6,16 +6,16 @@ import useToast from './useToast';
 // TODO: base RPC call
 
 export const useBaseFee = () => {
-  const { data, isLoading, isError, isSuccess } = useQuery(
+  const { data, isLoading, error, isSuccess } = useQuery(
     ['getBaseFee'],
     async () => getTxFee()
   );
 
-  console.debug('useBaseFee data: ', data, isLoading, isError, isSuccess);
+  console.debug('useBaseFee data: ', data, isLoading, error, isSuccess);
 
   return {
     isLoading,
-    isError,
+    error,
     baseFee: data ?? 0,
   };
 };

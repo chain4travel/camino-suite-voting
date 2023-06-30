@@ -1,5 +1,4 @@
 import { Vote } from '@/types';
-import { Circle } from '@mui/icons-material';
 import {
   Paper,
   Stack,
@@ -75,7 +74,6 @@ const VoteResultTable = ({ votes }: VoteResultTableProps) => {
                 }}
               >
                 <Stack direction="row" alignItems="center" spacing={2}>
-                  {idx === 0 ? <Circle /> : null}
                   <Typography>{column.label}</Typography>
                 </Stack>
               </TableCell>
@@ -92,20 +90,6 @@ const VoteResultTable = ({ votes }: VoteResultTableProps) => {
                   sx={{ borderColor: 'divider' }}
                 >
                   <Stack direction="row" alignItems="center" spacing={2}>
-                    {idx === 0 ? (
-                      <svg height={24} width={24}>
-                        <defs>
-                          <linearGradient
-                            id="grad"
-                            gradientTransform="rotate(45)"
-                          >
-                            <stop offset="40%" stopColor="#35E9AD" />
-                            <stop offset="120%" stopColor="#149EED" />
-                          </linearGradient>
-                        </defs>
-                        <circle cx={12} cy={12} r="10" fill="url(#grad)" />
-                      </svg>
-                    ) : null}
                     <Typography>{row[column.dataKey]}</Typography>
                   </Stack>
                 </TableCell>

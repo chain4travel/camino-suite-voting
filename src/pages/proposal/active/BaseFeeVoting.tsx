@@ -4,6 +4,7 @@ import { find } from 'lodash';
 import type { Proposal, VotingOption } from '@/types';
 import { useBaseFee, useVote } from '@/hooks/useRpc';
 import BaseFeeVotingOption from './BaseFeeVotingOption';
+import VotingOptionCard from './VotingOptionCard';
 interface BaseFeeVotingProps {
   data: Proposal;
   disableParentRipple?: (disabled: boolean) => void;
@@ -34,15 +35,18 @@ const BaseFeeVoting = ({ data, disableParentRipple }: BaseFeeVotingProps) => {
   return (
     <Stack direction="row" sx={{ marginRight: 3 }} spacing={3}>
       {data.options.map(opt => (
-        <BaseFeeVotingOption
-          key={opt.option}
-          data={opt}
+        <VotingOptionCard
+          key={`${opt.option}`}
+          option={opt}
+          title={`Future Base Fee ${opt.value} nCAM`}
           isVoted={!!find(data.voted, v => v.option === opt.option)}
           selected={selectToVote}
-          baseFee={baseFee}
           onSelect={handleSelectChange}
           onVote={() => handleConfirmToVote(opt)}
-          isVoting={votingOption === opt.option}
+          isSubmitting={votingOption === opt.option}
+          renderContent={(option: VotingOption) => (
+            <BaseFeeVotingOption option={option} baseFee={baseFee} />
+          )}
         />
       ))}
     </Stack>

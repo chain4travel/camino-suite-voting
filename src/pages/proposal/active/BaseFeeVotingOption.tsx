@@ -1,137 +1,38 @@
 import React from 'react';
-import { Check, CheckCircle, CircleOutlined } from '@mui/icons-material';
-import {
-  Card as MuiCard,
-  CardActionArea,
-  CardContent,
-  CardHeader as MuiCardHeader,
-  Stack,
-  Typography,
-  styled,
-  CardProps,
-} from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 import type { VotingOption } from '@/types';
-import Button from '@/components/Button';
-import StateButton from '@/components/StateButton';
+import Big from 'big.js';
 
-interface StyledCardProps {
-  isSelected?: boolean;
-  isVoted?: boolean;
-}
-const StyledCard = styled(
-  ({
-    isSelected: _isSelected,
-    isVoted: _isVoted,
-    ...props
-  }: StyledCardProps & CardProps) => <MuiCard {...props} />
-)(({ theme, ...props }) => ({
-  minWidth: '280px',
-  boxShadow: 'none',
-  background: 'transparent',
-  borderWidth: 1,
-  borderStyle: 'solid',
-  borderColor: props.isVoted
-    ? theme.palette.accent.main
-    : props.isSelected
-    ? theme.palette.primary.main
-    : theme.palette.divider,
-}));
-const StyledCardHeader = styled(MuiCardHeader)(({ theme }) => ({
-  padding: theme.spacing(1.5),
-  '.MuiCardHeader-action': {
-    marginTop: 0,
-    marginBottom: 0,
-  },
-}));
 interface BaseFeeVotingOptionProps {
-  data: VotingOption;
-  selected: string | number | null;
+  option: VotingOption;
   baseFee: number;
-  isVoting: boolean;
-  isVoted: boolean;
-  onSelect: (option: string | number | null) => void;
-  onVote: () => void;
 }
-const BaseFeeVotingOption = ({
-  data,
-  selected,
-  baseFee,
-  isVoting,
-  isVoted = false,
-  onSelect,
-  onVote,
-}: BaseFeeVotingOptionProps) => {
-  const toggleSelected = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    !isVoted && onSelect(data.option);
-  };
-  const confirmSelection = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    onVote();
-  };
+const BaseFeeVotingOption = ({ option, baseFee }: BaseFeeVotingOptionProps) => {
+  if (baseFee <= 0) {
+    console.warn('Invalid number of base fee: ', baseFee);
+    return null;
+  }
+  const absoluteChange = new Big(Number(option.value)).minus(baseFee);
+  const percentageChange = absoluteChange.times(100).div(baseFee);
   return (
-    <StyledCard
-      key={`${data.option}-${data.value}`}
-      isSelected={data.option === selected}
-      isVoted={isVoted}
-    >
-      <CardActionArea onClick={toggleSelected} disableRipple>
-        <StyledCardHeader
-          title={`Future Base Fee ${data.value} nCAM`}
-          action={
-            isVoted ? null : data.option === selected ? (
-              <CheckCircle color="primary" />
-            ) : (
-              <CircleOutlined sx={{ color: 'divider' }} />
-            )
-          }
-          titleTypographyProps={{ variant: 'h6' }}
-        />
-      </CardActionArea>
-      <CardContent sx={{ padding: 1.5 }}>
-        <Stack spacing={0.5}>
-          <Stack direction="row" justifyContent="space-between">
-            <Typography variant="body2" color="text.secondary">
-              Percentage Change:
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {((Number(data.value) - baseFee) / baseFee) * 100}%
-            </Typography>
-          </Stack>
-          <Stack direction="row" justifyContent="space-between">
-            <Typography variant="body2" color="text.secondary">
-              Absolute Change:
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {Number(data.value) - baseFee} nCAM
-            </Typography>
-          </Stack>
-        </Stack>
-        {isVoted ? (
-          <StateButton
-            variant="text"
-            color="accent"
-            sx={{ marginTop: 1.5 }}
-            fullWidth
-            startIcon={<Check />}
-          >
-            Your selection
-          </StateButton>
-        ) : (
-          <Button
-            variant="contained"
-            color="primary"
-            sx={{ marginTop: 1.5 }}
-            onClick={confirmSelection}
-            fullWidth
-            disabled={data.option !== selected}
-            loading={isVoting}
-          >
-            Confirm your selection
-          </Button>
-        )}
-      </CardContent>
-    </StyledCard>
+    <>
+      <Stack direction="row" justifyContent="space-between">
+        <Typography variant="body2" color="text.secondary">
+          Percentage Change:
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          {percentageChange.toFixed(2)}%
+        </Typography>
+      </Stack>
+      <Stack direction="row" justifyContent="space-between">
+        <Typography variant="body2" color="text.secondary">
+          Absolute Change:
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          {absoluteChange.toString()} nCAM
+        </Typography>
+      </Stack>
+    </>
   );
 };
 export default BaseFeeVotingOption;
