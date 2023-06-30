@@ -64,9 +64,11 @@ const ProposalStatus = ({ proposal, extraInfo }: ProposalStatusProps) => {
             </Typography>
           </Paragraph>
         </Paragraph>
-        <Paragraph spacing="sm" divider>
-          {extraInfo}
-        </Paragraph>
+        {extraInfo && (
+          <Paragraph spacing="sm" divider>
+            {extraInfo}
+          </Paragraph>
+        )}
         <Paragraph spacing="md">
           <Typography variant="h5">Your vote</Typography>
           <Paragraph spacing="sm">

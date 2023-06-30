@@ -158,14 +158,16 @@ const Detail = () => {
           <ProposalStatus
             proposal={proposal}
             extraInfo={
-              <>
-                <Typography variant="h5">{`${
-                  votingType?.abbr ?? votingType?.name
-                } prior to proposal`}</Typography>
-                <Typography variant="body1" color="text.secondary">
-                  {result?.value} nCAM
-                </Typography>
-              </>
+              votingType?.id === 'BASE_FEE' && (
+                <>
+                  <Typography variant="h5">{`${
+                    votingType?.abbr ?? votingType?.name
+                  } prior to proposal`}</Typography>
+                  <Typography variant="body1" color="text.secondary">
+                    {result?.value} nCAM
+                  </Typography>
+                </>
+              )
             }
           />
         </Stack>
