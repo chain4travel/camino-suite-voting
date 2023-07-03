@@ -61,7 +61,7 @@ const VoteResultTable = ({ votes }: VoteResultTableProps) => {
         components={VirtuosoTableComponents}
         fixedHeaderContent={() => (
           <TableRow>
-            {columns.map((column, idx) => (
+            {columns.map(column => (
               <TableCell
                 key={column.dataKey}
                 variant="head"
@@ -83,11 +83,15 @@ const VoteResultTable = ({ votes }: VoteResultTableProps) => {
         itemContent={(_index: number, row: VoteData) => {
           return (
             <>
-              {columns.map((column, idx) => (
+              {columns.map(column => (
                 <TableCell
                   key={column.dataKey}
                   align="left"
-                  sx={{ borderColor: 'divider' }}
+                  sx={{
+                    borderColor: 'divider',
+                    color:
+                      row['votedDateTime'] === '-' ? 'grey.400' : 'inherit',
+                  }}
                 >
                   <Stack direction="row" alignItems="center" spacing={2}>
                     <Typography>{row[column.dataKey]}</Typography>
