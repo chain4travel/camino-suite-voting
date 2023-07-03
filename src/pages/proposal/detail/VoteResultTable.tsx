@@ -31,8 +31,9 @@ const columns: ColumnField[] = [
   { dataKey: 'option', label: 'VOTE FOR', width: 260 },
 ];
 
-interface VoteData extends Vote {
+interface VoteData extends Omit<Vote, 'votedDateTime'> {
   id: number;
+  votedDateTime: string;
 }
 const VirtuosoTableComponents: TableComponents<VoteData> = {
   Scroller: forwardRef<HTMLDivElement>((props, ref) => (
@@ -89,8 +90,7 @@ const VoteResultTable = ({ votes }: VoteResultTableProps) => {
                   align="left"
                   sx={{
                     borderColor: 'divider',
-                    color:
-                      row['votedDateTime'] === '-' ? 'grey.400' : 'inherit',
+                    color: row.votedDateTime === '-' ? 'grey.400' : 'inherit',
                   }}
                 >
                   <Stack direction="row" alignItems="center" spacing={2}>
