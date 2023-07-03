@@ -3,6 +3,7 @@ import { filter } from 'lodash';
 import { Box, Stack, Typography } from '@mui/material';
 import Big from 'big.js';
 import { Percentage, Vote, VotingOption } from '@/types';
+import DistributionBar from '@/components/DistributionBar';
 
 type VotedOption = VotingOption & Percentage;
 
@@ -28,31 +29,47 @@ const VoteOptions = ({
         switch (votingType) {
           case 'BASE_FEE':
             {
-              label = `Future Base Fee ${opt.value} nCAM`;
-              const absoluteChange = new Big(opt.value).minus(baseFee);
-              const percentageChange = absoluteChange.times(100).div(baseFee);
-              const sign = absoluteChange.s > 0 ? '+' : '';
+              if (baseFee) {
+                label = `Future Base Fee ${opt.value} nCAM`;
+                const absoluteChange = new Big(opt.value as number).minus(
+                  baseFee
+                );
+                const percentageChange = absoluteChange.times(100).div(baseFee);
+                const sign = absoluteChange.s > 0 ? '+' : '';
+                extraInfo = (
+                  <>
+                    <Stack direction="row" justifyContent="space-between">
+                      <Typography variant="caption" color="text.secondary">
+                        Percentage Change
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {sign}
+                        {Number(percentageChange.toFixed(2))}%
+                      </Typography>
+                    </Stack>
+                    <Stack direction="row" justifyContent="space-between">
+                      <Typography variant="caption" color="text.secondary">
+                        Absolute Change
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {sign}
+                        {absoluteChange.toString()} nCAM
+                      </Typography>
+                    </Stack>
+                  </>
+                );
+              }
+            }
+            break;
+          case 'FEE_DISTRIBUTION':
+            {
+              label = `Distribution #${opt.option}`;
+              const values = opt.value as number[];
               extraInfo = (
-                <>
-                  <Stack direction="row" justifyContent="space-between">
-                    <Typography variant="caption" color="text.secondary">
-                      Percentage Change
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {sign}
-                      {Number(percentageChange.toFixed(2))}%
-                    </Typography>
-                  </Stack>
-                  <Stack direction="row" justifyContent="space-between">
-                    <Typography variant="caption" color="text.secondary">
-                      Absolute Change
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {sign}
-                      {absoluteChange.toString()} nCAM
-                    </Typography>
-                  </Stack>
-                </>
+                <DistributionBar
+                  data={values.map(percent => ({ percent }))}
+                  variant={opt.option === result.option ? 'vote' : 'default'}
+                />
               );
             }
             break;

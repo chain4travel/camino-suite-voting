@@ -6,6 +6,14 @@ export const getTxFee = async () => {
   return 80;
 };
 
+export const getFeeDistribution = async () => {
+  return [
+    { label: 'Validators', value: 30 },
+    { label: 'Take-off Grant Program', value: 40 },
+    { label: 'Burn', value: 30 },
+  ];
+};
+
 export const vote = async (
   proposalId: string | number,
   votingType: string,

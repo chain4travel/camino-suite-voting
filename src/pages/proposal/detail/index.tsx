@@ -9,7 +9,7 @@ import { Percentage, Vote, VotingOption, VotingType } from '@/types';
 import Header from '@/components/Header';
 import Button from '@/components/Button';
 import { useProposal } from '@/hooks/useProposals';
-import { useBaseFee } from '@/hooks/useRpc';
+import { useBaseFee, useFeeDistribution } from '@/hooks/useRpc';
 import DistributionBar from '@/components/DistributionBar';
 import ProposalStatus from './ProposalStatus';
 import VoteResultTable from './VoteResultTable';
@@ -27,6 +27,7 @@ const Detail = () => {
     isLoading: _isLoading,
   } = useProposal(type!, id!);
   const { baseFee } = useBaseFee();
+  const { feeDistribution } = useFeeDistribution();
 
   const votingType = votingTypes.find(vtype => vtype.id === type);
   const { result, statistics, votes } = useMemo(() => {
@@ -93,11 +94,32 @@ const Detail = () => {
     }
     return {};
   }, [proposal]);
+  const extraInfo = useMemo(() => {
+    if (votingType) {
+      switch (votingType.id) {
+        case 'BASE_FEE':
+          return {
+            label: votingType?.abbr ?? votingType?.name,
+            value: result?.value,
+          };
+        case 'FEE_DISTRIBUTION':
+          return map(feeDistribution, distribution => ({
+            label: distribution.label,
+            value: distribution.value,
+          }));
+        default:
+      }
+    }
+  }, [votingType, result]);
 
   return (
     <>
       <Stack paddingY={2} alignItems="flex-start">
-        <Button variant="text" color="inherit" onClick={() => navigate(-1)}>
+        <Button
+          variant="text"
+          color="inherit"
+          onClick={() => navigate('/completed')}
+        >
           Back to all Proposals
         </Button>
       </Stack>
@@ -128,9 +150,9 @@ const Detail = () => {
             <Stack>
               <Header variant="h6" headline="Vote options" />
               <VoteOptions
-                options={proposal?.options.map(opt => ({
+                options={proposal?.options.map((opt: VotingOption) => ({
                   ...opt,
-                  percent: statistics?.summary[opt.option].percent,
+                  percent: statistics?.summary[opt.option]?.percent ?? 0,
                 }))}
                 votingType={votingType?.id}
                 result={result}
@@ -155,21 +177,7 @@ const Detail = () => {
               )}
             </Stack>
           </Stack>
-          <ProposalStatus
-            proposal={proposal}
-            extraInfo={
-              votingType?.id === 'BASE_FEE' && (
-                <>
-                  <Typography variant="h5">{`${
-                    votingType?.abbr ?? votingType?.name
-                  } prior to proposal`}</Typography>
-                  <Typography variant="body1" color="text.secondary">
-                    {result?.value} nCAM
-                  </Typography>
-                </>
-              )
-            }
-          />
+          <ProposalStatus proposal={proposal} extraInfo={extraInfo} />
         </Stack>
         <Divider
           color="divider"
@@ -183,45 +191,60 @@ const Detail = () => {
               Cast votes: {statistics?.totalVotes}
             </Typography>
             <DistributionBar
+              variant="proposal"
               data={proposal?.options.map((option: VotingOption) => ({
                 ...option,
-                percentage: statistics.summary?.[option.option]?.percent,
+                percent: statistics.summary?.[option.option]?.percent ?? 0,
               }))}
               renderContent={(option: VotingOption & Percentage) => {
                 let extraInfo = null;
-                if (votingType?.id === 'BASE_FEE') {
-                  const absoluteChange = new Big(option.value)
-                    .minus(baseFee)
-                    .toString();
-                  const percentageChange = new Big(absoluteChange)
-                    .times(100)
-                    .div(baseFee)
-                    .toFixed(2);
-                  extraInfo = (
-                    <>
+                let label = null;
+                switch (votingType?.id) {
+                  case 'BASE_FEE':
+                    {
+                      const absoluteChange = new Big(option.value as number)
+                        .minus(baseFee)
+                        .toString();
+                      const percentageChange = new Big(absoluteChange)
+                        .times(100)
+                        .div(baseFee)
+                        .toFixed(2);
+                      label = (
+                        <Typography color="text.primary" variant="body2">
+                          {toPastTense(String(option.label))}
+                        </Typography>
+                      );
+                      extraInfo = (
+                        <>
+                          <Typography color="text.primary" variant="body2">
+                            {option.value} nCAM
+                          </Typography>
+                          <Typography color="text.primary" variant="body2">
+                            {absoluteChange} nCAM
+                          </Typography>
+                          <Typography color="text.primary" variant="body2">
+                            {Number(percentageChange)}%
+                          </Typography>
+                        </>
+                      );
+                    }
+                    break;
+                  case 'FEE_DISTRIBUTION':
+                    label = (
                       <Typography color="text.primary" variant="body2">
-                        {option.value} nCAM
+                        {`Distribution #${option.option}`}
                       </Typography>
-                      <Typography color="text.primary" variant="body2">
-                        {absoluteChange} nCAM
-                      </Typography>
-                      <Typography color="text.primary" variant="body2">
-                        {percentageChange}%
-                      </Typography>
-                    </>
-                  );
+                    );
+                    break;
                 }
                 return (
                   <>
-                    {votingType?.id !== 'BASE_FEE' && (
-                      <Typography color="text.primary" variant="body2">
-                        {toPastTense(option.label)}
-                      </Typography>
-                    )}
+                    {label}
                     <Typography color="text.primary" fontWeight={700}>
-                      {statistics.summary?.[option.option]?.count} /{' '}
-                      {statistics.summary?.[option.option]?.percent}%
+                      {statistics.summary?.[option.option]?.count ?? 0} /{' '}
+                      {statistics.summary?.[option.option]?.percent ?? 0}%
                     </Typography>
+                    {extraInfo}
                   </>
                 );
               }}
@@ -239,7 +262,7 @@ const Detail = () => {
                 (t: Percentage, key: 'true' | 'false') => ({
                   ...t,
                   isParticipated: key,
-                  percentage: t.percent,
+                  percent: t.percent,
                 })
               )}
               renderContent={(

@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { getTxFee, vote } from '@/helpers/rpc';
+import { getFeeDistribution, getTxFee, vote } from '@/helpers/rpc';
 import { VotingOption } from '@/types';
 import useToast from './useToast';
 
@@ -17,6 +17,21 @@ export const useBaseFee = () => {
     isLoading,
     error,
     baseFee: data ?? 0,
+  };
+};
+
+export const useFeeDistribution = () => {
+  const { data, isLoading, error, isSuccess } = useQuery(
+    ['getFeeDistribution'],
+    async () => getFeeDistribution()
+  );
+
+  console.debug('useFeeDistribution data: ', data, isLoading, error, isSuccess);
+
+  return {
+    isLoading,
+    error,
+    feeDistribution: data ?? [],
   };
 };
 
