@@ -1,5 +1,4 @@
 import { Vote } from '@/types';
-import { Circle } from '@mui/icons-material';
 import {
   Paper,
   Stack,
@@ -32,8 +31,9 @@ const columns: ColumnField[] = [
   { dataKey: 'option', label: 'VOTE FOR', width: 260 },
 ];
 
-interface VoteData extends Vote {
+interface VoteData extends Omit<Vote, 'votedDateTime'> {
   id: number;
+  votedDateTime: string;
 }
 const VirtuosoTableComponents: TableComponents<VoteData> = {
   Scroller: forwardRef<HTMLDivElement>((props, ref) => (
@@ -62,7 +62,7 @@ const VoteResultTable = ({ votes }: VoteResultTableProps) => {
         components={VirtuosoTableComponents}
         fixedHeaderContent={() => (
           <TableRow>
-            {columns.map((column, idx) => (
+            {columns.map(column => (
               <TableCell
                 key={column.dataKey}
                 variant="head"
@@ -75,7 +75,6 @@ const VoteResultTable = ({ votes }: VoteResultTableProps) => {
                 }}
               >
                 <Stack direction="row" alignItems="center" spacing={2}>
-                  {idx === 0 ? <Circle /> : null}
                   <Typography>{column.label}</Typography>
                 </Stack>
               </TableCell>
@@ -85,27 +84,16 @@ const VoteResultTable = ({ votes }: VoteResultTableProps) => {
         itemContent={(_index: number, row: VoteData) => {
           return (
             <>
-              {columns.map((column, idx) => (
+              {columns.map(column => (
                 <TableCell
                   key={column.dataKey}
                   align="left"
-                  sx={{ borderColor: 'divider' }}
+                  sx={{
+                    borderColor: 'divider',
+                    color: row.votedDateTime === '-' ? 'grey.400' : 'inherit',
+                  }}
                 >
                   <Stack direction="row" alignItems="center" spacing={2}>
-                    {idx === 0 ? (
-                      <svg height={24} width={24}>
-                        <defs>
-                          <linearGradient
-                            id="grad"
-                            gradientTransform="rotate(45)"
-                          >
-                            <stop offset="40%" stopColor="#35E9AD" />
-                            <stop offset="120%" stopColor="#149EED" />
-                          </linearGradient>
-                        </defs>
-                        <circle cx={12} cy={12} r="10" fill="url(#grad)" />
-                      </svg>
-                    ) : null}
                     <Typography>{row[column.dataKey]}</Typography>
                   </Stack>
                 </TableCell>

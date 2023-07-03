@@ -1,26 +1,30 @@
-import React from 'react';
 import { Check, CheckCircle, CircleOutlined } from '@mui/icons-material';
 import {
   Card as MuiCard,
   CardActionArea,
-  CardContent,
-  CardHeader as MuiCardHeader,
-  Stack,
-  Typography,
-  styled,
   CardProps,
+  styled,
+  CardHeader as MuiCardHeader,
+  CardContent,
+  Stack,
 } from '@mui/material';
-import type { VotingOption } from '@/types';
+import React, { ReactNode } from 'react';
+import { find } from 'lodash';
 import Button from '@/components/Button';
 import StateButton from '@/components/StateButton';
+import { Vote, VotingOption } from '@/types';
 
 interface StyledCardProps {
   isSelected?: boolean;
   isVoted?: boolean;
 }
-const StyledCard = styled((props: StyledCardProps & CardProps) => (
-  <MuiCard {...props} />
-))(({ theme, ...props }) => ({
+const StyledCard = styled(
+  ({
+    isSelected: _isSelected,
+    isVoted: _isVoted,
+    ...props
+  }: StyledCardProps & CardProps) => <MuiCard {...props} />
+)(({ theme, ...props }) => ({
   minWidth: '280px',
   boxShadow: 'none',
   background: 'transparent',
@@ -39,43 +43,49 @@ const StyledCardHeader = styled(MuiCardHeader)(({ theme }) => ({
     marginBottom: 0,
   },
 }));
-interface BaseFeeVotingOptionProps {
-  data: VotingOption;
-  selected: string | number | null;
-  baseFee: number;
-  isVoting: boolean;
-  isVoted: boolean;
-  onSelect: (option: string | number | null) => void;
-  onVote: () => void;
+
+interface VotingOptionProps {
+  option: VotingOption;
+  title?: string;
+  voted?: Vote[];
+  isSubmitting?: boolean;
+  selected?: string | number | null;
+  children?: ReactNode;
+  renderContent?: (option: VotingOption) => ReactNode;
+  onSelect?: (option: string | number | null) => void;
+  onVote?: () => void;
 }
-const BaseFeeVotingOption = ({
-  data,
+const VotingOptionCard = ({
+  option,
+  title,
+  voted,
+  isSubmitting,
   selected,
-  baseFee,
-  isVoting,
-  isVoted = false,
+  renderContent,
   onSelect,
   onVote,
-}: BaseFeeVotingOptionProps) => {
+}: VotingOptionProps) => {
+  const hadVoted = voted && voted.length > 0;
+  const isVoted = !!find(voted, v => v.option === option.option);
   const toggleSelected = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
-    !isVoted && onSelect(data.option);
+    !hadVoted && onSelect && onSelect(option.option);
   };
   const confirmSelection = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
-    onVote();
+    onVote && onVote();
   };
   return (
     <StyledCard
-      key={`${data.option}-${data.value}`}
-      isSelected={data.option === selected}
+      key={`${option.option}-${option.value}`}
+      isSelected={option.option === selected}
       isVoted={isVoted}
     >
       <CardActionArea onClick={toggleSelected} disableRipple>
         <StyledCardHeader
-          title={`Future Base Fee ${data.value} nCAM`}
+          title={title}
           action={
-            isVoted ? null : data.option === selected ? (
+            hadVoted ? null : option.option === selected ? (
               <CheckCircle color="primary" />
             ) : (
               <CircleOutlined sx={{ color: 'divider' }} />
@@ -85,24 +95,7 @@ const BaseFeeVotingOption = ({
         />
       </CardActionArea>
       <CardContent sx={{ padding: 1.5 }}>
-        <Stack spacing={0.5}>
-          <Stack direction="row" justifyContent="space-between">
-            <Typography variant="body2" color="text.secondary">
-              Percentage Change:
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {((Number(data.value) - baseFee) / baseFee) * 100}%
-            </Typography>
-          </Stack>
-          <Stack direction="row" justifyContent="space-between">
-            <Typography variant="body2" color="text.secondary">
-              Absolute Change:
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {Number(data.value) - baseFee} nCAM
-            </Typography>
-          </Stack>
-        </Stack>
+        {renderContent && <Stack spacing={0.5}>{renderContent(option)}</Stack>}
         {isVoted ? (
           <StateButton
             variant="text"
@@ -120,8 +113,8 @@ const BaseFeeVotingOption = ({
             sx={{ marginTop: 1.5 }}
             onClick={confirmSelection}
             fullWidth
-            disabled={data.option !== selected}
-            loading={isVoting}
+            disabled={option.option !== selected}
+            loading={isSubmitting}
           >
             Confirm your selection
           </Button>
@@ -130,4 +123,4 @@ const BaseFeeVotingOption = ({
     </StyledCard>
   );
 };
-export default BaseFeeVotingOption;
+export default VotingOptionCard;

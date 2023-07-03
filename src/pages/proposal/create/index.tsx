@@ -1,7 +1,5 @@
 import React, { useMemo, useState } from 'react';
 import {
-  Box,
-  Button,
   Container,
   MenuItem,
   Select,
@@ -13,7 +11,16 @@ import { useLoaderData } from 'react-router-dom';
 import Header from '@/components/Header';
 import type { VotingType } from '@/types';
 import NoVotingType from './NoVotingType';
-import BaseFeeVoting from './BaseFeeVoting';
+import BaseFeeVoting, { baseFeeFormSchema } from './BaseFeeVoting';
+import EssentialForm from './EssentialForm';
+import NewMemberVoting, { newMemberFormSchema } from './NewMemberVoting';
+import ExcludeMemberVoting, {
+  excludeMemberFormSchema,
+} from './ExcludeMemberVoting';
+import FormContainer from './FormContainer';
+import FeeDistributionVoting, {
+  feeDistributionFormSchema,
+} from './FeeDistributionVoting';
 
 const CreateNewVoting = () => {
   const { data: votingTypes } = useLoaderData() as { data: VotingType[] };
@@ -26,14 +33,33 @@ const CreateNewVoting = () => {
     setSelectedVotingType(value);
   };
 
-  const ProposalForm = useMemo(() => {
+  const { ProposalForm, formSchema } = useMemo(() => {
+    let ProposalForm, formSchema;
     switch (selectedVotingType) {
       case 'BASE_FEE':
-        return <BaseFeeVoting />;
+        ProposalForm = <BaseFeeVoting />;
+        formSchema = baseFeeFormSchema;
+        break;
+      case 'NEW_MEMBER':
+        ProposalForm = <NewMemberVoting />;
+        formSchema = newMemberFormSchema;
+        break;
+      case 'EXCLUDE_MEMBER':
+        ProposalForm = <ExcludeMemberVoting />;
+        formSchema = excludeMemberFormSchema;
+        break;
+      case 'FEE_DISTRIBUTION':
+        ProposalForm = <FeeDistributionVoting />;
+        formSchema = feeDistributionFormSchema;
+        break;
       default:
         console.warn(`Unsupported voting type ${selectedVotingType}`);
-        return <NoVotingType />;
+        ProposalForm = <NoVotingType />;
     }
+    return {
+      ProposalForm,
+      formSchema,
+    };
   }, [selectedVotingType]);
   return (
     <Container>
@@ -69,41 +95,11 @@ const CreateNewVoting = () => {
           </MenuItem>
         ))}
       </Select>
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        flexDirection="column"
-        sx={{
-          marginTop: '20px',
-          minHeight: '300px',
-          border: 1,
-          borderColor: 'divider',
-          borderRadius: '12px',
-          padding: '24px 20px',
-        }}
-      >
-        {ProposalForm}
-      </Box>
-      <Stack direction="row" spacing="16px" marginTop="20px">
-        <Button
-          variant="outlined"
-          sx={{ paddingTop: '12px', paddingBottom: '12px' }}
-          color="inherit"
-          fullWidth
-        >
-          Cancel
-        </Button>
-        <Button
-          variant="contained"
-          sx={{ paddingTop: '12px', paddingBottom: '12px' }}
-          color="primary"
-          disabled={!selectedVotingType}
-          fullWidth
-        >
-          Create new voting
-        </Button>
-      </Stack>
+      {formSchema ? (
+        <EssentialForm formSchema={formSchema}>{ProposalForm}</EssentialForm>
+      ) : (
+        ProposalForm
+      )}
     </Container>
   );
 };

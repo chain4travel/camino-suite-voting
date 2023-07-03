@@ -6,6 +6,7 @@ import NewMemberVoting from './NewMemberVoting';
 import BaseFeeVoting from './BaseFeeVoting';
 import ListItemDuration from '@/components/ListItemDuration';
 import ExcludeMemberVoting from './ExcludeMemberVoting';
+import FeeDistributionVoting from './FeeDistributionVoting';
 
 interface VotingListProps {
   data: { type: string; name: string; data: Proposal[] };
@@ -24,6 +25,9 @@ const VotingList = ({ data }: VotingListProps) => {
             break;
           case 'BASE_FEE':
             Vote = <BaseFeeVoting data={proposal} />;
+            break;
+          case 'FEE_DISTRIBUTION':
+            Vote = <FeeDistributionVoting data={proposal} />;
             break;
           default:
             console.warn(`Unsupport voting type ${data.type}`);
