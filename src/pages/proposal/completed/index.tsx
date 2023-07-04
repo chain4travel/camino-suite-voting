@@ -17,6 +17,9 @@ import { DatePicker } from '@mui/x-date-pickers';
 import ListItemDuration from '@/components/ListItemDuration';
 import RadioButton from '@/components/RadioButton';
 import NewMemberVote from './NewMemberVote';
+import ExcludeMember from './ExcludeMember';
+import TransactionFee from './TransactionFee';
+import TransactionFeeDistribution from './TransactionFeeDistribution';
 import { ArrowForwardIos } from '@mui/icons-material';
 
 const CompletedVotes = () => {
@@ -25,7 +28,6 @@ const CompletedVotes = () => {
   const { votes, error, isLoading } = useCompletedVotes(votingType);
   const toast = useToast();
   const navigate = useNavigate();
-
   useEffect(() => {
     if (error) {
       toast.error('Failed to fetch votes');
@@ -44,8 +46,18 @@ const CompletedVotes = () => {
           <NewMemberVote data={data} voteTypeName={voteTypeName} />
         );
         break;
+      case 'EXCLUDE_MEMBER':
+        voteItem = (data: Proposal) => (
+          <ExcludeMember data={data} voteTypeName={voteTypeName} />
+        );
+        break;
       case 'BASE_FEE':
-        // voteItem =
+        voteItem = (data: Proposal) => <TransactionFee data={data} />;
+        break;
+      case 'FEE_DISTRIBUTION':
+        voteItem = (data: Proposal) => (
+          <TransactionFeeDistribution data={data} />
+        );
         break;
       default:
         console.warn(`Unsupport voting type ${votingType}`);
