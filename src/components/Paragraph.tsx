@@ -1,4 +1,4 @@
-import { Stack, Divider } from '@mui/material';
+import { Stack, Divider, StackProps } from '@mui/material';
 import React, { ReactNode } from 'react';
 
 interface ParagraphProps {
@@ -6,7 +6,12 @@ interface ParagraphProps {
   spacing?: 'lg' | 'md' | 'sm' | number;
   divider?: boolean;
 }
-const Paragraph = ({ children, spacing, divider }: ParagraphProps) => {
+const Paragraph = ({
+  children,
+  spacing,
+  divider,
+  ...props
+}: ParagraphProps & StackProps) => {
   let margin = spacing;
   switch (spacing) {
     case 'lg':
@@ -22,7 +27,9 @@ const Paragraph = ({ children, spacing, divider }: ParagraphProps) => {
   }
   return (
     <>
-      <Stack spacing={margin}>{children}</Stack>
+      <Stack width="100%" {...props} spacing={margin}>
+        {children}
+      </Stack>
       {divider && <Divider sx={{ marginTop: 3 }} />}
     </>
   );

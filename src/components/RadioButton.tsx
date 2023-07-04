@@ -1,5 +1,5 @@
 import React from 'react';
-import { ButtonProps, styled } from '@mui/material';
+import { ButtonProps, alpha, styled } from '@mui/material';
 import Button from './Button';
 
 const checkedClassName = 'RadioButton-checked';
@@ -31,6 +31,9 @@ const RadioButton = styled(
   '&.RadioButton-checked': {
     color: theme.palette.background.default,
     backgroundColor: theme.palette.grey[50],
+    '&:hover': {
+      backgroundColor: alpha(theme.palette.grey[50], 0.6),
+    },
   },
   '&.RadioButton-checked .MuiButton-startIcon': {
     color: theme.palette.background.default,

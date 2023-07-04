@@ -3,6 +3,10 @@ import { Box, Stack, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
 import Big from 'big.js';
 import Paragraph from '@/components/Paragraph';
+import DistributionBar, {
+  VOTE_DISTRIBUTION_COLORS,
+} from '@/components/DistributionBar';
+import { Circle } from '@mui/icons-material';
 
 interface VoteResultProps {
   result: VotingOption & { baseFee?: number; target?: string };
@@ -13,7 +17,13 @@ const VoteResult = ({ result, votingType }: VoteResultProps) => {
     if (result.value) {
       switch (votingType) {
         case 'BASE_FEE': {
-          const absoluteChange = new Big(result.value).minus(result.baseFee);
+          if (!result.baseFee) {
+            console.error('type BASE_FEE must provide current baseFee');
+            return null;
+          }
+          const absoluteChange = new Big(result.value as number).minus(
+            result.baseFee
+          );
           const percentageChange = absoluteChange
             .times(100)
             .div(result.baseFee);
@@ -62,6 +72,45 @@ const VoteResult = ({ result, votingType }: VoteResultProps) => {
               {result.target} - {result.value ? 'Excluded' : 'Declined'}
             </Typography>
           );
+        case 'FEE_DISTRIBUTION': {
+          const values = result.value as number[];
+          const labels = result.label as string[];
+          return (
+            <Paragraph spacing={1.5}>
+              <Typography variant="h6">{`Vote Result: Distribution #${result.option}`}</Typography>
+              <DistributionBar
+                data={values.map(v => ({ percent: v }))}
+                variant="vote"
+              />
+              {labels.map((label, idx) => (
+                <Stack
+                  key={`vote-dist-${label}`}
+                  direction="row"
+                  alignItems="center"
+                  spacing={1}
+                >
+                  <Circle
+                    sx={{
+                      color: VOTE_DISTRIBUTION_COLORS[idx],
+                      fontSize: 12,
+                    }}
+                  />
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    width="100%"
+                  >
+                    <Typography color="text.secondary">{label}</Typography>
+                    <Typography color="text.secondary">
+                      {values[idx]}%
+                    </Typography>
+                  </Stack>
+                </Stack>
+              ))}
+            </Paragraph>
+          );
+        }
         default:
       }
       return null;

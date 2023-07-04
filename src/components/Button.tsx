@@ -16,7 +16,7 @@ const Button = styled(LoadingButton)(({ theme }) => ({
     backgroundColor: theme.palette.grey[700],
 
     '&:hover': {
-      backgroundColor: alpha(theme.palette.grey[900], 0.6),
+      backgroundColor: alpha(theme.palette.grey[700], 0.6),
     },
   },
   '&.MuiButton-containedPrimary': {

@@ -11,6 +11,9 @@ dependencies:
   '@emotion/styled':
     specifier: ^11.10.5
     version: 11.10.5(@babel/core@7.20.5)(@emotion/react@11.10.5)(@types/react@18.0.26)(react@18.2.0)
+  '@hookform/resolvers':
+    specifier: ^3.1.1
+    version: 3.1.1(react-hook-form@7.45.0)
   '@mui/base':
     specifier: 5.0.0-alpha.111
     version: 5.0.0-alpha.111(@types/react@18.0.26)(react-dom@18.2.0)(react@18.2.0)
@@ -74,6 +77,9 @@ dependencies:
   react-dom:
     specifier: ^18.2.0
     version: 18.2.0(react@18.2.0)
+  react-hook-form:
+    specifier: ^7.45.0
+    version: 7.45.0(react@18.2.0)
   react-i18next:
     specifier: ^12.1.1
     version: 12.1.1(i18next@22.4.6)(react-dom@18.2.0)(react@18.2.0)
@@ -86,6 +92,9 @@ dependencies:
   react-virtuoso:
     specifier: ^4.3.11
     version: 4.3.11(react-dom@18.2.0)(react@18.2.0)
+  zod:
+    specifier: ^3.21.4
+    version: 3.21.4
   zustand:
     specifier: ^4.1.5
     version: 4.1.5(react@18.2.0)
@@ -121,6 +130,9 @@ devDependencies:
   '@testing-library/react':
     specifier: ^13.4.0
     version: 13.4.0(react-dom@18.2.0)(react@18.2.0)
+  '@types/big.js':
+    specifier: ^6.1.6
+    version: 6.1.6
   '@types/jest':
     specifier: ^27.5.2
     version: 27.5.2
@@ -2110,6 +2122,14 @@ packages:
       - supports-color
     dev: true
 
+  /@hookform/resolvers@3.1.1(react-hook-form@7.45.0):
+    resolution: {integrity: sha512-tS16bAUkqjITNSvbJuO1x7MXbn7Oe8ZziDTJdA9mMvsoYthnOOiznOTGBYwbdlYBgU+tgpI/BtTU3paRbCuSlg==}
+    peerDependencies:
+      react-hook-form: ^7.0.0
+    dependencies:
+      react-hook-form: 7.45.0(react@18.2.0)
+    dev: false
+
   /@humanwhocodes/config-array@0.11.8:
     resolution: {integrity: sha512-UybHIJzJnR5Qc/MsD9Kr+RpO2h+/P1GhOwdiLPXK5TWk5sgTdu88bTD9UP+CKbPPh5Rni1u0GjAdYQLemG8g+g==}
     engines: {node: '>=10.10.0'}
@@ -3247,6 +3267,10 @@ packages:
     resolution: {integrity: sha512-1kbcJ40lLB7MHsj39U4Sh1uTd2E7rLEa79kmDpI6cy+XiXsteB3POdQomoq4FxszMrO3ZYchkhYJw7A2862b3w==}
     dependencies:
       '@babel/types': 7.20.5
+    dev: true
+
+  /@types/big.js@6.1.6:
+    resolution: {integrity: sha512-0r9J+Zz9rYm2hOTwiMAVkm3XFQ4u5uTK37xrQMhc9bysn/sf/okzovWMYYIBMFTn/yrEZ11pusgLEaoarTlQbA==}
     dev: true
 
   /@types/body-parser@1.19.2:
@@ -10653,6 +10677,15 @@ packages:
     resolution: {integrity: sha512-/6UZ2qgEyH2aqzYZgQPxEnz33NJ2gNsnHA2o5+o4wW9bLM/JYQitNP9xPhsXwC08hMMovfGe/8retsdDsczPRg==}
     dev: true
 
+  /react-hook-form@7.45.0(react@18.2.0):
+    resolution: {integrity: sha512-AbHeZ4ad+0dEIknSW9dBgIwcvRDfZ1O97sgj75WaMdOX0eg8TBiUf9wxzVkIjZbk76BBIE9lmFOzyD4PN80ZQg==}
+    engines: {node: '>=12.22.0'}
+    peerDependencies:
+      react: ^16.8.0 || ^17 || ^18
+    dependencies:
+      react: 18.2.0
+    dev: false
+
   /react-i18next@12.1.1(i18next@22.4.6)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-mFdieOI0LDy84q3JuZU6Aou1DoWW2fhapcTGeBS8+vWSJuViuoCLQAMYSb0QoHhXS8B0WKUOPpx4cffAP7r/aA==}
     peerDependencies:
@@ -13149,6 +13182,10 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     dev: true
+
+  /zod@3.21.4:
+    resolution: {integrity: sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==}
+    dev: false
 
   /zustand@4.1.5(react@18.2.0):
     resolution: {integrity: sha512-PsdRT8Bvq22Yyh1tvpgdHNE7OAeFKqJXUxtJvj1Ixw2B9O2YZ1M34ImQ+xyZah4wZrR4lENMoDUutKPpyXCQ/Q==}
