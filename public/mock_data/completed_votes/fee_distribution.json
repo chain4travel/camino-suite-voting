@@ -1,97 +1,109 @@
 [
   {
-    "id": 1,
-    "type": "NEW_MEMBER",
+    "id": 11,
+    "type": "FEE_DISTRIBUTION",
     "startDateTime": 1688054400,
     "endDateTime": 1690646400,
-    "forumLink": "https://google.com",
+    "forumLink": "https://twitter.com",
     "options": [
-      { "option": 1, "value": true, "label": "Accept" },
-      { "option": 2, "value": false, "label": "Decline" }
+      {
+        "option": 1,
+        "value": [30, 50, 20],
+        "label": ["Validators", "TAKEOFF Camino Grant Program", "Burn"]
+      }
     ],
     "voted": [],
-    "result": [],
-    "target": "Some Validator Applicant 1",
+    "target": "Distribution #1",
     "description": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus.",
     "status": "COMPLETED"
   },
   {
-    "id": 2,
-    "type": "NEW_MEMBER",
+    "id": 12,
+    "type": "FEE_DISTRIBUTION",
     "startDateTime": 1688054400,
     "endDateTime": 1690646400,
     "forumLink": "https://apple.com",
     "options": [
-      { "option": 1, "value": true, "label": "Accept" },
-      { "option": 2, "value": false, "label": "Decline" }
+      {
+        "option": 1,
+        "value": [30, 50, 20],
+        "label": ["Validators", "TAKEOFF Camino Grant Program", "Burn"]
+      }
     ],
     "voted": [{ "option": 2 }],
-    "result": [{ "option": 2 }],
-    "target": "Some Validator Applicant 2",
+    "target": "Distribution #2",
     "description": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus.",
     "status": "COMPLETED"
   },
   {
-    "id": 3,
-    "type": "NEW_MEMBER",
+    "id": 13,
+    "type": "FEE_DISTRIBUTION",
     "startDateTime": 1688054400,
     "endDateTime": 1690646400,
-    "forumLink": "https://apple.com",
+    "forumLink": "https://twitter.com",
     "options": [
-      { "option": 1, "value": true, "label": "Accept" },
-      { "option": 2, "value": false, "label": "Decline" }
+      {
+        "option": 1,
+        "value": [30, 50, 20],
+        "label": ["Validators", "TAKEOFF Camino Grant Program", "Burn"]
+      }
     ],
     "voted": [{ "option": 1 }],
-    "result": [{ "option": 1 }],
-    "target": "Some Validator Applicant 3",
+    "target": "Distribution #3",
     "description": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus.",
     "status": "COMPLETED"
   },
   {
-    "id": 4,
-    "type": "NEW_MEMBER",
+    "id": 14,
+    "type": "FEE_DISTRIBUTION",
     "startDateTime": 1688054400,
     "endDateTime": 1690646400,
-    "forumLink": "https://google.com",
+    "forumLink": "https://twitter.com",
     "options": [
-      { "option": 1, "value": true, "label": "Accept" },
-      { "option": 2, "value": false, "label": "Decline" }
+      {
+        "option": 1,
+        "value": [30, 50, 20],
+        "label": ["Validators", "TAKEOFF Camino Grant Program", "Burn"]
+      }
     ],
     "voted": [],
-    "result": [{ "option": 1 }],
-    "target": "Some Validator Applicant 1",
+    "target": "Distribution #4",
     "description": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus.",
     "status": "COMPLETED"
   },
   {
-    "id": 5,
-    "type": "NEW_MEMBER",
+    "id": 15,
+    "type": "FEE_DISTRIBUTION",
     "startDateTime": 1688054400,
     "endDateTime": 1690646400,
     "forumLink": "https://apple.com",
     "options": [
-      { "option": 1, "value": true, "label": "Accept" },
-      { "option": 2, "value": false, "label": "Decline" }
+      {
+        "option": 1,
+        "value": [30, 50, 20],
+        "label": ["Validators", "TAKEOFF Camino Grant Program", "Burn"]
+      }
     ],
     "voted": [{ "option": 2 }],
-    "result": [{ "option": 1 }],
-    "target": "Some Validator Applicant 2",
+    "target": "Distribution #5",
     "description": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus.",
     "status": "COMPLETED"
   },
   {
-    "id": 6,
-    "type": "NEW_MEMBER",
+    "id": 16,
+    "type": "FEE_DISTRIBUTION",
     "startDateTime": 1688054400,
     "endDateTime": 1690646400,
-    "forumLink": "https://apple.com",
+    "forumLink": "https://twitter.com",
     "options": [
-      { "option": 1, "value": true, "label": "Accept" },
-      { "option": 2, "value": false, "label": "Decline" }
+      {
+        "option": 1,
+        "value": [30, 50, 20],
+        "label": ["Validators", "TAKEOFF Camino Grant Program", "Burn"]
+      }
     ],
     "voted": [{ "option": 1 }],
-    "result": [{ "option": 1 }],
-    "target": "Some Validator Applicant 3",
+    "target": "Distribution #6",
     "description": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus.",
     "status": "COMPLETED"
   }

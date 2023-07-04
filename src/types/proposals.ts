@@ -23,7 +23,8 @@ export type Proposal = {
   startDateTime: number;
   endDateTime: number;
   options: VotingOption[];
-  voted: Vote[];
+  result?: Vote[];
+  voted?: Vote[];
   status: string;
   forumLink?: string;
   target?: string;
