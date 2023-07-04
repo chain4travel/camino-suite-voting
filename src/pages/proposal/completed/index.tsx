@@ -18,8 +18,8 @@ import ListItemDuration from '@/components/ListItemDuration';
 import RadioButton from '@/components/RadioButton';
 import NewMemberVote from './NewMemberVote';
 import ExcludeMember from './ExcludeMember';
-import TransactionFee from './TransactionFee';
-import TransactionFeeDistribution from './TransactionFeeDistribution';
+import TransactionFee from './BaseFee';
+import TransactionFeeDistribution from './FeeDistribution';
 import { ArrowForwardIos } from '@mui/icons-material';
 
 const CompletedVotes = () => {
