@@ -1,11 +1,12 @@
-import React, { MouseEventHandler, MouseEvent, useState } from 'react';
-import { Check, Close } from '@mui/icons-material';
+import React, { MouseEventHandler, MouseEvent, useState, useMemo } from 'react';
+import { CheckCircle, Cancel } from '@mui/icons-material';
 import { IconButton, ListItemText, Stack, Typography } from '@mui/material';
 import { filter, find } from 'lodash';
 import type { Proposal, VotingOption } from '@/types';
 import Button from '@/components/Button';
 import { useVote } from '@/hooks/useRpc';
 import StateButton from '@/components/StateButton';
+import { toPastTense } from '@/helpers/string';
 
 interface NewMemberVotingProps {
   data: Proposal;
@@ -22,6 +23,70 @@ const NewMemberVoting = ({ data }: NewMemberVotingProps) => {
     opt => !!find(data.voted, v => v.option === opt.option)
   );
 
+  const triggerVoting =
+    (option: VotingOption): MouseEventHandler<HTMLButtonElement> =>
+    (event: MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
+      setNeedConfirm(option);
+    };
+
+  const actionButtons = useMemo(() => {
+    const isVoted = voted.length > 0;
+    // Voted state
+    if (isVoted) {
+      return voted.map(v => (
+        <StateButton
+          key={`voted-${v.option}`}
+          variant="contained"
+          color={v.value ? 'success' : 'error'}
+          startIcon={v.value ? <CheckCircle /> : <Cancel />}
+          fullWidth
+        >
+          You {toPastTense(String(v.label))}
+        </StateButton>
+      ));
+    }
+
+    // Multisig pending state
+    const isMultisigPending = !isVoted && data.multisig && data.multisig.voted;
+    if (isMultisigPending) {
+      const votedOption = find(data.options, {
+        option: data.multisig!.voted.option,
+      });
+      if (votedOption) {
+        return (
+          <Button
+            key={`multisig-voted-${votedOption?.option}`}
+            variant={votedOption.value ? 'contained' : 'outlined'}
+            startIcon={votedOption.value ? <CheckCircle /> : <Cancel />}
+            onClick={triggerVoting(votedOption)}
+            loading={votingOption === votedOption.option}
+            color={votedOption.value ? 'primary' : 'inherit'}
+            fullWidth
+          >
+            {votedOption.label}
+          </Button>
+        );
+      }
+    }
+
+    // default non-voted state
+    return data.options
+      .map(opt => (
+        <Button
+          key={opt.option}
+          variant={opt.value ? 'contained' : 'outlined'}
+          startIcon={opt.value ? <CheckCircle /> : <Cancel />}
+          onClick={triggerVoting(opt)}
+          loading={votingOption === opt.option}
+          color={opt.value ? 'primary' : 'inherit'}
+        >
+          {opt.label}
+        </Button>
+      ))
+      .reverse();
+  }, [voted, data.options, data.multisig]);
+
   const handleConfirmToVote = (option: VotingOption) => {
     vote.mutate({
       proposalId: data.id,
@@ -30,12 +95,6 @@ const NewMemberVoting = ({ data }: NewMemberVotingProps) => {
     });
     setVotingOption(option.option);
   };
-  const triggerVoting =
-    (option: VotingOption): MouseEventHandler<HTMLButtonElement> =>
-    (event: MouseEvent<HTMLButtonElement>) => {
-      event.stopPropagation();
-      setNeedConfirm(option);
-    };
   const confirmVoting =
     (option: VotingOption): MouseEventHandler<HTMLButtonElement> =>
     (event: MouseEvent<HTMLButtonElement>) => {
@@ -45,7 +104,7 @@ const NewMemberVoting = ({ data }: NewMemberVotingProps) => {
     };
 
   return (
-    <>
+    <Stack direction="row" alignItems="center" spacing={3}>
       <ListItemText
         primary={data.target}
         secondary={
@@ -63,69 +122,40 @@ const NewMemberVoting = ({ data }: NewMemberVotingProps) => {
             {data.description}
           </Typography>
         }
-        sx={{ marginRight: 3 }}
         primaryTypographyProps={{
           sx: { fontWeight: 500, marginBottom: 1 },
         }}
       />
-      <Stack
-        direction="row"
-        sx={{ marginRight: 3, minWidth: 220 }}
-        spacing={1.5}
-      >
-        {voted.length > 0
-          ? voted.map(v => (
-              <StateButton
-                key={`voted-${v.option}`}
-                variant="outlined"
-                color={v.value ? 'accent' : 'error'}
-                startIcon={v.value ? <Check /> : <Close />}
-                fullWidth
-              >
-                {v.label}
-              </StateButton>
-            ))
-          : needConfirm
+      <Stack direction="row" sx={{ minWidth: 220 }} spacing={1.5}>
+        {needConfirm
           ? [
               <IconButton
                 key="btn-cancel"
                 color="inherit"
                 sx={{
-                  backgroundColor: 'grey.700',
+                  border: '1px solid',
+                  borderColor: 'divider',
                   borderRadius: 1,
                   paddingX: 2,
                 }}
                 onClick={() => setNeedConfirm(null)}
               >
-                <Close />
+                <Cancel />
               </IconButton>,
               <Button
                 key="btn-confirm"
                 fullWidth
-                startIcon={<Check />}
+                startIcon={<CheckCircle />}
                 variant="contained"
-                color="accent"
+                color={needConfirm.value ? 'success' : 'error'}
                 onClick={confirmVoting(needConfirm)}
               >
-                Confirm
+                Confirm {needConfirm.label}
               </Button>,
             ]
-          : data.options
-              .map(opt => (
-                <Button
-                  key={opt.option}
-                  variant="contained"
-                  startIcon={opt.value ? <Check /> : <Close />}
-                  onClick={triggerVoting(opt)}
-                  loading={votingOption === opt.option}
-                  color={opt.value ? 'primary' : 'inherit'}
-                >
-                  {opt.label}
-                </Button>
-              ))
-              .reverse()}
+          : actionButtons}
       </Stack>
-    </>
+    </Stack>
   );
 };
 export default NewMemberVoting;

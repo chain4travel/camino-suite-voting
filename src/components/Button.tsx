@@ -12,6 +12,12 @@ const Button = styled(LoadingButton)(({ theme }) => ({
   '&, &.MuiButton-root': {
     boxShadow: 'none',
   },
+  '&.MuiButton-outlined': {
+    borderColor: theme.palette.divider,
+  },
+  '&.MuiButton-contained': {
+    color: theme.palette.text.primary,
+  },
   '&.MuiButton-containedInherit': {
     backgroundColor: theme.palette.grey[700],
 

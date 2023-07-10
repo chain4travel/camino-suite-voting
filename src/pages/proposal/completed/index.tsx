@@ -14,7 +14,7 @@ import { Proposal, VotingType } from '@/types';
 import { useCompletedVotes } from '@/hooks/useProposals';
 import useToast from '@/hooks/useToast';
 import { DatePicker } from '@mui/x-date-pickers';
-import ListItemDuration from '@/components/ListItemDuration';
+import ListItemStatus from '@/components/ListItemStatus';
 import RadioButton from '@/components/RadioButton';
 import NewMemberVote from './NewMemberVote';
 import ExcludeMember from './ExcludeMember';
@@ -108,7 +108,7 @@ const CompletedVotes = () => {
               key={vote.id}
               onClick={() => navigate(`${vote.type}/${vote.id}`)}
             >
-              <ListItemDuration
+              <ListItemStatus
                 startTimestamp={vote.startDateTime}
                 endTimestamp={vote.endDateTime}
               />

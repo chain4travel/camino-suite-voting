@@ -21,6 +21,7 @@ const GREY = {
   700: '#334155',
   800: '#1E293B',
   900: '#0F172A',
+  950: '#020617',
 };
 
 const ACTION = {
@@ -44,11 +45,11 @@ const COMMON = {
   primary: { main: PRIMARY, contrastText: '#fff' },
   secondary: { main: SECONDARY, contrastText: '#fff' },
   info: { light: SKY, main: '#66C9E8', contrastText: '#fff' },
-  success: { light: '#4ADE80', main: '#59B755', contrastText: GREY[800] },
-  warning: { main: '#EAC254', contrastText: GREY[800] },
-  error: { light: '#FCA5A5', main: '#CD3919', contrastText: '#fff' },
+  success: { light: '#4ADE80', main: '#18B728', contrastText: GREY[800] },
+  warning: { main: '#E5A21F', contrastText: GREY[800] },
+  error: { light: '#FCA5A5', main: '#E5431F', contrastText: '#fff' },
   grey: GREY,
-  divider: GREY[700],
+  divider: GREY[600],
   accent: { main: ACCENT, dark: GRADIENT_ACCENT, contrastText: '#fff' },
 };
 
@@ -68,8 +69,8 @@ const palette = {
     ...COMMON,
     text: { primary: '#fff', secondary: GREY[300], disabled: GREY[500] },
     background: {
-      paper: GREY[900],
-      default: GREY[900],
+      paper: GREY[950],
+      default: GREY[950],
       neutral: GREY[500],
     },
     action: { ...ACTION, active: GREY[500] },
