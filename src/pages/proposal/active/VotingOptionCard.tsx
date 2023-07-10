@@ -1,7 +1,6 @@
-import { Check, CheckCircle, CircleOutlined } from '@mui/icons-material';
+import { CheckCircle } from '@mui/icons-material';
 import {
   Card as MuiCard,
-  CardActionArea,
   CardProps,
   styled,
   CardHeader as MuiCardHeader,
@@ -15,29 +14,30 @@ import StateButton from '@/components/StateButton';
 import { Vote, VotingOption } from '@/types';
 
 interface StyledCardProps {
-  isSelected?: boolean;
+  active?: boolean;
   isVoted?: boolean;
 }
 const StyledCard = styled(
   ({
-    isSelected: _isSelected,
+    active: _active,
     isVoted: _isVoted,
     ...props
   }: StyledCardProps & CardProps) => <MuiCard {...props} />
 )(({ theme, ...props }) => ({
-  minWidth: '280px',
+  flex: 1,
   boxShadow: 'none',
   background: 'transparent',
-  borderWidth: 1,
+  borderWidth: props.isVoted ? 2 : 1,
   borderStyle: 'solid',
   borderColor: props.isVoted
-    ? theme.palette.accent.main
-    : props.isSelected
-    ? theme.palette.primary.main
+    ? theme.palette.text.primary
+    : props.active
+    ? theme.palette.grey[400]
     : theme.palette.divider,
 }));
 const StyledCardHeader = styled(MuiCardHeader)(({ theme }) => ({
-  padding: theme.spacing(1.5),
+  padding: theme.spacing(1.5, 2.5),
+  paddingBottom: 0,
   '.MuiCardHeader-action': {
     marginTop: 0,
     marginBottom: 0,
@@ -67,6 +67,7 @@ const VotingOptionCard = ({
 }: VotingOptionProps) => {
   const hadVoted = voted && voted.length > 0;
   const isVoted = !!find(voted, v => v.option === option.option);
+  const isSelected = option.option === selected;
   const toggleSelected = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     !hadVoted && onSelect && onSelect(option.option);
@@ -78,45 +79,36 @@ const VotingOptionCard = ({
   return (
     <StyledCard
       key={`${option.option}-${option.value}`}
-      isSelected={option.option === selected}
+      active={isSelected}
       isVoted={isVoted}
     >
-      <CardActionArea onClick={toggleSelected} disableRipple>
-        <StyledCardHeader
-          title={title}
-          action={
-            hadVoted ? null : option.option === selected ? (
-              <CheckCircle color="primary" />
-            ) : (
-              <CircleOutlined sx={{ color: 'divider' }} />
-            )
-          }
-          titleTypographyProps={{ variant: 'h6' }}
-        />
-      </CardActionArea>
-      <CardContent sx={{ padding: 1.5 }}>
+      <StyledCardHeader
+        title={title}
+        titleTypographyProps={{ variant: 'h6' }}
+      />
+      <CardContent sx={{ padding: 2.5, paddingTop: 1.5 }}>
         {renderContent && <Stack spacing={0.5}>{renderContent(option)}</Stack>}
         {isVoted ? (
           <StateButton
-            variant="text"
-            color="accent"
+            variant="contained"
+            color="success"
             sx={{ marginTop: 1.5 }}
-            fullWidth
-            startIcon={<Check />}
+            startIcon={<CheckCircle />}
           >
             Your selection
           </StateButton>
         ) : (
           <Button
-            variant="contained"
-            color="primary"
+            variant={isSelected ? 'contained' : 'outlined'}
+            color={isSelected ? 'success' : 'inherit'}
             sx={{ marginTop: 1.5 }}
-            onClick={confirmSelection}
-            fullWidth
-            disabled={option.option !== selected}
+            onClick={isSelected ? confirmSelection : toggleSelected}
             loading={isSubmitting}
+            loadingPosition="start"
+            startIcon={<CheckCircle />}
+            disabled={hadVoted}
           >
-            Confirm your selection
+            {isSelected ? 'Confirm selection' : 'Select'}
           </Button>
         )}
       </CardContent>

@@ -38,7 +38,7 @@ const FeeDistributionVoting = ({
   };
 
   return (
-    <Stack direction="row" sx={{ marginRight: 3 }} spacing={3}>
+    <Stack direction="row" sx={{ marginRight: 3 }} spacing={3} width="100%">
       {data.options.map(opt => (
         <VotingOptionCard
           key={`${opt.option}`}

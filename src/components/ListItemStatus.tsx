@@ -31,7 +31,7 @@ const ListItemStatus = styled(
         {multisig && multisig.voted?.count && (
           <Chip
             className={`${props.className} status-warning`}
-            label={`${multisig.voted?.count} / ${multisig.threshold} pending`}
+            label={`${multisig.voted?.count} / ${multisig.threshold} PENDING`}
           />
         )}
       </Stack>

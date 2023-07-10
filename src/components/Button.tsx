@@ -31,5 +31,9 @@ const Button = styled(LoadingButton)(({ theme }) => ({
   '&.MuiButton-containedAccent': {
     color: theme.palette.grey[900],
   },
+  '&.Mui-disabled': {
+    color: alpha(theme.palette.grey[100], 0.5),
+    borderColor: alpha(theme.palette.divider, 0.5),
+  },
 }));
 export default Button;

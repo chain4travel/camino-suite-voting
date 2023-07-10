@@ -18,10 +18,28 @@ const VotingList = ({ data }: VotingListProps) => {
         let Vote: JSX.Element | null = null;
         switch (data.type) {
           case 'NEW_MEMBER':
-            Vote = <NewMemberVoting data={proposal} />;
+            Vote = (
+              <Stack width="100%">
+                <NewMemberVoting data={proposal} />
+                <ListItemStatus
+                  startTimestamp={proposal.startDateTime}
+                  endTimestamp={proposal.endDateTime}
+                  multisig={proposal.multisig}
+                />
+              </Stack>
+            );
             break;
           case 'EXCLUDE_MEMBER':
-            Vote = <ExcludeMemberVoting data={proposal} />;
+            Vote = (
+              <Stack width="100%">
+                <ExcludeMemberVoting data={proposal} />
+                <ListItemStatus
+                  startTimestamp={proposal.startDateTime}
+                  endTimestamp={proposal.endDateTime}
+                  multisig={proposal.multisig}
+                />
+              </Stack>
+            );
             break;
           case 'BASE_FEE':
             Vote = <BaseFeeVoting data={proposal} />;
@@ -36,17 +54,10 @@ const VotingList = ({ data }: VotingListProps) => {
           <ListItemButton
             key={proposal.id}
             divider={index !== data.data.length - 1}
-            sx={{ padding: 2.5 }}
+            sx={{ padding: 2.5, width: '100%' }}
             disableRipple
           >
-            <Stack>
-              {Vote}
-              <ListItemStatus
-                startTimestamp={proposal.startDateTime}
-                endTimestamp={proposal.endDateTime}
-                multisig={proposal.multisig}
-              />
-            </Stack>
+            {Vote}
             {/* <ArrowForwardIos /> */}
           </ListItemButton>
         );

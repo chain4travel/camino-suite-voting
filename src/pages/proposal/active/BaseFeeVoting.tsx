@@ -32,12 +32,12 @@ const BaseFeeVoting = ({ data, disableParentRipple }: BaseFeeVotingProps) => {
   };
 
   return (
-    <Stack direction="row" sx={{ marginRight: 3 }} spacing={3}>
+    <Stack direction="row" sx={{ marginRight: 3 }} spacing={3} width="100%">
       {data.options.map(opt => (
         <VotingOptionCard
           key={`${opt.option}`}
           option={opt}
-          title={`Future Base Fee ${opt.value} nCAM`}
+          title={String(opt.label)}
           voted={data.voted}
           selected={selectToVote}
           onSelect={handleSelectChange}
