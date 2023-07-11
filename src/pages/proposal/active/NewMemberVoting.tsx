@@ -54,14 +54,15 @@ const NewMemberVoting = ({ data }: NewMemberVotingProps) => {
         option: data.multisig!.voted.option,
       });
       if (votedOption) {
+        const isAccepted = votedOption.value;
         return (
           <Button
             key={`multisig-voted-${votedOption?.option}`}
-            variant={votedOption.value ? 'contained' : 'outlined'}
-            startIcon={votedOption.value ? <CheckCircle /> : <Cancel />}
+            variant={isAccepted ? 'contained' : 'outlined'}
+            startIcon={isAccepted ? <CheckCircle /> : <Cancel />}
             onClick={triggerVoting(votedOption)}
             loading={votingOption === votedOption.option}
-            color={votedOption.value ? 'primary' : 'inherit'}
+            color={isAccepted ? 'primary' : 'inherit'}
             fullWidth
           >
             {votedOption.label}
@@ -76,12 +77,13 @@ const NewMemberVoting = ({ data }: NewMemberVotingProps) => {
         <Button
           key={opt.option}
           variant={opt.value ? 'contained' : 'outlined'}
-          startIcon={opt.value ? <CheckCircle /> : <Cancel />}
+          startIcon={opt.value && <CheckCircle />}
           onClick={triggerVoting(opt)}
           loading={votingOption === opt.option}
           color={opt.value ? 'primary' : 'inherit'}
+          fullWidth={!!opt.value}
         >
-          {opt.label}
+          {opt.value ? opt.label : <Cancel />}
         </Button>
       ))
       .reverse();
