@@ -16,20 +16,20 @@ const StateButton = styled(
   )
 )(({ theme }) => ({
   minWidth: '150px',
-  borderRadius: theme.typography.fontSize + 4,
+  padding: theme.spacing(1.25, 2),
   '&.Mui-disabled': {
     borderColor: 'inherit',
     color: theme.palette.grey[50],
     '&.MuiButton-contained': {
-      backgroundColor: theme.palette.grey[500],
+      backgroundColor: theme.palette.grey[800],
     },
-    '&.StateButton-success': {
+    '&.StateButton-success .MuiButton-startIcon': {
       color: theme.palette.success.main,
     },
-    '&.StateButton-error': {
-      color: theme.palette.error.light,
+    '&.StateButton-error .MuiButton-startIcon': {
+      color: theme.palette.error.main,
     },
-    '&.StateButton-accent': {
+    '&.StateButton-accent .MuiButton-startIcon': {
       color: theme.palette.accent.main,
     },
   },

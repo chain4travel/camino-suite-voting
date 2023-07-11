@@ -53,7 +53,7 @@ const ActiveVotings = () => {
       <Header headline="Ongoing Proposals" variant="h4">
         <NavLink to="/proposal/create">
           <Button variant="contained" color="primary">
-            Create Vote
+            Create new
           </Button>
         </NavLink>
       </Header>

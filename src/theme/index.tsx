@@ -14,7 +14,7 @@ type CaminoThemes = {
 export default class CaminoTheme {
   private static _commonThemeOptions = {
     components: overrides,
-    shape: { borderRadius: 12 },
+    shape: { borderRadius: 8 },
     typography,
     breakpoints,
   };

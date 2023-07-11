@@ -33,7 +33,7 @@ const Input = {
         backgroundColor: theme.palette.grey[800],
         borderRadius: theme.shape.borderRadius,
         '&:hover': {
-          backgroundColor: theme.palette.grey[700],
+          backgroundColor: theme.palette.grey[500],
         },
         '&.Mui-focused': {
           backgroundColor: theme.palette.action.focus,

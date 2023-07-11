@@ -16,6 +16,10 @@ export type Vote = {
   address?: string;
   votedDateTime?: number;
 };
+export type MultisigVote = {
+  threshold: number;
+  voted: { option: number; count: number };
+};
 export type Proposal = {
   id: number | string;
   type: string;
@@ -28,6 +32,7 @@ export type Proposal = {
   status: string;
   forumLink?: string;
   target?: string;
+  multisig?: MultisigVote;
 };
 export type Group = {
   type: string;

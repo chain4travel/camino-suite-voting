@@ -11,6 +11,9 @@ const Accordion = styled(MuiAccordion)({
 });
 const AccordionSummary = styled(MuiAccordionSummary)(({ theme }) => ({
   borderRadius: theme.shape.borderRadius,
+  '&.MuiAccordionSummary-root': {
+    backgroundColor: theme.palette.grey[900],
+  },
   '&.Mui-expanded': {
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,

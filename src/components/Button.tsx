@@ -12,6 +12,12 @@ const Button = styled(LoadingButton)(({ theme }) => ({
   '&, &.MuiButton-root': {
     boxShadow: 'none',
   },
+  '&.MuiButton-outlined': {
+    borderColor: theme.palette.divider,
+  },
+  '&.MuiButton-contained': {
+    color: theme.palette.text.primary,
+  },
   '&.MuiButton-containedInherit': {
     backgroundColor: theme.palette.grey[700],
 
@@ -24,6 +30,10 @@ const Button = styled(LoadingButton)(({ theme }) => ({
   },
   '&.MuiButton-containedAccent': {
     color: theme.palette.grey[900],
+  },
+  '&.Mui-disabled': {
+    color: alpha(theme.palette.grey[100], 0.5),
+    borderColor: alpha(theme.palette.divider, 0.5),
   },
 }));
 export default Button;
