@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLoaderData, useNavigate } from 'react-router-dom';
 import {
-  Container,
+  Paper,
   FormControlLabel,
   List,
   ListItemButton,
@@ -68,8 +68,8 @@ const CompletedVotes = () => {
   }, [votingType]);
 
   return (
-    <Container>
-      <Header headline="Completed Proposals" variant="h4" />
+    <Paper sx={{ px: 2 }}>
+      <Header headline="Completed Proposals" variant="h5" />
       <Stack spacing="16px">
         <Stack direction="row" spacing="12px">
           <DatePicker sx={{ flex: 1 }} />
@@ -118,7 +118,7 @@ const CompletedVotes = () => {
           );
         })}
       </List>
-    </Container>
+    </Paper>
   );
 };
 export default CompletedVotes;

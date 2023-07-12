@@ -6,7 +6,7 @@ import Button from './Button';
 
 export const PROPOSAL_DISTRIBUTION_COLORS = ['#304275', '#4864AF', '#7D92CA'];
 export const TURNOUTS_COLORS = ['#B7C3E1', '#7D92CA'];
-export const VOTE_DISTRIBUTION_COLORS = ['#7251B5', '#9163CB', '#B185DB'];
+export const VOTE_DISTRIBUTION_COLORS = ['#304275', '#4864AF', '#7D92CA'];
 export const DEFAULT_COLORS = ['#9E9E9E', '#B9B9B9', '#E4E4E4'];
 
 interface DistributionBarProps<T extends Percentage> {

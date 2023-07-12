@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { NavLink, useLoaderData } from 'react-router-dom';
-import { Container, FormControlLabel, Stack } from '@mui/material';
+import { Paper, FormControlLabel, Stack } from '@mui/material';
 import { ExpandMore } from '@mui/icons-material';
 import { filter } from 'lodash';
 import { useActiveVotings } from '@/hooks/useProposals';
@@ -59,8 +59,8 @@ const ActiveVotings = () => {
     }, {});
   }, [proposals, onlyTodo]);
   return (
-    <Container>
-      <Header headline="Ongoing Proposals" variant="h4">
+    <Paper sx={{ px: 2 }}>
+      <Header headline="Ongoing Proposals" variant="h5">
         <Stack direction="row" alignItems="center" spacing={1}>
           <FormControlLabel
             control={<Checkbox />}
@@ -94,7 +94,7 @@ const ActiveVotings = () => {
         )
       )}
       <ConfirmDialog {...dialogOption} />
-    </Container>
+    </Paper>
   );
 };
 export default ActiveVotings;
