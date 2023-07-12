@@ -116,19 +116,20 @@ const Detail = () => {
     <>
       <Stack paddingY={2} alignItems="flex-start">
         <Button
-          variant="text"
+          variant="outlined"
           color="inherit"
-          onClick={() => navigate('/completed')}
+          onClick={() => navigate('/proposal/completed')}
+          sx={{ py: 1.25, px: 2 }}
         >
           Back to all Proposals
         </Button>
       </Stack>
       <Container sx={{ paddingBottom: 5 }}>
-        <Stack direction="row" spacing={15} alignItems="flex-start">
+        <Stack direction="row" spacing={4} alignItems="flex-start">
           <Stack spacing={5}>
             <Stack spacing={1}>
               <Header
-                variant="h2"
+                variant="h3"
                 headline={
                   votingType?.brief ??
                   votingType?.abbr ??
@@ -137,7 +138,11 @@ const Detail = () => {
                 }
                 sx={{ marginBottom: 0 }}
               />
-              <Typography variant="h5" color="text.secondary">
+              <Typography
+                variant="caption"
+                color="info.light"
+                letterSpacing={2}
+              >
                 {DateTime.fromSeconds(proposal?.endDateTime ?? 0).toFormat(
                   'dd.MM.yyyy hh:mm:ss a'
                 )}
@@ -160,9 +165,7 @@ const Detail = () => {
               />
             </Stack>
             <Stack spacing={1.5} alignItems="flex-start">
-              <Typography color="text.secondary">
-                {proposal?.description}
-              </Typography>
+              <Typography color="grey.400">{proposal?.description}</Typography>
               {proposal?.forumLink && (
                 <Button
                   sx={{
@@ -202,28 +205,36 @@ const Detail = () => {
                 switch (votingType?.id) {
                   case 'BASE_FEE':
                     {
-                      const absoluteChange = new Big(option.value as number)
-                        .minus(baseFee)
-                        .toString();
+                      const absoluteChange = new Big(
+                        option.value as number
+                      ).minus(baseFee);
                       const percentageChange = new Big(absoluteChange)
                         .times(100)
                         .div(baseFee)
                         .toFixed(2);
-                      label = (
-                        <Typography color="text.primary" variant="body2">
-                          {toPastTense(String(option.label))}
-                        </Typography>
-                      );
+                      const sign = absoluteChange.s > 0 ? '+' : '';
                       extraInfo = (
                         <>
-                          <Typography color="text.primary" variant="body2">
+                          <Typography
+                            color="text.primary"
+                            variant="caption"
+                            component="p"
+                          >
                             {option.value} nCAM
                           </Typography>
-                          <Typography color="text.primary" variant="body2">
-                            {absoluteChange} nCAM
+                          <Typography
+                            color="text.primary"
+                            variant="caption"
+                            component="p"
+                          >
+                            {sign} {absoluteChange.toString()} nCAM
                           </Typography>
-                          <Typography color="text.primary" variant="body2">
-                            {Number(percentageChange)}%
+                          <Typography
+                            color="text.primary"
+                            variant="caption"
+                            component="p"
+                          >
+                            {sign} {Number(percentageChange)}%
                           </Typography>
                         </>
                       );

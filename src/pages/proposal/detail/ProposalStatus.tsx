@@ -6,6 +6,8 @@ import Paragraph from '@/components/Paragraph';
 import StateButton from '@/components/StateButton';
 import { Proposal, Vote, VotingOption } from '@/types';
 import { toPastTense } from '@/helpers/string';
+import Tag from '@/components/Tag';
+import { Cancel, CheckCircle } from '@mui/icons-material';
 
 interface ExtraInfo {
   label: string;
@@ -29,8 +31,13 @@ const ProposalStatus = ({ proposal, extraInfo }: ProposalStatusProps) => {
           const info = extraInfo as ExtraInfo;
           extraInfoComponent = (
             <>
-              <Typography variant="h5">{`${info?.label} prior to proposal`}</Typography>
-              <Typography variant="body1" color="text.secondary">
+              <Typography
+                variant="caption"
+                fontWeight={600}
+                letterSpacing={2}
+                sx={{ textTransform: 'uppercase' }}
+              >{`${info?.label} prior to proposal`}</Typography>
+              <Typography variant="body2" color="text.secondary">
                 {info?.value} nCAM
               </Typography>
             </>
@@ -44,7 +51,12 @@ const ProposalStatus = ({ proposal, extraInfo }: ProposalStatusProps) => {
           const info = extraInfo as ExtraInfo[];
           extraInfoComponent = (
             <>
-              <Typography variant="h5">
+              <Typography
+                variant="caption"
+                fontWeight={600}
+                letterSpacing={2}
+                sx={{ textTransform: 'uppercase' }}
+              >
                 Distribution prior to proposal
               </Typography>
               {map(info, distribution => (
@@ -53,10 +65,10 @@ const ProposalStatus = ({ proposal, extraInfo }: ProposalStatusProps) => {
                   direction="row"
                   justifyContent="space-between"
                 >
-                  <Typography variant="body1" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary">
                     {distribution.label}
                   </Typography>
-                  <Typography variant="body1" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary">
                     {distribution.value}%
                   </Typography>
                 </Stack>
@@ -76,13 +88,12 @@ const ProposalStatus = ({ proposal, extraInfo }: ProposalStatusProps) => {
   }, [proposal?.type]);
   return (
     <Box
-      padding={3}
-      minWidth={300}
-      border="1px solid"
-      borderColor="divider"
-      borderRadius={3}
+      padding={2.5}
+      minWidth={339}
+      borderRadius={1.5}
+      sx={{ backgroundColor: 'grey.900' }}
     >
-      <Paragraph spacing="lg">
+      <Paragraph spacing="md">
         <Paragraph divider>
           <Stack
             direction="row"
@@ -90,21 +101,26 @@ const ProposalStatus = ({ proposal, extraInfo }: ProposalStatusProps) => {
             alignItems="center"
           >
             <Typography variant="h5">Status</Typography>
-            <StateButton variant="contained" sx={{ minWidth: 0 }}>
-              {proposal?.status}
-            </StateButton>
+            <Tag color="success" label={proposal?.status} />
           </Stack>
         </Paragraph>
-        <Paragraph spacing="sm" divider>
-          <Typography variant="h5">Proposal period</Typography>
-          <Paragraph>
-            <Typography variant="body1" color="text.secondary">
+        <Paragraph spacing={1.5} divider>
+          <Typography
+            variant="caption"
+            fontWeight={600}
+            letterSpacing={2}
+            sx={{ textTransform: 'uppercase' }}
+          >
+            Proposal period
+          </Typography>
+          <Paragraph spacing={1.5}>
+            <Typography variant="body2" color="text.secondary">
               Start:{' '}
               {DateTime.fromSeconds(proposal?.startDateTime ?? 0).toFormat(
                 'dd.MM.yyyy - hh:mm:ss a'
               )}
             </Typography>
-            <Typography variant="body1" color="text.secondary">
+            <Typography variant="body2" color="text.secondary">
               End:{' '}
               {DateTime.fromSeconds(proposal?.endDateTime ?? 0).toFormat(
                 'dd.MM.yyyy - hh:mm:ss a'
@@ -113,25 +129,32 @@ const ProposalStatus = ({ proposal, extraInfo }: ProposalStatusProps) => {
           </Paragraph>
         </Paragraph>
         {extraInfo && (
-          <Paragraph spacing="sm" divider>
+          <Paragraph spacing={1.5} divider>
             {extraInfoComponent}
           </Paragraph>
         )}
         <Paragraph spacing="md">
-          <Typography variant="h5">Your vote</Typography>
-          <Paragraph spacing="sm">
+          <Typography
+            variant="caption"
+            fontWeight={600}
+            letterSpacing={2}
+            sx={{ textTransform: 'uppercase' }}
+          >
+            Your vote
+          </Typography>
+          <Paragraph spacing="sm" alignItems="flex-start">
             {voted?.map((v: VotingOption) => (
               <StateButton
                 key={v.option}
-                variant="outlined"
-                color="accent"
+                variant="contained"
+                color={v.value ? 'success' : 'error'}
+                startIcon={v.value ? <CheckCircle /> : <Cancel />}
                 sx={{ textTransform: 'none' }}
               >
                 {getVotedState(v)}
               </StateButton>
             ))}
           </Paragraph>
-          <Box />
         </Paragraph>
       </Paragraph>
     </Box>

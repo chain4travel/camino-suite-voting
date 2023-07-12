@@ -14,8 +14,12 @@ interface DistributionBarProps<T extends Percentage> {
   renderContent?: (d: T) => ReactNode | ReactNode[] | null;
   variant?: 'proposal' | 'vote' | 'turnouts' | 'default';
 }
-const DistributionContainer = styled(ButtonGroup)(() => ({
+const DistributionContainer = styled(ButtonGroup)(({ theme }) => ({
   boxShadow: 'none',
+  borderRadius: theme.shape.borderRadius * 2,
+  '.MuiButton-root': {
+    padding: theme.spacing(1, 2),
+  },
 }));
 const DistributionBar = <T extends Percentage>({
   data,
