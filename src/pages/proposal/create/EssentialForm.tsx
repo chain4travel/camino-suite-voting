@@ -152,7 +152,7 @@ const EssentialForm = ({ children, formSchema = {} }: EssentialFormProps) => {
                 </Stack>
               </Stack>
             </FormSection>
-            <FormSection spacing="md" divider sx={{ paddingX: 3 }}>
+            {/* <FormSection spacing="md" divider sx={{ paddingX: 3 }}>
               <Header headline="Add link of forum of discussion" variant="h6" />
               <Controller
                 name="forumLink"
@@ -168,12 +168,12 @@ const EssentialForm = ({ children, formSchema = {} }: EssentialFormProps) => {
                   />
                 )}
               />
-            </FormSection>
+            </FormSection> */}
             {children}
           </Paragraph>
         </FormContainer>
         <Stack direction="row" spacing={2}>
-          <Button variant="outlined" sx={{ py: 1.5 }} color="inherit" fullWidth>
+          <Button variant="outlined" sx={{ py: 1.5 }} color="inherit">
             Cancel
           </Button>
           <Button
@@ -181,9 +181,8 @@ const EssentialForm = ({ children, formSchema = {} }: EssentialFormProps) => {
             variant="contained"
             sx={{ py: 1.5 }}
             color="primary"
-            fullWidth
           >
-            Create new voting
+            Create
           </Button>
         </Stack>
       </form>

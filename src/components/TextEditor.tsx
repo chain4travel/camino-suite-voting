@@ -47,11 +47,22 @@ interface TextEditorProps {
   title?: string;
   description?: string;
   value?: string;
+  placeholder?: string;
   error?: FieldError;
   onChange: (value: string) => void;
 }
 const TextEditor = forwardRef(
-  ({ title, description, value, error, onChange }: TextEditorProps, ref) => {
+  (
+    {
+      title,
+      description,
+      value,
+      placeholder,
+      error,
+      onChange,
+    }: TextEditorProps,
+    ref
+  ) => {
     const modules = {
       toolbar: [
         [{ header: [1, 2, 3, 4, 5, 6, false] }],
@@ -84,6 +95,7 @@ const TextEditor = forwardRef(
             modules={modules}
             value={value}
             onChange={onChange}
+            placeholder={placeholder}
           />
         </StyledEditor>
       </Box>

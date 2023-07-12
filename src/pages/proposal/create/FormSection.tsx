@@ -3,6 +3,6 @@ import React from 'react';
 import Paragraph from '@/components/Paragraph';
 
 const FormSection = styled(Paragraph)(({ theme }) => ({
-  padding: `0 ${theme.spacing(3)}`,
+  padding: theme.spacing(0),
 }));
 export default FormSection;
