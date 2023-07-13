@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import {
   Container,
+  Divider,
   MenuItem,
   Select,
   SelectChangeEvent,
@@ -78,7 +79,6 @@ const CreateNewVoting = () => {
           return selectedType?.name;
         }}
         onChange={handleChange}
-        variant="filled"
         sx={{ marginTop: '16px', borderRadius: '12px' }}
       >
         <MenuItem
@@ -93,6 +93,7 @@ const CreateNewVoting = () => {
           </MenuItem>
         ))}
       </Select>
+      <Divider sx={{ marginY: 4 }} />
       {formSchema ? (
         <EssentialForm formSchema={formSchema}>{ProposalForm}</EssentialForm>
       ) : (

@@ -7,6 +7,7 @@ import DistributionBar, {
   VOTE_DISTRIBUTION_COLORS,
 } from '@/components/DistributionBar';
 import { Circle } from '@mui/icons-material';
+import Tag from '@/components/Tag';
 
 interface VoteResultProps {
   result: VotingOption & { baseFee?: number; target?: string };
@@ -30,13 +31,24 @@ const VoteResult = ({ result, votingType }: VoteResultProps) => {
           const sign = absoluteChange.s > 0 ? '+' : '';
           return (
             <Paragraph spacing={1.5}>
-              <Typography variant="h6">Vote Result</Typography>
+              <Stack
+                direction="row"
+                alignItems="center"
+                justifyContent="space-between"
+              >
+                <Typography variant="h6">Vote Result</Typography>
+                <Tag color="success" label="WINNER" />
+              </Stack>
               <Paragraph>
                 <Stack direction="row" justifyContent="space-between">
                   <Typography variant="caption" color="text.secondary">
                     New Base Fee
                   </Typography>
-                  <Typography color="text.secondary">
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    fontWeight={600}
+                  >
                     {result?.value} nCAM
                   </Typography>
                 </Stack>
@@ -44,7 +56,11 @@ const VoteResult = ({ result, votingType }: VoteResultProps) => {
                   <Typography variant="caption" color="text.secondary">
                     Percentage Change
                   </Typography>
-                  <Typography color="text.secondary">
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    fontWeight={600}
+                  >
                     {sign} {Number(percentageChange.toFixed(2))}%
                   </Typography>
                 </Stack>
@@ -52,7 +68,11 @@ const VoteResult = ({ result, votingType }: VoteResultProps) => {
                   <Typography variant="caption" color="text.secondary">
                     Absolute Change
                   </Typography>
-                  <Typography color="text.secondary">
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    fontWeight={600}
+                  >
                     {sign} {absoluteChange.toString()} nCAM
                   </Typography>
                 </Stack>
@@ -120,8 +140,8 @@ const VoteResult = ({ result, votingType }: VoteResultProps) => {
   return (
     <Box
       padding={1.5}
-      border="1px solid"
-      borderColor="accent.main"
+      border="2px solid"
+      borderColor="success.main"
       borderRadius={1}
     >
       {content}

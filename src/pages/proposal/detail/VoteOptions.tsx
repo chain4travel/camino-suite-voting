@@ -1,9 +1,10 @@
 import React from 'react';
 import { filter } from 'lodash';
-import { Box, Stack, Typography } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 import Big from 'big.js';
 import { Percentage, Vote, VotingOption } from '@/types';
 import DistributionBar from '@/components/DistributionBar';
+import Tag from '@/components/Tag';
 
 type VotedOption = VotingOption & Percentage;
 
@@ -37,12 +38,12 @@ const VoteOptions = ({
                 const percentageChange = absoluteChange.times(100).div(baseFee);
                 const sign = absoluteChange.s > 0 ? '+' : '';
                 extraInfo = (
-                  <>
+                  <Stack spacing={0.5}>
                     <Stack direction="row" justifyContent="space-between">
                       <Typography variant="caption" color="text.secondary">
                         Percentage Change
                       </Typography>
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography variant="caption" fontWeight={600}>
                         {sign}
                         {Number(percentageChange.toFixed(2))}%
                       </Typography>
@@ -51,12 +52,12 @@ const VoteOptions = ({
                       <Typography variant="caption" color="text.secondary">
                         Absolute Change
                       </Typography>
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography variant="caption" fontWeight={600}>
                         {sign}
                         {absoluteChange.toString()} nCAM
                       </Typography>
                     </Stack>
-                  </>
+                  </Stack>
                 );
               }
             }
@@ -76,30 +77,32 @@ const VoteOptions = ({
           default:
         }
         return (
-          <Box
+          <Stack
             key={opt.option}
             padding={2}
             border="1px solid"
             borderColor="divider"
             borderRadius={2}
             flex={1}
+            spacing={1}
+            justifyContent="space-between"
           >
-            <Stack direction="row" justifyContent="space-between" spacing={3}>
-              <Typography variant="body2">{label}</Typography>
-              <Typography
-                variant="body2"
-                color={
-                  opt.option === result.option
-                    ? 'accent.main'
-                    : 'text.secondary'
-                }
-                textAlign="right"
-              >
-                VOTED {opt.percent ?? 0}%
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+              spacing={3}
+            >
+              <Typography variant="body2" fontWeight={600}>
+                {label}
               </Typography>
+              <Tag
+                color={opt.option === result.option ? 'success' : 'default'}
+                label={`VOTED ${opt.percent ?? 0}%`}
+              />
             </Stack>
             {extraInfo}
-          </Box>
+          </Stack>
         );
       })}
     </Stack>

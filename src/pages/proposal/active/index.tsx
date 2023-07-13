@@ -1,7 +1,8 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { NavLink, useLoaderData } from 'react-router-dom';
-import { Container } from '@mui/material';
+import { Paper, FormControlLabel, Stack } from '@mui/material';
 import { ExpandMore } from '@mui/icons-material';
+import { filter } from 'lodash';
 import { useActiveVotings } from '@/hooks/useProposals';
 import Header from '@/components/Header';
 import {
@@ -15,15 +16,24 @@ import VotingList from './VotingList';
 import GroupHeader from './GroupHeader';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useDialogStore } from '@/store';
+import Checkbox from '@/components/Checkbox';
 
 const ActiveVotings = () => {
   const { data: votingTypes } = useLoaderData() as { data: VotingType[] };
+  const [onlyTodo, setOnlyTodo] = useState(false);
   const { proposals, error, isLoading } = useActiveVotings();
   const { option: dialogOption } = useDialogStore(state => ({
     option: state.option,
   }));
   const groupedProposals = useMemo(() => {
-    return proposals.reduce((result: any, proposal: any) => {
+    let filteredProposals = proposals;
+    if (onlyTodo) {
+      filteredProposals = filter(
+        proposals,
+        proposal => !proposal.voted || proposal.voted.length === 0
+      );
+    }
+    return filteredProposals.reduce((result: any, proposal: any) => {
       const votingType = votingTypes.find(
         (vtype: VotingType) => vtype.id === proposal.type
       );
@@ -47,15 +57,22 @@ const ActiveVotings = () => {
       }
       return result;
     }, {});
-  }, [proposals]);
+  }, [proposals, onlyTodo]);
   return (
-    <Container>
-      <Header headline="Ongoing Proposals" variant="h4">
-        <NavLink to="/proposal/create">
-          <Button variant="contained" color="primary">
-            Create new
-          </Button>
-        </NavLink>
+    <Paper sx={{ px: 2 }}>
+      <Header headline="Ongoing Proposals" variant="h5">
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <FormControlLabel
+            control={<Checkbox />}
+            onChange={(_event, checked) => setOnlyTodo(checked)}
+            label="Show only TODO"
+          />
+          <NavLink to="/proposal/create">
+            <Button variant="contained" color="primary">
+              Create new
+            </Button>
+          </NavLink>
+        </Stack>
       </Header>
       {Object.entries(groupedProposals ?? {}).map(
         ([votingType, group]: [string, any]) => (
@@ -77,7 +94,7 @@ const ActiveVotings = () => {
         )
       )}
       <ConfirmDialog {...dialogOption} />
-    </Container>
+    </Paper>
   );
 };
 export default ActiveVotings;

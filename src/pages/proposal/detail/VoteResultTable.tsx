@@ -1,5 +1,7 @@
 import { Vote } from '@/types';
+import { AccountBalanceWalletOutlined } from '@mui/icons-material';
 import {
+  Box,
   Paper,
   Stack,
   Table,
@@ -26,9 +28,9 @@ type ColumnField = {
   width: string | number;
 };
 const columns: ColumnField[] = [
-  { dataKey: 'address', label: 'ADDRESS / NAME', width: '100%' },
-  { dataKey: 'votedDateTime', label: 'TIME OF VOTE', width: 260 },
-  { dataKey: 'option', label: 'VOTE FOR', width: 260 },
+  { dataKey: 'address', label: 'Address / Name', width: '100%' },
+  { dataKey: 'votedDateTime', label: 'Time of vote', width: 260 },
+  { dataKey: 'option', label: 'Voted for', width: 260 },
 ];
 
 interface VoteData extends Omit<Vote, 'votedDateTime'> {
@@ -62,20 +64,20 @@ const VoteResultTable = ({ votes }: VoteResultTableProps) => {
         components={VirtuosoTableComponents}
         fixedHeaderContent={() => (
           <TableRow>
-            {columns.map(column => (
+            {columns.map((column, idx) => (
               <TableCell
                 key={column.dataKey}
                 variant="head"
                 align="left"
                 style={{ width: column.width }}
                 sx={{
-                  backgroundColor: 'grey.800',
+                  backgroundColor: 'grey.900',
                   borderColor: 'divider',
-                  color: 'grey.500',
                 }}
               >
                 <Stack direction="row" alignItems="center" spacing={2}>
-                  <Typography>{column.label}</Typography>
+                  {idx === 0 && <Box width={24} height={24} />}
+                  <Typography variant="subtitle2">{column.label}</Typography>
                 </Stack>
               </TableCell>
             ))}
@@ -84,17 +86,22 @@ const VoteResultTable = ({ votes }: VoteResultTableProps) => {
         itemContent={(_index: number, row: VoteData) => {
           return (
             <>
-              {columns.map(column => (
+              {columns.map((column, idx) => (
                 <TableCell
                   key={column.dataKey}
                   align="left"
                   sx={{
                     borderColor: 'divider',
-                    color: row.votedDateTime === '-' ? 'grey.400' : 'inherit',
+                    color: row.votedDateTime === '-' ? '#999090' : 'inherit',
                   }}
                 >
                   <Stack direction="row" alignItems="center" spacing={2}>
-                    <Typography>{row[column.dataKey]}</Typography>
+                    {idx === 0 && (
+                      <AccountBalanceWalletOutlined color="primary" />
+                    )}
+                    <Typography variant="body2">
+                      {row[column.dataKey]}
+                    </Typography>
                   </Stack>
                 </TableCell>
               ))}
