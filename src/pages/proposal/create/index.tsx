@@ -11,15 +11,15 @@ import { useLoaderData } from 'react-router-dom';
 import Header from '@/components/Header';
 import type { VotingType } from '@/types';
 import NoVotingType from './NoVotingType';
-import BaseFeeVoting, { baseFeeFormSchema } from './BaseFeeVoting';
+import BaseFeeForm, { baseFeeFormSchema } from './BaseFeeForm';
 import EssentialForm from './EssentialForm';
-import NewMemberVoting, { newMemberFormSchema } from './NewMemberVoting';
+import NewMemberForm, { newMemberFormSchema } from './NewMemberForm';
 import ExcludeMemberVoting, {
   excludeMemberFormSchema,
-} from './ExcludeMemberVoting';
-import FeeDistributionVoting, {
+} from './ExcludeMemberForm';
+import FeeDistributionForm, {
   feeDistributionFormSchema,
-} from './FeeDistributionVoting';
+} from './FeeDistributionForm';
 
 const CreateNewVoting = () => {
   const { data: votingTypes } = useLoaderData() as { data: VotingType[] };
@@ -36,11 +36,11 @@ const CreateNewVoting = () => {
     let ProposalForm, formSchema;
     switch (selectedVotingType) {
       case 'BASE_FEE':
-        ProposalForm = <BaseFeeVoting />;
+        ProposalForm = <BaseFeeForm />;
         formSchema = baseFeeFormSchema;
         break;
       case 'NEW_MEMBER':
-        ProposalForm = <NewMemberVoting />;
+        ProposalForm = <NewMemberForm />;
         formSchema = newMemberFormSchema;
         break;
       case 'EXCLUDE_MEMBER':
@@ -48,7 +48,7 @@ const CreateNewVoting = () => {
         formSchema = excludeMemberFormSchema;
         break;
       case 'FEE_DISTRIBUTION':
-        ProposalForm = <FeeDistributionVoting />;
+        ProposalForm = <FeeDistributionForm />;
         formSchema = feeDistributionFormSchema;
         break;
       default:

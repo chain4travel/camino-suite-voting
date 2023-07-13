@@ -18,7 +18,7 @@ export const excludeMemberFormSchema = {
     .nonempty()
     .refine(d => d?.replaceAll(/(<p>|<\/p>|<br>)/g, '') !== '', 'requied'),
 };
-const ExcludeMemberVoting = () => {
+const ExcludeMemberForm = () => {
   const { control } = useFormContext();
   return (
     <>
@@ -102,4 +102,4 @@ const ExcludeMemberVoting = () => {
     </>
   );
 };
-export default ExcludeMemberVoting;
+export default ExcludeMemberForm;
