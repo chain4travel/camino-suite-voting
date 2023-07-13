@@ -8,7 +8,7 @@ export type VotingType = {
 };
 export type VotingOption = {
   option: number | string;
-  value: number | boolean | number[];
+  value: number | boolean | string | number[];
   label?: string | string[];
 };
 export type Vote = {

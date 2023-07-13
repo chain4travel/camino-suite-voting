@@ -20,6 +20,7 @@ import ExcludeMemberVoting, {
 import FeeDistributionForm, {
   feeDistributionFormSchema,
 } from './FeeDistributionForm';
+import GeneralProposalForm, { generalFormSchema } from './GeneralProposalForm';
 
 const CreateNewVoting = () => {
   const { data: votingTypes } = useLoaderData() as { data: VotingType[] };
@@ -35,6 +36,10 @@ const CreateNewVoting = () => {
   const { ProposalForm, formSchema } = useMemo(() => {
     let ProposalForm, formSchema;
     switch (selectedVotingType) {
+      case 'GENERAL':
+        ProposalForm = <GeneralProposalForm />;
+        formSchema = generalFormSchema;
+        break;
       case 'BASE_FEE':
         ProposalForm = <BaseFeeForm />;
         formSchema = baseFeeFormSchema;
