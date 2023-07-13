@@ -82,15 +82,23 @@ const VoteResult = ({ result, votingType }: VoteResultProps) => {
         }
         case 'NEW_MEMBER':
           return (
-            <Typography>
-              {result.target} - {result.value ? 'Admitted' : 'Declined'}
-            </Typography>
+            <Stack spacing={1} alignItems="flex-start">
+              <Typography fontWeight={600}>{result.target}</Typography>
+              <Tag
+                color={result.value ? 'success' : 'error'}
+                label={result.value ? 'Admitted' : 'Declined'}
+              />
+            </Stack>
           );
         case 'EXCLUDE_MEMBER':
           return (
-            <Typography>
-              {result.target} - {result.value ? 'Excluded' : 'Declined'}
-            </Typography>
+            <Stack spacing={1} alignItems="flex-start">
+              <Typography fontWeight={600}>{result.target}</Typography>
+              <Tag
+                color={result.value ? 'success' : 'error'}
+                label={result.value ? 'Excluded' : 'Declined'}
+              />
+            </Stack>
           );
         case 'FEE_DISTRIBUTION': {
           const values = result.value as number[];
@@ -139,7 +147,7 @@ const VoteResult = ({ result, votingType }: VoteResultProps) => {
 
   return (
     <Box
-      padding={1.5}
+      padding={2.5}
       border="2px solid"
       borderColor="success.main"
       borderRadius={1}
