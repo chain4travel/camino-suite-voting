@@ -14,7 +14,6 @@ import DistributionBar from '@/components/DistributionBar';
 import ProposalStatus from './ProposalStatus';
 import VoteResultTable from './VoteResultTable';
 import VoteResult from './VoteResult';
-import { toPastTense } from '@/helpers/string';
 import VoteOptions from './VoteOptions';
 
 const Detail = () => {
@@ -124,7 +123,7 @@ const Detail = () => {
           Back to all Proposals
         </Button>
       </Stack>
-      <Container sx={{ paddingBottom: 5 }}>
+      <Container>
         <Stack direction="row" spacing={4} alignItems="flex-start">
           <Stack spacing={2}>
             <Stack spacing={2}>
@@ -182,7 +181,9 @@ const Detail = () => {
           </Stack>
           <ProposalStatus proposal={proposal} extraInfo={extraInfo} />
         </Stack>
-        <Divider color="divider" variant="fullWidth" sx={{ my: 4 }} />
+      </Container>
+      <Divider color="divider" variant="fullWidth" sx={{ my: 4 }} />
+      <Container sx={{ paddingBottom: 5 }}>
         <Stack spacing={3}>
           <Stack spacing={1}>
             <Typography variant="h5">Proposal Distribution</Typography>

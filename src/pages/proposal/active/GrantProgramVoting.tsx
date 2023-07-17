@@ -123,7 +123,8 @@ const GrantProgramVoting = ({ data }: GrantProgramVotingProps) => {
             }}
             variant="body2"
           >
-            {data.description}
+            {(data.target! as Applicant).additionalInfo ??
+              (data.target! as Applicant).companyDescription}
           </Typography>
         }
         primaryTypographyProps={{

@@ -33,6 +33,7 @@ export type Applicant = {
   numberOfFunds: number | string;
   useOfFunds: string;
   pitchDeck: string;
+  additionalInfo?: string;
 };
 export type Proposal = {
   id: number | string;
