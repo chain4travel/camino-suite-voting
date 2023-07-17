@@ -1,29 +1,15 @@
 import React from 'react';
 import { ButtonProps, alpha, styled } from '@mui/material';
-import Button from './Button';
+import Radio from '@mui/material/Radio';
+import { CheckCircle } from '@mui/icons-material';
 
-const checkedClassName = 'RadioButton-checked';
 interface RadioButtonProps {
   label?: string;
   checked?: boolean;
 }
-const RadioButton = styled(
-  ({ label, checked, className, ...props }: ButtonProps & RadioButtonProps) => {
-    const overrideClassName = checked
-      ? [className, checkedClassName].join(' ')
-      : className;
-    return (
-      <Button
-        variant="contained"
-        color="inherit"
-        className={overrideClassName}
-        {...props}
-      >
-        {label}
-      </Button>
-    );
-  }
-)(({ theme }) => ({
+const RadioButton = styled(({ value }: ButtonProps & RadioButtonProps) => {
+  return <Radio value={value} checkedIcon={<CheckCircle />} color="default" />;
+})(({ theme }) => ({
   backgroundColor: theme.palette.grey[800],
   '.MuiButton-startIcon': {
     color: theme.palette.info.light,
