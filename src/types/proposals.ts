@@ -20,6 +20,20 @@ export type MultisigVote = {
   threshold: number;
   voted: { option: number; count: number };
 };
+export type Applicant = {
+  name: string;
+  email: string;
+  pchainAddress: string;
+  companyName: string;
+  companyWebsite: string;
+  companyIndustry: string;
+  companyDescription: string;
+  companyStage: string;
+  milestones: string;
+  numberOfFunds: number | string;
+  useOfFunds: string;
+  pitchDeck: string;
+};
 export type Proposal = {
   id: number | string;
   type: string;
@@ -31,7 +45,7 @@ export type Proposal = {
   voted?: Vote[];
   status: string;
   forumLink?: string;
-  target?: string;
+  target?: string | Applicant;
   multisig?: MultisigVote;
 };
 export type Group = {

@@ -62,6 +62,7 @@ const NewMemberVoting = ({ data }: NewMemberVotingProps) => {
             startIcon={isAccepted ? <CheckCircle /> : <Cancel />}
             onClick={triggerVoting(votedOption)}
             loading={votingOption === votedOption.option}
+            loadingPosition="start"
             color={isAccepted ? 'primary' : 'inherit'}
             fullWidth
           >
@@ -80,6 +81,7 @@ const NewMemberVoting = ({ data }: NewMemberVotingProps) => {
           startIcon={opt.value && <CheckCircle />}
           onClick={triggerVoting(opt)}
           loading={votingOption === opt.option}
+          loadingPosition="start"
           color={opt.value ? 'primary' : 'inherit'}
           fullWidth={!!opt.value}
         >
@@ -108,7 +110,7 @@ const NewMemberVoting = ({ data }: NewMemberVotingProps) => {
   return (
     <Stack direction="row" alignItems="center" spacing={3}>
       <ListItemText
-        primary={data.target}
+        primary={String(data.target)}
         secondary={
           <Typography
             color="text.secondary"

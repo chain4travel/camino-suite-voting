@@ -8,11 +8,15 @@ interface ListItemStatusProps extends ChipProps {
   startTimestamp?: number;
   endTimestamp?: number;
   multisig?: MultisigVote;
+  stage?: string;
+  industry?: string;
 }
 const ListItemStatus = ({
   startTimestamp,
   endTimestamp,
   multisig,
+  stage,
+  industry,
   ...props
 }: ListItemStatusProps) => {
   let duration;
@@ -37,6 +41,8 @@ const ListItemStatus = ({
           label={`${multisig.voted?.count} / ${multisig.threshold} PENDING`}
         />
       )}
+      {stage && <Tag color="success" label={stage.toUpperCase()} />}
+      {industry && <Tag label={industry.toUpperCase()} />}
     </Stack>
   );
 };

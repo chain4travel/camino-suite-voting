@@ -1,12 +1,13 @@
 import React from 'react';
 import { List, ListItemButton, Stack } from '@mui/material';
 import { ArrowForwardIos } from '@mui/icons-material';
-import type { Proposal } from '@/types';
+import type { Applicant, Proposal } from '@/types';
 import NewMemberVoting from './NewMemberVoting';
 import BaseFeeVoting from './BaseFeeVoting';
 import ListItemStatus from '@/components/ListItemStatus';
 import ExcludeMemberVoting from './ExcludeMemberVoting';
 import FeeDistributionVoting from './FeeDistributionVoting';
+import GrantProgramVoting from './GrantProgramVoting';
 
 interface VotingListProps {
   data: { type: string; name: string; data: Proposal[] };
@@ -46,6 +47,23 @@ const VotingList = ({ data }: VotingListProps) => {
             break;
           case 'FEE_DISTRIBUTION':
             Vote = <FeeDistributionVoting data={proposal} />;
+            break;
+          case 'GRANT':
+            {
+              const applicant = proposal.target! as Applicant;
+              Vote = (
+                <Stack width="100%">
+                  <GrantProgramVoting data={proposal} />
+                  <ListItemStatus
+                    startTimestamp={proposal.startDateTime}
+                    endTimestamp={proposal.endDateTime}
+                    multisig={proposal.multisig}
+                    stage={applicant.companyStage}
+                    industry={applicant.companyIndustry}
+                  />
+                </Stack>
+              );
+            }
             break;
           default:
             console.warn(`Unsupport voting type ${data.type}`);

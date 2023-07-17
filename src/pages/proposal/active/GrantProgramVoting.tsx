@@ -1,17 +1,17 @@
 import React, { MouseEventHandler, MouseEvent, useState, useMemo } from 'react';
-import { Cancel, CheckCircle } from '@mui/icons-material';
+import { CheckCircle, Cancel } from '@mui/icons-material';
 import { IconButton, ListItemText, Stack, Typography } from '@mui/material';
 import { filter, find } from 'lodash';
-import type { Proposal, VotingOption } from '@/types';
+import type { Applicant, Proposal, VotingOption } from '@/types';
 import Button from '@/components/Button';
 import { useVote } from '@/hooks/useRpc';
 import StateButton from '@/components/StateButton';
 import { toPastTense } from '@/helpers/string';
 
-interface ExcludeMemberVotingProps {
+interface GrantProgramVotingProps {
   data: Proposal;
 }
-const ExcludeMemberVoting = ({ data }: ExcludeMemberVotingProps) => {
+const GrantProgramVoting = ({ data }: GrantProgramVotingProps) => {
   const [votingOption, setVotingOption] = useState<string | number | null>(
     null
   );
@@ -54,7 +54,7 @@ const ExcludeMemberVoting = ({ data }: ExcludeMemberVotingProps) => {
         option: data.multisig!.voted.option,
       });
       if (votedOption) {
-        const isAccepted = !!votedOption.value;
+        const isAccepted = votedOption.value;
         return (
           <Button
             key={`multisig-voted-${votedOption?.option}`}
@@ -108,9 +108,9 @@ const ExcludeMemberVoting = ({ data }: ExcludeMemberVotingProps) => {
     };
 
   return (
-    <Stack direction="row" alignItems="center">
+    <Stack direction="row" alignItems="center" spacing={3}>
       <ListItemText
-        primary={String(data.target)}
+        primary={(data.target! as Applicant).name}
         secondary={
           <Typography
             color="text.secondary"
@@ -126,16 +126,11 @@ const ExcludeMemberVoting = ({ data }: ExcludeMemberVotingProps) => {
             {data.description}
           </Typography>
         }
-        sx={{ marginRight: 3 }}
         primaryTypographyProps={{
           sx: { fontWeight: 500, marginBottom: 1 },
         }}
       />
-      <Stack
-        direction="row"
-        sx={{ marginRight: 3, minWidth: 240 }}
-        spacing={1.5}
-      >
+      <Stack direction="row" sx={{ minWidth: 240 }} spacing={1.5}>
         {needConfirm
           ? [
               <IconButton
@@ -167,4 +162,4 @@ const ExcludeMemberVoting = ({ data }: ExcludeMemberVotingProps) => {
     </Stack>
   );
 };
-export default ExcludeMemberVoting;
+export default GrantProgramVoting;
