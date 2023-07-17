@@ -90,6 +90,7 @@ const CompletedVotes = () => {
           name="votingType"
           value={votingType}
           onChange={handleChange}
+          sx={{ textAlign: 'left' }}
           row
         >
           {votingTypes.map(vtype => (
@@ -100,7 +101,6 @@ const CompletedVotes = () => {
               sx={{ marginLeft: 0 }}
               control={
                 <RadioButton
-                  startIcon={vtype.icon}
                   label={vtype.abbr ?? vtype.name}
                   onClick={() => setVotingType(vtype.id)}
                   checked={votingType === vtype.id}
@@ -116,16 +116,18 @@ const CompletedVotes = () => {
             <ListItemButton
               key={vote.id}
               onClick={() => navigate(`${vote.type}/${vote.id}`)}
+              divider={votes.length !== index + 1 && true}
+              sx={{ px: 0 }}
             >
               <Stack width="100%">
-                {voteItem(vote)}
-                <ListItemStatus
-                  startTimestamp={vote.startDateTime}
-                  endTimestamp={vote.endDateTime}
-                />
-                {votes.length !== index + 1 && (
-                  <Divider sx={{ marginTop: 3 }} />
-                )}
+                <Stack>
+                  {voteItem(vote)}
+                  <ListItemStatus
+                    startTimestamp={vote.startDateTime}
+                    endTimestamp={vote.endDateTime}
+                  />
+                </Stack>
+                <Stack></Stack>
               </Stack>
             </ListItemButton>
           );

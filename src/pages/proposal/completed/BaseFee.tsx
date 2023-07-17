@@ -20,7 +20,7 @@ const TransactionFee = ({ data }: TransactionFeeProps) => {
     });
   });
   return (
-    <Container sx={{ paddingBottom: 2, px: 0 }} maxWidth="xl" disableGutters>
+    <Container sx={{ paddingBottom: 2 }} maxWidth="xl" disableGutters>
       <Paragraph spacing="sm">
         <Typography variant="h5">{data.target}</Typography>
         <DistributionBar
