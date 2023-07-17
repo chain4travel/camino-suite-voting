@@ -26,7 +26,7 @@
     "options": [
       {
         "option": 1,
-        "value": [30, 50, 20],
+        "value": [35, 45, 20],
         "label": ["Validators", "TAKEOFF Camino Grant Program", "Burn"]
       }
     ],
@@ -44,7 +44,7 @@
     "options": [
       {
         "option": 1,
-        "value": [30, 50, 20],
+        "value": [25, 45, 30],
         "label": ["Validators", "TAKEOFF Camino Grant Program", "Burn"]
       }
     ],
@@ -62,7 +62,7 @@
     "options": [
       {
         "option": 1,
-        "value": [30, 50, 20],
+        "value": [25, 40, 35],
         "label": ["Validators", "TAKEOFF Camino Grant Program", "Burn"]
       }
     ],
@@ -80,7 +80,7 @@
     "options": [
       {
         "option": 1,
-        "value": [30, 50, 20],
+        "value": [25, 60, 15],
         "label": ["Validators", "TAKEOFF Camino Grant Program", "Burn"]
       }
     ],

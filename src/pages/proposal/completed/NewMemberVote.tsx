@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Check, Close } from '@mui/icons-material';
+import { Cancel, CheckCircle } from '@mui/icons-material';
 import { ListItemText, Stack, Typography } from '@mui/material';
 import type { Proposal, VotingOption } from '@/types';
 import StateButton from '@/components/StateButton';
@@ -45,8 +45,9 @@ const NewMemberVote = ({ data, voteTypeName }: NewMemberVoteProps) => {
       />
       {votedList.map(voted => (
         <StateButton
+          variant="contained"
           key={voted.option}
-          startIcon={voted.value ? <Check /> : <Close />}
+          startIcon={voted.value ? <CheckCircle /> : <Cancel />}
           color={voted.value ? 'success' : 'error'}
         >
           {toPastTense(voted.label)}
