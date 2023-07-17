@@ -187,6 +187,44 @@ const VoteResult = ({ result, votingType }: VoteResultProps) => {
                     {applicant.additionalInfo}
                   </Typography>
                 </Stack>
+                <Paragraph>
+                  <Stack direction="row" justifyContent="space-between">
+                    <Typography variant="caption" color="text.secondary">
+                      New Base Fee
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      fontWeight={600}
+                    >
+                      {result?.value} nCAM
+                    </Typography>
+                  </Stack>
+                  <Stack direction="row" justifyContent="space-between">
+                    <Typography variant="caption" color="text.secondary">
+                      Percentage Change
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      fontWeight={600}
+                    >
+                      {sign} {Number(percentageChange.toFixed(2))}%
+                    </Typography>
+                  </Stack>
+                  <Stack direction="row" justifyContent="space-between">
+                    <Typography variant="caption" color="text.secondary">
+                      Absolute Change
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      fontWeight={600}
+                    >
+                      {sign} {absoluteChange.toString()} nCAM
+                    </Typography>
+                  </Stack>
+                </Paragraph>
               </Paragraph>
             );
           }
@@ -324,6 +362,163 @@ const VoteResult = ({ result, votingType }: VoteResultProps) => {
           );
           break;
         }
+        case 'GRANT':
+          {
+            const applicant = result.target as Applicant;
+            noBox = true;
+            content = (
+              <Paragraph spacing="md">
+                <Stack direction="row">
+                  <Stack spacing={0.5} flex={1}>
+                    <Typography
+                      variant="caption"
+                      fontWeight={600}
+                      color="grey.400"
+                    >
+                      Company name
+                    </Typography>
+                    <Typography variant="body2" color="grey.100">
+                      {applicant.companyName}
+                    </Typography>
+                  </Stack>
+                  <Stack spacing={0.5} flex={1}>
+                    <Typography
+                      variant="caption"
+                      fontWeight={600}
+                      color="grey.400"
+                    >
+                      Company website
+                    </Typography>
+                    <Typography variant="body2" color="grey.100">
+                      {applicant.companyWebsite}
+                    </Typography>
+                  </Stack>
+                </Stack>
+                <Stack direction="row">
+                  <Stack spacing={0.5} flex={1}>
+                    <Typography
+                      variant="caption"
+                      fontWeight={600}
+                      color="grey.400"
+                    >
+                      Applicant name
+                    </Typography>
+                    <Typography variant="body2" color="grey.100">
+                      {applicant.name}
+                    </Typography>
+                  </Stack>
+                  <Stack spacing={0.5} flex={1}>
+                    <Typography
+                      variant="caption"
+                      fontWeight={600}
+                      color="grey.400"
+                    >
+                      Applicant email
+                    </Typography>
+                    <Typography variant="body2" color="grey.100">
+                      {applicant.email}
+                    </Typography>
+                  </Stack>
+                </Stack>
+                <Stack direction="row">
+                  <Stack spacing={0.5} flex={1}>
+                    <Typography
+                      variant="caption"
+                      fontWeight={600}
+                      color="grey.400"
+                    >
+                      Applicant p-chain address
+                    </Typography>
+                    <Typography variant="body2" color="grey.100">
+                      {applicant.pchainAddress}
+                    </Typography>
+                  </Stack>
+                  <Stack spacing={0.5} flex={1} alignItems="flex-start">
+                    <Typography
+                      variant="caption"
+                      fontWeight={600}
+                      color="grey.400"
+                    >
+                      Company industry
+                    </Typography>
+                    <Tag label={applicant.companyIndustry.toUpperCase()} />
+                  </Stack>
+                </Stack>
+                <Stack spacing={0.5} alignItems="flex-start">
+                  <Typography
+                    variant="caption"
+                    fontWeight={600}
+                    color="grey.400"
+                  >
+                    Company stage
+                  </Typography>
+                  <Tag
+                    color="success"
+                    label={applicant.companyStage.toUpperCase()}
+                  />
+                </Stack>
+                <Stack spacing={0.5} alignItems="flex-start">
+                  <Typography
+                    variant="caption"
+                    fontWeight={600}
+                    color="grey.400"
+                  >
+                    Company description
+                  </Typography>
+                  <Typography variant="body2" color="grey.100">
+                    {applicant.companyDescription}
+                  </Typography>
+                </Stack>
+                <Stack spacing={0.5} alignItems="flex-start">
+                  <Typography
+                    variant="caption"
+                    fontWeight={600}
+                    color="grey.400"
+                  >
+                    Number of funds
+                  </Typography>
+                  <Tag label={String(applicant.numberOfFunds).toUpperCase()} />
+                </Stack>
+                <Stack spacing={0.5} alignItems="flex-start">
+                  <Typography
+                    variant="caption"
+                    fontWeight={600}
+                    color="grey.400"
+                  >
+                    Use of funds
+                  </Typography>
+                  <Typography variant="body2" color="grey.100">
+                    {applicant.useOfFunds}
+                  </Typography>
+                </Stack>
+                <Stack spacing={0.5} alignItems="flex-start">
+                  <Typography
+                    variant="caption"
+                    fontWeight={600}
+                    color="grey.400"
+                  >
+                    Pitch deck
+                  </Typography>
+                  <Typography variant="body2" color="grey.100">
+                    {applicant.pitchDeck}
+                  </Typography>
+                </Stack>
+                <Stack spacing={0.5} alignItems="flex-start">
+                  <Typography
+                    variant="caption"
+                    fontWeight={600}
+                    color="grey.400"
+                  >
+                    Additional info about the application / company
+                  </Typography>
+                  <Typography variant="body2" color="grey.100">
+                    {applicant.additionalInfo}
+                  </Typography>
+                </Stack>
+              </Paragraph>
+            );
+          }
+          break;
         default:
       }
     }
