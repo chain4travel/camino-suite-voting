@@ -13,7 +13,7 @@ interface DistributionBarProps<T extends Percentage> {
   data: T[];
   renderContent?: (d: T) => ReactNode | ReactNode[] | null;
   variant?: 'proposal' | 'vote' | 'turnouts' | 'default';
-  borderRadius?: `${string}%` | `${string}rem` | `${string}px` | number;
+  borderRadius?: `${number}%` | `${number}rem` | `${number}px` | number;
 }
 const DistributionContainer = styled(ButtonGroup)(({ theme }) => ({
   boxShadow: 'none',
