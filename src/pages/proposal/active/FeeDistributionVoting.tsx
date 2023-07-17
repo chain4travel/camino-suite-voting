@@ -10,8 +10,12 @@ import { Circle } from '@mui/icons-material';
 import useVote from '@/hooks/useVote';
 interface FeeDistributionVotingProps {
   data: Proposal;
+  isConsortiumMember?: boolean;
 }
-const FeeDistributionVoting = ({ data }: FeeDistributionVotingProps) => {
+const FeeDistributionVoting = ({
+  data,
+  isConsortiumMember,
+}: FeeDistributionVotingProps) => {
   const {
     selectedOption,
     setSelectedOption,
@@ -40,6 +44,7 @@ const FeeDistributionVoting = ({ data }: FeeDistributionVotingProps) => {
         <VotingOptionCard
           key={`${opt.option}`}
           option={opt}
+          isConsortiumMember={isConsortiumMember}
           title={`Distribution #${opt.option}`}
           voted={data.voted}
           selected={selectedOption?.option}

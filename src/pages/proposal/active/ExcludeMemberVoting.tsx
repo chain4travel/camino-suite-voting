@@ -10,8 +10,12 @@ import useVote from '@/hooks/useVote';
 
 interface ExcludeMemberVotingProps {
   data: Proposal;
+  isConsortiumMember?: boolean;
 }
-const ExcludeMemberVoting = ({ data }: ExcludeMemberVotingProps) => {
+const ExcludeMemberVoting = ({
+  data,
+  isConsortiumMember,
+}: ExcludeMemberVotingProps) => {
   const {
     selectedOption,
     setSelectedOption,
@@ -127,44 +131,46 @@ const ExcludeMemberVoting = ({ data }: ExcludeMemberVotingProps) => {
           sx: { fontWeight: 500, marginBottom: 1 },
         }}
       />
-      <Stack
-        direction="row"
-        sx={{ marginRight: 3, minWidth: 240 }}
-        spacing={1.5}
-      >
-        {selectedOption
-          ? [
-              <IconButton
-                key="btn-cancel"
-                color="inherit"
-                sx={{
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  borderRadius: 1,
-                  paddingX: 2,
-                }}
-                onClick={event => {
-                  event.stopPropagation();
-                  setSelectedOption(null);
-                }}
-              >
-                <Cancel />
-              </IconButton>,
-              <Button
-                key="btn-confirm"
-                fullWidth
-                startIcon={<CheckCircle />}
-                variant="contained"
-                loading={!!confirmedOption}
-                loadingPosition="start"
-                color={selectedOption.value ? 'success' : 'error'}
-                onClick={confirmVoting(selectedOption)}
-              >
-                Confirm {selectedOption.label}
-              </Button>,
-            ]
-          : actionButtons}
-      </Stack>
+      {isConsortiumMember && (
+        <Stack
+          direction="row"
+          sx={{ marginRight: 3, minWidth: 240 }}
+          spacing={1.5}
+        >
+          {selectedOption
+            ? [
+                <IconButton
+                  key="btn-cancel"
+                  color="inherit"
+                  sx={{
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    borderRadius: 1,
+                    paddingX: 2,
+                  }}
+                  onClick={event => {
+                    event.stopPropagation();
+                    setSelectedOption(null);
+                  }}
+                >
+                  <Cancel />
+                </IconButton>,
+                <Button
+                  key="btn-confirm"
+                  fullWidth
+                  startIcon={<CheckCircle />}
+                  variant="contained"
+                  loading={!!confirmedOption}
+                  loadingPosition="start"
+                  color={selectedOption.value ? 'success' : 'error'}
+                  onClick={confirmVoting(selectedOption)}
+                >
+                  Confirm {selectedOption.label}
+                </Button>,
+              ]
+            : actionButtons}
+        </Stack>
+      )}
     </Stack>
   );
 };

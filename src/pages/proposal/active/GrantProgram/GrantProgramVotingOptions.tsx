@@ -1,6 +1,6 @@
 import React, { MouseEventHandler, MouseEvent, useMemo } from 'react';
 import { CheckCircle, Cancel } from '@mui/icons-material';
-import { IconButton, Stack } from '@mui/material';
+import { Stack } from '@mui/material';
 import { filter, find } from 'lodash';
 import type { Proposal, VotingOption } from '@/types';
 import Button from '@/components/Button';
@@ -29,8 +29,8 @@ const GrantProgramVotingOptions = ({
     opt => !!find(data.voted, v => v.option === opt.option)
   );
 
-  console.log('data.options: ', data.options);
-  console.log('voted: ', voted);
+  console.debug('data.options: ', data.options);
+  console.debug('voted: ', voted);
   const triggerVoting =
     (option: VotingOption): MouseEventHandler<HTMLButtonElement> =>
     (event: MouseEvent<HTMLButtonElement>) => {

@@ -1,9 +1,10 @@
 import React, { useMemo, useState } from 'react';
 import { NavLink, useLoaderData } from 'react-router-dom';
-import { Paper, FormControlLabel, Stack } from '@mui/material';
+import { FormControlLabel, Stack } from '@mui/material';
 import { ExpandMore } from '@mui/icons-material';
 import { filter } from 'lodash';
 import { useActiveVotings } from '@/hooks/useProposals';
+import useWallet from '@/hooks/useWallet';
 import Header from '@/components/Header';
 import {
   Accordion,
@@ -12,14 +13,16 @@ import {
 } from '@/components/Accordion';
 import Button from '@/components/Button';
 import { VotingType } from '@/types';
-import VotingList from './VotingList';
-import GroupHeader from './GroupHeader';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useDialogStore } from '@/store';
 import Checkbox from '@/components/Checkbox';
+import Paper from '@/components/Paper';
+import VotingList from './VotingList';
+import GroupHeader from './GroupHeader';
 
 const ActiveVotings = () => {
   const { data: votingTypes } = useLoaderData() as { data: VotingType[] };
+  const wallet = useWallet();
   const [onlyTodo, setOnlyTodo] = useState(false);
   const { proposals, error, isLoading } = useActiveVotings();
   const { option: dialogOption } = useDialogStore(state => ({
@@ -67,11 +70,13 @@ const ActiveVotings = () => {
             onChange={(_event, checked) => setOnlyTodo(checked)}
             label="Show only TODO"
           />
-          <NavLink to="/proposal/create">
-            <Button variant="contained" color="primary">
-              Create new
-            </Button>
-          </NavLink>
+          {wallet.isConsortiumMember && (
+            <NavLink to="/proposal/create">
+              <Button variant="contained" color="primary">
+                Create new
+              </Button>
+            </NavLink>
+          )}
         </Stack>
       </Header>
       {Object.entries(groupedProposals ?? {}).map(
@@ -88,7 +93,10 @@ const ActiveVotings = () => {
               <GroupHeader group={group} />
             </AccordionSummary>
             <AccordionDetails style={{ padding: 0 }}>
-              <VotingList data={group} />
+              <VotingList
+                data={group}
+                isConsortiumMember={wallet.isConsortiumMember}
+              />
             </AccordionDetails>
           </Accordion>
         )

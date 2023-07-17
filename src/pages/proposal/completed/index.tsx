@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { useLoaderData, useNavigate } from 'react-router-dom';
 import {
-  Paper,
   FormControlLabel,
   List,
   ListItemButton,
@@ -23,6 +22,7 @@ import GrantProgram from './GrantProgram';
 import TransactionFee from './BaseFee';
 import TransactionFeeDistribution from './FeeDistribution';
 import { useVotingTypeStore } from '@/store';
+import Paper from '@/components/Paper';
 
 const CompletedVotes = () => {
   const { selectVotingType: votingType, setSelectVotingType } =

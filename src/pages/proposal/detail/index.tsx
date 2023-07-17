@@ -10,6 +10,7 @@ import Header from '@/components/Header';
 import Button from '@/components/Button';
 import { useProposal } from '@/hooks/useProposals';
 import { useBaseFee, useFeeDistribution } from '@/hooks/useRpc';
+import useWallet from '@/hooks/useWallet';
 import ProposalStatus from './ProposalStatus';
 import VoteResult from './VoteResult';
 import VoteOptions from './VoteOptions';
@@ -18,6 +19,7 @@ import CompletedStatistics from './CompletedStatistics';
 
 const Detail = () => {
   const { data: votingTypes } = useLoaderData() as { data: VotingType[] };
+  const wallet = useWallet();
   const { type, id } = useParams();
   const navigate = useNavigate();
   const {
@@ -156,6 +158,7 @@ const Detail = () => {
               <Header variant="h6" headline="Vote options" />
               <VoteOptions
                 proposal={proposal}
+                isConsortiumMember={wallet.isConsortiumMember}
                 options={proposal?.options.map((opt: VotingOption) => ({
                   ...opt,
                   percent: statistics?.summary[opt.option]?.percent ?? 0,

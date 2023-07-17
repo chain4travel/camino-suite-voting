@@ -7,8 +7,9 @@ import VotingOptionCard from './VotingOptionCard';
 import useVote from '@/hooks/useVote';
 interface BaseFeeVotingProps {
   data: Proposal;
+  isConsortiumMember?: boolean;
 }
-const BaseFeeVoting = ({ data }: BaseFeeVotingProps) => {
+const BaseFeeVoting = ({ data, isConsortiumMember }: BaseFeeVotingProps) => {
   const {
     selectedOption,
     setSelectedOption,
@@ -39,6 +40,7 @@ const BaseFeeVoting = ({ data }: BaseFeeVotingProps) => {
           key={`${opt.option}`}
           option={opt}
           title={String(opt.label)}
+          isConsortiumMember={isConsortiumMember}
           voted={data.voted}
           selected={selectedOption?.option}
           onSelect={handleSelectChange}

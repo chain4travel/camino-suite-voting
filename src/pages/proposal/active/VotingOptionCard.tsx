@@ -46,6 +46,7 @@ const StyledCardHeader = styled(MuiCardHeader)(({ theme }) => ({
 
 interface VotingOptionProps {
   option: VotingOption;
+  isConsortiumMember?: boolean;
   title?: string;
   voted?: Vote[];
   isSubmitting?: boolean;
@@ -58,6 +59,7 @@ interface VotingOptionProps {
 const VotingOptionCard = ({
   option,
   title,
+  isConsortiumMember,
   voted,
   isSubmitting,
   selected,
@@ -88,29 +90,30 @@ const VotingOptionCard = ({
       />
       <CardContent sx={{ padding: 2.5, paddingTop: 1.5 }}>
         {renderContent && <Stack spacing={0.5}>{renderContent(option)}</Stack>}
-        {isVoted ? (
-          <StateButton
-            variant="contained"
-            color="success"
-            sx={{ marginTop: 1.5 }}
-            startIcon={<CheckCircle />}
-          >
-            Your selection
-          </StateButton>
-        ) : (
-          <Button
-            variant={isSelected ? 'contained' : 'outlined'}
-            color={isSelected ? 'success' : 'inherit'}
-            sx={{ marginTop: 1.5 }}
-            onClick={isSelected ? confirmSelection : toggleSelected}
-            loading={isSubmitting}
-            loadingPosition="start"
-            startIcon={<CheckCircle />}
-            disabled={hadVoted}
-          >
-            {isSelected ? 'Confirm selection' : 'Select'}
-          </Button>
-        )}
+        {isConsortiumMember &&
+          (isVoted ? (
+            <StateButton
+              variant="contained"
+              color="success"
+              sx={{ marginTop: 1.5 }}
+              startIcon={<CheckCircle />}
+            >
+              Your selection
+            </StateButton>
+          ) : (
+            <Button
+              variant={isSelected ? 'contained' : 'outlined'}
+              color={isSelected ? 'success' : 'inherit'}
+              sx={{ marginTop: 1.5 }}
+              onClick={isSelected ? confirmSelection : toggleSelected}
+              loading={isSubmitting}
+              loadingPosition="start"
+              startIcon={<CheckCircle />}
+              disabled={hadVoted}
+            >
+              {isSelected ? 'Confirm selection' : 'Select'}
+            </Button>
+          ))}
       </CardContent>
     </StyledCard>
   );

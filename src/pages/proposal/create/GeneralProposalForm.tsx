@@ -76,7 +76,7 @@ const GeneralProposalForm = () => {
                     <InputLabel>Option Title</InputLabel>
                     <TextField
                       {...field}
-                      variant="filled"
+                      variant="outlined"
                       error={!!errors.votingOptions?.[index]}
                       helperText={
                         errors.votingOptions?.[index] && (
@@ -100,7 +100,7 @@ const GeneralProposalForm = () => {
                     <InputLabel>Option Description</InputLabel>
                     <TextField
                       {...field}
-                      variant="filled"
+                      variant="outlined"
                       error={!!errors.votingOptions?.[index]}
                       helperText={
                         errors.votingOptions?.[index] && (

@@ -29,9 +29,6 @@ const StateButton = styled(
     '&.StateButton-error .MuiButton-startIcon': {
       color: theme.palette.error.main,
     },
-    '&.StateButton-accent .MuiButton-startIcon': {
-      color: theme.palette.accent.main,
-    },
   },
 }));
 export default StateButton;

@@ -4,6 +4,7 @@ import {
   FormHelperText,
   IconButton,
   InputLabel,
+  Select,
   Stack,
   TextField,
   Typography,
@@ -77,6 +78,7 @@ const BaseFeeForm = () => {
             name={`votingOptions.${index}.value`}
             control={control}
             render={({ field }) => {
+              if (baseFee <= 0) return <></>;
               const absoluteChange = new Big(Number(field.value) || 0).minus(
                 baseFee
               );
@@ -101,7 +103,7 @@ const BaseFeeForm = () => {
                     <TextField
                       {...field}
                       type="number"
-                      variant="filled"
+                      variant="outlined"
                       inputProps={{ min: 0 }}
                       error={!!errors.votingOptions?.[index]}
                       helperText={

@@ -11,8 +11,9 @@ import GrantProgramVoting from './GrantProgram';
 
 interface VotingListProps {
   data: { type: string; name: string; data: Proposal[] };
+  isConsortiumMember?: boolean;
 }
-const VotingList = ({ data }: VotingListProps) => {
+const VotingList = ({ data, isConsortiumMember }: VotingListProps) => {
   const navigate = useNavigate();
   return (
     <List disablePadding>
@@ -22,7 +23,10 @@ const VotingList = ({ data }: VotingListProps) => {
           case 'NEW_MEMBER':
             Vote = (
               <Stack width="100%">
-                <NewMemberVoting data={proposal} />
+                <NewMemberVoting
+                  data={proposal}
+                  isConsortiumMember={isConsortiumMember}
+                />
                 <ListItemStatus
                   startTimestamp={proposal.startDateTime}
                   endTimestamp={proposal.endDateTime}
@@ -34,7 +38,10 @@ const VotingList = ({ data }: VotingListProps) => {
           case 'EXCLUDE_MEMBER':
             Vote = (
               <Stack width="100%">
-                <ExcludeMemberVoting data={proposal} />
+                <ExcludeMemberVoting
+                  data={proposal}
+                  isConsortiumMember={isConsortiumMember}
+                />
                 <ListItemStatus
                   startTimestamp={proposal.startDateTime}
                   endTimestamp={proposal.endDateTime}
@@ -44,17 +51,30 @@ const VotingList = ({ data }: VotingListProps) => {
             );
             break;
           case 'BASE_FEE':
-            Vote = <BaseFeeVoting data={proposal} />;
+            Vote = (
+              <BaseFeeVoting
+                data={proposal}
+                isConsortiumMember={isConsortiumMember}
+              />
+            );
             break;
           case 'FEE_DISTRIBUTION':
-            Vote = <FeeDistributionVoting data={proposal} />;
+            Vote = (
+              <FeeDistributionVoting
+                data={proposal}
+                isConsortiumMember={isConsortiumMember}
+              />
+            );
             break;
           case 'GRANT':
             {
               const applicant = proposal.target! as Applicant;
               Vote = (
                 <Stack width="100%">
-                  <GrantProgramVoting data={proposal} />
+                  <GrantProgramVoting
+                    data={proposal}
+                    isConsortiumMember={isConsortiumMember}
+                  />
                   <ListItemStatus
                     startTimestamp={proposal.startDateTime}
                     endTimestamp={proposal.endDateTime}
