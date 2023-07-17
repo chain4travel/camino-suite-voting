@@ -13,7 +13,7 @@ interface DistributionBarProps<T extends Percentage> {
   data: T[];
   renderContent?: (d: T) => ReactNode | ReactNode[] | null;
   variant?: 'proposal' | 'vote' | 'turnouts' | 'default';
-  borderRadius?: string | number;
+  borderRadius?: `${string}%` | `${string}rem` | `${string}px` | number;
 }
 const DistributionContainer = styled(ButtonGroup)(({ theme }) => ({
   boxShadow: 'none',
@@ -56,7 +56,7 @@ const DistributionBar = <T extends Percentage>({
                 textAlign: 'left',
                 textTransform: 'none',
                 width: `${datum.percent}%`,
-                borderRadius: Number(borderRadius),
+                borderRadius,
               }}
             >
               {renderContent && renderContent(datum)}
