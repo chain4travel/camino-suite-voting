@@ -22,7 +22,7 @@ const TransactionFeeDistribution = ({
     });
   });
   return (
-    <Container sx={{ paddingBottom: 2 }}>
+    <Container sx={{ paddingBottom: 2 }} maxWidth="xl" disableGutters>
       <Paragraph spacing="sm">
         <Typography variant="h5">{data.target}</Typography>
         <DistributionBar
@@ -40,6 +40,7 @@ const TransactionFeeDistribution = ({
             );
           }}
           variant={'vote'}
+          borderRadius={2}
         />
       </Paragraph>
     </Container>

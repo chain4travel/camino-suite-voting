@@ -20,7 +20,6 @@ import NewMemberVote from './NewMemberVote';
 import ExcludeMember from './ExcludeMember';
 import TransactionFee from './BaseFee';
 import TransactionFeeDistribution from './FeeDistribution';
-import { ArrowForwardIos } from '@mui/icons-material';
 
 const CompletedVotes = () => {
   const { data: votingTypes } = useLoaderData() as { data: VotingType[] };
@@ -33,6 +32,10 @@ const CompletedVotes = () => {
       toast.error('Failed to fetch votes');
     }
   }, [error]);
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setVotingType((event.target as HTMLInputElement).value);
+  };
 
   const { voteItem } = useMemo(() => {
     const selectedVotingType = votingTypes.find(
@@ -82,16 +85,20 @@ const CompletedVotes = () => {
             Apply
           </Button>
         </Stack>
-        <RadioGroup name="votingType" value={votingType} row>
+        <RadioGroup
+          name="votingType"
+          value={votingType}
+          onChange={handleChange}
+          row
+        >
           {votingTypes.map(vtype => (
             <FormControlLabel
               key={vtype.id}
-              label=""
+              label={vtype.abbr ?? vtype.name}
               value={vtype.id}
               sx={{ marginLeft: 0 }}
               control={
                 <RadioButton
-                  startIcon={vtype.icon}
                   label={vtype.abbr ?? vtype.name}
                   onClick={() => setVotingType(vtype.id)}
                   checked={votingType === vtype.id}
@@ -102,18 +109,24 @@ const CompletedVotes = () => {
         </RadioGroup>
       </Stack>
       <List>
-        {votes.map((vote: Proposal) => {
+        {votes.map((vote: Proposal, index: number) => {
           return (
             <ListItemButton
               key={vote.id}
               onClick={() => navigate(`${vote.type}/${vote.id}`)}
+              divider={votes.length !== index + 1 && true}
+              sx={{ px: 0 }}
             >
-              <ListItemStatus
-                startTimestamp={vote.startDateTime}
-                endTimestamp={vote.endDateTime}
-              />
-              {voteItem(vote)}
-              <ArrowForwardIos />
+              <Stack width="100%">
+                <Stack>
+                  {voteItem(vote)}
+                  <ListItemStatus
+                    startTimestamp={vote.startDateTime}
+                    endTimestamp={vote.endDateTime}
+                  />
+                </Stack>
+                <Stack></Stack>
+              </Stack>
             </ListItemButton>
           );
         })}

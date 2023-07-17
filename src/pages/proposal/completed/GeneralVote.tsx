@@ -9,8 +9,7 @@ interface NewMemberVoteProps {
   data: Proposal;
   voteTypeName?: string;
 }
-
-const ExcludeMember = ({ data, voteTypeName }: NewMemberVoteProps) => {
+const GeneralVote = ({ data, voteTypeName }: NewMemberVoteProps) => {
   const votedList: VotingOption[] = useMemo(
     () =>
       data.options.filter(opt =>
@@ -18,6 +17,7 @@ const ExcludeMember = ({ data, voteTypeName }: NewMemberVoteProps) => {
       ),
     [data.result]
   );
+
   return (
     <Stack
       direction="row"
@@ -57,5 +57,4 @@ const ExcludeMember = ({ data, voteTypeName }: NewMemberVoteProps) => {
     </Stack>
   );
 };
-
-export default ExcludeMember;
+export default GeneralVote;
