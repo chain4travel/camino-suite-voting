@@ -128,7 +128,7 @@ const NewMemberVoting = ({ data }: NewMemberVotingProps) => {
           sx: { fontWeight: 500, marginBottom: 1 },
         }}
       />
-      <Stack direction="row" sx={{ minWidth: 220 }} spacing={1.5}>
+      <Stack direction="row" sx={{ minWidth: 240 }} spacing={1.5}>
         {needConfirm
           ? [
               <IconButton

@@ -38,7 +38,7 @@ export const baseFeeFormSchema = {
 const schema = z.object(baseFeeFormSchema);
 type BaseFeeFormSchema = z.infer<typeof schema>;
 
-const BaseFeeVoting = () => {
+const BaseFeeForm = () => {
   const { baseFee } = useBaseFee();
   const {
     control,
@@ -162,4 +162,4 @@ const BaseFeeVoting = () => {
     </>
   );
 };
-export default BaseFeeVoting;
+export default BaseFeeForm;

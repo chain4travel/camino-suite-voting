@@ -114,7 +114,7 @@ const Detail = () => {
 
   return (
     <>
-      <Stack paddingY={2} alignItems="flex-start">
+      <Stack padding={2} alignItems="flex-start">
         <Button
           variant="outlined"
           color="inherit"
@@ -126,8 +126,8 @@ const Detail = () => {
       </Stack>
       <Container sx={{ paddingBottom: 5 }}>
         <Stack direction="row" spacing={4} alignItems="flex-start">
-          <Stack spacing={5}>
-            <Stack spacing={1}>
+          <Stack spacing={2}>
+            <Stack spacing={2}>
               <Header
                 variant="h3"
                 headline={
@@ -182,11 +182,7 @@ const Detail = () => {
           </Stack>
           <ProposalStatus proposal={proposal} extraInfo={extraInfo} />
         </Stack>
-        <Divider
-          color="divider"
-          variant="fullWidth"
-          sx={{ marginTop: 5, marginBottom: 3 }}
-        />
+        <Divider color="divider" variant="fullWidth" sx={{ my: 4 }} />
         <Stack spacing={3}>
           <Stack spacing={1}>
             <Typography variant="h5">Proposal Distribution</Typography>
@@ -201,7 +197,11 @@ const Detail = () => {
               }))}
               renderContent={(option: VotingOption & Percentage) => {
                 let extraInfo = null;
-                let label = null;
+                let label = (
+                  <Typography color="grey.50" variant="caption">
+                    {option.label}
+                  </Typography>
+                );
                 switch (votingType?.id) {
                   case 'BASE_FEE':
                     {
@@ -283,7 +283,7 @@ const Detail = () => {
                 }
               ) => (
                 <>
-                  <Typography color="grey.900" variant="body2">
+                  <Typography color="grey.900" variant="caption">
                     {turnout.isParticipated === 'true'
                       ? 'Participated'
                       : 'Did not participate'}

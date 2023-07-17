@@ -16,7 +16,7 @@ export const newMemberFormSchema = {
     .nonempty()
     .refine(d => d?.replaceAll(/(<p>|<\/p>|<br>)/g, '') !== '', 'requied'),
 };
-const NewMemberVoting = () => {
+const NewMemberForm = () => {
   const { control } = useFormContext();
   return (
     <>
@@ -56,4 +56,4 @@ const NewMemberVoting = () => {
     </>
   );
 };
-export default NewMemberVoting;
+export default NewMemberForm;

@@ -1,5 +1,9 @@
 [
   {
+    "id": "GENERAL",
+    "name": "General Proposal"
+  },
+  {
     "id": "NEW_MEMBER",
     "name": "Admittance of new consortium members",
     "brief": "Admittance of Consortium Member",

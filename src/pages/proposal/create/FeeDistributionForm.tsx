@@ -53,7 +53,7 @@ export const feeDistributionFormSchema = {
 const schema = z.object(feeDistributionFormSchema);
 type FeeDistributionFormSchema = z.infer<typeof schema>;
 
-const FeeDistributionVoting = () => {
+const FeeDistributionForm = () => {
   const {
     control,
     formState: { errors },
@@ -195,4 +195,4 @@ const FeeDistributionVoting = () => {
     </>
   );
 };
-export default FeeDistributionVoting;
+export default FeeDistributionForm;

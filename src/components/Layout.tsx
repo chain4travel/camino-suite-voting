@@ -6,7 +6,14 @@ import Navbar from './Navbar';
 
 const Layout = () => {
   return (
-    <Paper style={{ height: '100%', boxShadow: 'none', paddingBottom: '40px' }}>
+    <Paper
+      style={{
+        height: '100%',
+        boxShadow: 'none',
+        paddingBottom: '40px',
+        backgroundImage: 'none',
+      }}
+    >
       <Navbar />
       <Outlet />
     </Paper>

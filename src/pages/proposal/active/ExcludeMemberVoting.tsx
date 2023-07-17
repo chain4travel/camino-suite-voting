@@ -131,7 +131,7 @@ const ExcludeMemberVoting = ({ data }: ExcludeMemberVotingProps) => {
       />
       <Stack
         direction="row"
-        sx={{ marginRight: 3, minWidth: 220 }}
+        sx={{ marginRight: 3, minWidth: 240 }}
         spacing={1.5}
       >
         {needConfirm

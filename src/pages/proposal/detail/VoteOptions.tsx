@@ -5,6 +5,7 @@ import Big from 'big.js';
 import { Percentage, Vote, VotingOption } from '@/types';
 import DistributionBar from '@/components/DistributionBar';
 import Tag from '@/components/Tag';
+import { Cancel, CheckCircle } from '@mui/icons-material';
 
 type VotedOption = VotingOption & Percentage;
 
@@ -25,13 +26,22 @@ const VoteOptions = ({
   return (
     <Stack direction={options.length < 3 ? 'row' : 'column'} spacing={1.5}>
       {filter(options, opt => opt.value !== baseFee).map(opt => {
-        let label = opt.label;
+        let label;
         let extraInfo = null;
+        let labelDirection = 'column';
+        let labelSpacing = 1;
         switch (votingType) {
           case 'BASE_FEE':
             {
               if (baseFee) {
-                label = `Future Base Fee ${opt.value} nCAM`;
+                label = (
+                  <Typography
+                    variant="body2"
+                    fontWeight={600}
+                  >{`Future Base Fee ${opt.value} nCAM`}</Typography>
+                );
+                labelDirection = 'row';
+                labelSpacing = 3;
                 const absoluteChange = new Big(opt.value as number).minus(
                   baseFee
                 );
@@ -64,7 +74,12 @@ const VoteOptions = ({
             break;
           case 'FEE_DISTRIBUTION':
             {
-              label = `Distribution #${opt.option}`;
+              label = (
+                <Typography
+                  variant="body2"
+                  fontWeight={600}
+                >{`Distribution #${opt.option}`}</Typography>
+              );
               const values = opt.value as number[];
               extraInfo = (
                 <DistributionBar
@@ -74,12 +89,21 @@ const VoteOptions = ({
               );
             }
             break;
-          default:
+          default: {
+            label = (
+              <Stack direction="row" spacing={1}>
+                {opt.value ? <CheckCircle /> : <Cancel />}
+                <Typography variant="body2" fontWeight={600}>
+                  {opt.label}
+                </Typography>
+              </Stack>
+            );
+          }
         }
         return (
           <Stack
             key={opt.option}
-            padding={2}
+            padding={2.5}
             border="1px solid"
             borderColor="divider"
             borderRadius={2}
@@ -88,14 +112,12 @@ const VoteOptions = ({
             justifyContent="space-between"
           >
             <Stack
-              direction="row"
+              direction={labelDirection}
               justifyContent="space-between"
               alignItems="center"
-              spacing={3}
+              spacing={labelSpacing}
             >
-              <Typography variant="body2" fontWeight={600}>
-                {label}
-              </Typography>
+              {label}
               <Tag
                 color={opt.option === result.option ? 'success' : 'default'}
                 label={`VOTED ${opt.percent ?? 0}%`}
