@@ -7,7 +7,6 @@ import {
   ListItemButton,
   RadioGroup,
   Stack,
-  Divider,
 } from '@mui/material';
 import Header from '@/components/Header';
 import Button from '@/components/Button';
@@ -90,7 +89,6 @@ const CompletedVotes = () => {
           name="votingType"
           value={votingType}
           onChange={handleChange}
-          sx={{ textAlign: 'left' }}
           row
         >
           {votingTypes.map(vtype => (
