@@ -40,7 +40,7 @@ const TransactionFeeDistribution = ({
             );
           }}
           variant={'vote'}
-          borderRadius="16"
+          borderRadius={2}
         />
       </Paragraph>
     </Container>
