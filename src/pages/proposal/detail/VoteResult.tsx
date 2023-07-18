@@ -235,79 +235,10 @@ const VoteResult = ({ result, votingType }: VoteResultProps) => {
     // Has result value
     if (result.value) {
       switch (votingType) {
-        case 'BASE_FEE':
-          {
-            if (!result.baseFee) {
-              console.error('type BASE_FEE must provide current baseFee');
-              return { content: null, noBox };
-            }
-            const absoluteChange = new Big(result.value as number).minus(
-              result.baseFee
-            );
-            const percentageChange = absoluteChange
-              .times(100)
-              .div(result.baseFee);
-            const sign = absoluteChange.s > 0 ? '+' : '';
-            content = (
-              <Paragraph spacing={1.5}>
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="space-between"
-                >
-                  <Typography variant="h6">Vote Result</Typography>
-                  <Tag color="success" label="WINNER" />
-                </Stack>
-                <Paragraph>
-                  <Stack direction="row" justifyContent="space-between">
-                    <Typography variant="caption" color="text.secondary">
-                      New Base Fee
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      fontWeight={600}
-                    >
-                      {result?.value} nCAM
-                    </Typography>
-                  </Stack>
-                  <Stack direction="row" justifyContent="space-between">
-                    <Typography variant="caption" color="text.secondary">
-                      Percentage Change
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      fontWeight={600}
-                    >
-                      {sign} {Number(percentageChange.toFixed(2))}%
-                    </Typography>
-                  </Stack>
-                  <Stack direction="row" justifyContent="space-between">
-                    <Typography variant="caption" color="text.secondary">
-                      Absolute Change
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      fontWeight={600}
-                    >
-                      {sign} {absoluteChange.toString()} nCAM
-                    </Typography>
-                  </Stack>
-                </Paragraph>
-              </Paragraph>
-            );
-          }
-          break;
         case 'NEW_MEMBER':
           content = (
             <Stack spacing={1} alignItems="flex-start">
               <Typography fontWeight={600}>{String(result.target)}</Typography>
-              <Tag
-                color={result.value ? 'success' : 'error'}
-                label={result.value ? 'Admitted' : 'Declined'}
-              />
             </Stack>
           );
           break;
@@ -315,53 +246,9 @@ const VoteResult = ({ result, votingType }: VoteResultProps) => {
           content = (
             <Stack spacing={1} alignItems="flex-start">
               <Typography fontWeight={600}>{String(result.target)}</Typography>
-              <Tag
-                color={result.value ? 'success' : 'error'}
-                label={result.value ? 'Excluded' : 'Declined'}
-              />
             </Stack>
           );
           break;
-        case 'FEE_DISTRIBUTION': {
-          const values = result.value as number[];
-          const labels = result.label as string[];
-          content = (
-            <Paragraph spacing={1.5}>
-              <Typography variant="h6">{`Vote Result: Distribution #${result.option}`}</Typography>
-              <DistributionBar
-                data={values.map(v => ({ percent: v }))}
-                variant="vote"
-              />
-              {labels.map((label, idx) => (
-                <Stack
-                  key={`vote-dist-${label}`}
-                  direction="row"
-                  alignItems="center"
-                  spacing={1}
-                >
-                  <Circle
-                    sx={{
-                      color: VOTE_DISTRIBUTION_COLORS[idx],
-                      fontSize: 12,
-                    }}
-                  />
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    justifyContent="space-between"
-                    width="100%"
-                  >
-                    <Typography color="text.secondary">{label}</Typography>
-                    <Typography color="text.secondary">
-                      {values[idx]}%
-                    </Typography>
-                  </Stack>
-                </Stack>
-              ))}
-            </Paragraph>
-          );
-          break;
-        }
         case 'GRANT':
           {
             const applicant = result.target as Applicant;
@@ -519,6 +406,139 @@ const VoteResult = ({ result, votingType }: VoteResultProps) => {
             );
           }
           break;
+        default:
+      }
+    }
+    // Has result value
+    if (result.value) {
+      switch (votingType) {
+        case 'BASE_FEE':
+          {
+            if (!result.baseFee) {
+              console.error('type BASE_FEE must provide current baseFee');
+              return { content: null, noBox };
+            }
+            const absoluteChange = new Big(result.value as number).minus(
+              result.baseFee
+            );
+            const percentageChange = absoluteChange
+              .times(100)
+              .div(result.baseFee);
+            const sign = absoluteChange.s > 0 ? '+' : '';
+            content = (
+              <Paragraph spacing={1.5}>
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <Typography variant="h6">Vote Result</Typography>
+                  <Tag color="success" label="WINNER" />
+                </Stack>
+                <Paragraph>
+                  <Stack direction="row" justifyContent="space-between">
+                    <Typography variant="caption" color="text.secondary">
+                      New Base Fee
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      fontWeight={600}
+                    >
+                      {result?.value} nCAM
+                    </Typography>
+                  </Stack>
+                  <Stack direction="row" justifyContent="space-between">
+                    <Typography variant="caption" color="text.secondary">
+                      Percentage Change
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      fontWeight={600}
+                    >
+                      {sign} {Number(percentageChange.toFixed(2))}%
+                    </Typography>
+                  </Stack>
+                  <Stack direction="row" justifyContent="space-between">
+                    <Typography variant="caption" color="text.secondary">
+                      Absolute Change
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      fontWeight={600}
+                    >
+                      {sign} {absoluteChange.toString()} nCAM
+                    </Typography>
+                  </Stack>
+                </Paragraph>
+              </Paragraph>
+            );
+          }
+          break;
+        case 'NEW_MEMBER':
+          content = (
+            <Stack spacing={1} alignItems="flex-start">
+              <Typography fontWeight={600}>{String(result.target)}</Typography>
+              <Tag
+                color={result.value ? 'success' : 'error'}
+                label={result.value ? 'Admitted' : 'Declined'}
+              />
+            </Stack>
+          );
+          break;
+        case 'EXCLUDE_MEMBER':
+          content = (
+            <Stack spacing={1} alignItems="flex-start">
+              <Typography fontWeight={600}>{String(result.target)}</Typography>
+              <Tag
+                color={result.value ? 'success' : 'error'}
+                label={result.value ? 'Excluded' : 'Declined'}
+              />
+            </Stack>
+          );
+          break;
+        case 'FEE_DISTRIBUTION': {
+          const values = result.value as number[];
+          const labels = result.label as string[];
+          content = (
+            <Paragraph spacing={1.5}>
+              <Typography variant="h6">{`Vote Result: Distribution #${result.option}`}</Typography>
+              <DistributionBar
+                data={values.map(v => ({ percent: v }))}
+                variant="vote"
+              />
+              {labels.map((label, idx) => (
+                <Stack
+                  key={`vote-dist-${label}`}
+                  direction="row"
+                  alignItems="center"
+                  spacing={1}
+                >
+                  <Circle
+                    sx={{
+                      color: VOTE_DISTRIBUTION_COLORS[idx],
+                      fontSize: 12,
+                    }}
+                  />
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    width="100%"
+                  >
+                    <Typography color="text.secondary">{label}</Typography>
+                    <Typography color="text.secondary">
+                      {values[idx]}%
+                    </Typography>
+                  </Stack>
+                </Stack>
+              ))}
+            </Paragraph>
+          );
+          break;
+        }
         default:
       }
     }
