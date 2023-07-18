@@ -52,7 +52,7 @@ interface VotingOptionProps {
   selected?: string | number | null;
   children?: ReactNode;
   renderContent?: (option: VotingOption) => ReactNode;
-  onSelect?: (option: string | number | null) => void;
+  onSelect?: (option: VotingOption | null) => void;
   onVote?: () => void;
 }
 const VotingOptionCard = ({
@@ -70,7 +70,7 @@ const VotingOptionCard = ({
   const isSelected = option.option === selected;
   const toggleSelected = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
-    !hadVoted && onSelect && onSelect(option.option);
+    !hadVoted && onSelect && onSelect(option);
   };
   const confirmSelection = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();

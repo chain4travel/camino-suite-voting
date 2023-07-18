@@ -1,6 +1,6 @@
 import React from 'react';
 import { List, ListItemButton, Stack } from '@mui/material';
-import { ArrowForwardIos } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 import type { Applicant, Proposal } from '@/types';
 import NewMemberVoting from './NewMemberVoting';
 import BaseFeeVoting from './BaseFeeVoting';
@@ -13,6 +13,7 @@ interface VotingListProps {
   data: { type: string; name: string; data: Proposal[] };
 }
 const VotingList = ({ data }: VotingListProps) => {
+  const navigate = useNavigate();
   return (
     <List disablePadding>
       {data.data.map((proposal: Proposal, index: number) => {
@@ -73,6 +74,7 @@ const VotingList = ({ data }: VotingListProps) => {
             key={proposal.id}
             divider={index !== data.data.length - 1}
             sx={{ padding: 2.5, width: '100%' }}
+            onClick={() => navigate(`/proposal/${data.type}/${proposal.id}`)}
             disableRipple
           >
             {Vote}

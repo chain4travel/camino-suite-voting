@@ -1,22 +1,24 @@
-import React, { MouseEventHandler, MouseEvent, useState, useMemo } from 'react';
+import React, { MouseEventHandler, MouseEvent, useMemo } from 'react';
 import { CheckCircle, Cancel } from '@mui/icons-material';
 import { IconButton, ListItemText, Stack, Typography } from '@mui/material';
 import { filter, find } from 'lodash';
 import type { Proposal, VotingOption } from '@/types';
 import Button from '@/components/Button';
-import { useVote } from '@/hooks/useRpc';
 import StateButton from '@/components/StateButton';
 import { toPastTense } from '@/helpers/string';
+import useVote from '@/hooks/useVote';
 
 interface NewMemberVotingProps {
   data: Proposal;
 }
 const NewMemberVoting = ({ data }: NewMemberVotingProps) => {
-  const [votingOption, setVotingOption] = useState<string | number | null>(
-    null
-  );
-  const [needConfirm, setNeedConfirm] = useState<VotingOption | null>(null);
-  const vote = useVote({ onSettled: () => setVotingOption(null) });
+  const {
+    selectedOption,
+    setSelectedOption,
+    confirmedOption,
+    setConfirmedOption,
+    submitVote,
+  } = useVote();
 
   const voted = filter(
     data.options,
@@ -27,7 +29,7 @@ const NewMemberVoting = ({ data }: NewMemberVotingProps) => {
     (option: VotingOption): MouseEventHandler<HTMLButtonElement> =>
     (event: MouseEvent<HTMLButtonElement>) => {
       event.stopPropagation();
-      setNeedConfirm(option);
+      setSelectedOption(option);
     };
 
   const actionButtons = useMemo(() => {
@@ -61,7 +63,7 @@ const NewMemberVoting = ({ data }: NewMemberVotingProps) => {
             variant={isAccepted ? 'contained' : 'outlined'}
             startIcon={isAccepted ? <CheckCircle /> : <Cancel />}
             onClick={triggerVoting(votedOption)}
-            loading={votingOption === votedOption.option}
+            loading={confirmedOption === votedOption.option}
             loadingPosition="start"
             color={isAccepted ? 'primary' : 'inherit'}
             fullWidth
@@ -80,8 +82,6 @@ const NewMemberVoting = ({ data }: NewMemberVotingProps) => {
           variant={opt.value ? 'contained' : 'outlined'}
           startIcon={opt.value && <CheckCircle />}
           onClick={triggerVoting(opt)}
-          loading={votingOption === opt.option}
-          loadingPosition="start"
           color={opt.value ? 'primary' : 'inherit'}
           fullWidth={!!opt.value}
         >
@@ -91,20 +91,16 @@ const NewMemberVoting = ({ data }: NewMemberVotingProps) => {
       .reverse();
   }, [voted, data.options, data.multisig]);
 
-  const handleConfirmToVote = (option: VotingOption) => {
-    vote.mutate({
-      proposalId: data.id,
-      votingType: data.type,
-      votes: [option],
-    });
-    setVotingOption(option.option);
-  };
   const confirmVoting =
     (option: VotingOption): MouseEventHandler<HTMLButtonElement> =>
     (event: MouseEvent<HTMLButtonElement>) => {
       event.stopPropagation();
-      handleConfirmToVote(option);
-      setNeedConfirm(null);
+      setConfirmedOption(option.option);
+      submitVote({
+        proposalId: data.id,
+        votingType: data.type,
+        votes: [option],
+      });
     };
 
   return (
@@ -131,7 +127,7 @@ const NewMemberVoting = ({ data }: NewMemberVotingProps) => {
         }}
       />
       <Stack direction="row" sx={{ minWidth: 240 }} spacing={1.5}>
-        {needConfirm
+        {selectedOption
           ? [
               <IconButton
                 key="btn-cancel"
@@ -142,7 +138,10 @@ const NewMemberVoting = ({ data }: NewMemberVotingProps) => {
                   borderRadius: 1,
                   paddingX: 2,
                 }}
-                onClick={() => setNeedConfirm(null)}
+                onClick={event => {
+                  event.stopPropagation();
+                  setSelectedOption(null);
+                }}
               >
                 <Cancel />
               </IconButton>,
@@ -151,10 +150,12 @@ const NewMemberVoting = ({ data }: NewMemberVotingProps) => {
                 fullWidth
                 startIcon={<CheckCircle />}
                 variant="contained"
-                color={needConfirm.value ? 'success' : 'error'}
-                onClick={confirmVoting(needConfirm)}
+                loading={!!confirmedOption}
+                loadingPosition="start"
+                color={selectedOption.value ? 'success' : 'error'}
+                onClick={confirmVoting(selectedOption)}
               >
-                Confirm {needConfirm.label}
+                Confirm {selectedOption.label}
               </Button>,
             ]
           : actionButtons}
