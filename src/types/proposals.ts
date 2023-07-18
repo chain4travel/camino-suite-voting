@@ -16,6 +16,10 @@ export type Vote = {
   address?: string;
   votedDateTime?: number;
 };
+export interface VoteData extends Omit<Vote, 'votedDateTime'> {
+  id: number;
+  votedDateTime: string;
+}
 export type MultisigVote = {
   threshold: number;
   voted: { option: number; count: number };
@@ -44,6 +48,7 @@ export type Proposal = {
   options: VotingOption[];
   result?: Vote[];
   voted?: Vote[];
+  votes?: Vote[];
   status: string;
   forumLink?: string;
   target?: string | Applicant;
@@ -56,9 +61,17 @@ export type Group = {
   icon?: ReactElement;
 };
 export interface Percentage {
-  percent: number;
+  percent: number | string;
 }
-
+export type Summary = {
+  [key: string | number]: { count: number; percent: number | string };
+};
+export type Statistics = {
+  totalVotes: number;
+  summary: Summary;
+  turnouts: Summary;
+  eligibleVotes?: number;
+};
 export interface ProposalState {
   currentProposal: Proposal | null;
   setCurrentProposal: (proposal: Proposal) => void;

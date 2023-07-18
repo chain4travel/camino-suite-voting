@@ -10,7 +10,7 @@ export const VOTE_DISTRIBUTION_COLORS = ['#304275', '#4864AF', '#7D92CA'];
 export const DEFAULT_COLORS = ['#9E9E9E', '#B9B9B9', '#E4E4E4'];
 
 interface DistributionBarProps<T extends Percentage> {
-  data: T[];
+  data?: T[];
   renderContent?: (d: T) => ReactNode | ReactNode[] | null;
   variant?: 'proposal' | 'vote' | 'turnouts' | 'default';
   borderRadius?: `${number}%` | `${number}rem` | `${number}px` | number;

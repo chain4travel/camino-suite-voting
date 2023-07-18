@@ -2,26 +2,50 @@ import React from 'react';
 import { filter } from 'lodash';
 import { Stack, Typography } from '@mui/material';
 import Big from 'big.js';
-import { Percentage, Vote, VotingOption } from '@/types';
+import { Percentage, Proposal, Vote, VotingOption } from '@/types';
 import DistributionBar from '@/components/DistributionBar';
 import Tag from '@/components/Tag';
 import { Cancel, CheckCircle } from '@mui/icons-material';
+import GrantProgramVotingOptions from '../active/GrantProgram/GrantProgramVotingOptions';
+import BaseFeeVoting from '../active/BaseFeeVoting';
 
 type VotedOption = VotingOption & Percentage;
 
 interface VoteOptionsProps {
+  proposal: Proposal;
   options: VotedOption[];
-  result: Vote;
+  result?: Vote;
   votingType?: string;
   baseFee?: number;
 }
 const VoteOptions = ({
+  proposal,
   options,
   votingType,
   result,
   baseFee,
 }: VoteOptionsProps) => {
   if (!options) return null;
+
+  if (!result) {
+    let item;
+    switch (votingType) {
+      case 'BASE_FEE':
+        item = <BaseFeeVoting data={proposal} />;
+        break;
+      case 'GRANT':
+        item = <GrantProgramVotingOptions data={proposal} showFullText />;
+        break;
+    }
+    return (
+      <Stack
+        direction={options.length < 3 ? 'row' : 'column'}
+        spacing={options.length < 3 ? 1 : 2}
+      >
+        {item}
+      </Stack>
+    );
+  }
 
   return (
     <Stack direction={options.length < 3 ? 'row' : 'column'} spacing={1.5}>

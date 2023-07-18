@@ -1,17 +1,21 @@
 import React, { MouseEventHandler, MouseEvent, useMemo } from 'react';
 import { CheckCircle, Cancel } from '@mui/icons-material';
-import { IconButton, ListItemText, Stack, Typography } from '@mui/material';
+import { IconButton, Stack } from '@mui/material';
 import { filter, find } from 'lodash';
-import type { Applicant, Proposal, VotingOption } from '@/types';
+import type { Proposal, VotingOption } from '@/types';
 import Button from '@/components/Button';
 import StateButton from '@/components/StateButton';
 import { toPastTense } from '@/helpers/string';
 import useVote from '@/hooks/useVote';
 
-interface GrantProgramVotingProps {
+interface GrantProgramVotingOptionsProps {
   data: Proposal;
+  showFullText?: boolean;
 }
-const GrantProgramVoting = ({ data }: GrantProgramVotingProps) => {
+const GrantProgramVotingOptions = ({
+  data,
+  showFullText,
+}: GrantProgramVotingOptionsProps) => {
   const {
     selectedOption,
     setSelectedOption,
@@ -25,6 +29,8 @@ const GrantProgramVoting = ({ data }: GrantProgramVotingProps) => {
     opt => !!find(data.voted, v => v.option === opt.option)
   );
 
+  console.log('data.options: ', data.options);
+  console.log('voted: ', voted);
   const triggerVoting =
     (option: VotingOption): MouseEventHandler<HTMLButtonElement> =>
     (event: MouseEvent<HTMLButtonElement>) => {
@@ -80,13 +86,15 @@ const GrantProgramVoting = ({ data }: GrantProgramVotingProps) => {
         <Button
           key={opt.option}
           variant={opt.value ? 'contained' : 'outlined'}
-          startIcon={opt.value && <CheckCircle />}
+          startIcon={
+            opt.value ? <CheckCircle /> : showFullText ? <Cancel /> : null
+          }
           onClick={triggerVoting(opt)}
           loadingPosition="start"
           color={opt.value ? 'primary' : 'inherit'}
-          fullWidth={!!opt.value}
+          fullWidth={showFullText || !!opt.value}
         >
-          {opt.value ? opt.label : <Cancel />}
+          {opt.value ? opt.label : showFullText ? opt.label : <Cancel />}
         </Button>
       ))
       .reverse();
@@ -103,66 +111,44 @@ const GrantProgramVoting = ({ data }: GrantProgramVotingProps) => {
         votes: [option],
       });
     };
+  const cancelConfirm = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    setSelectedOption(null);
+  };
 
   return (
-    <Stack direction="row" alignItems="center" spacing={3}>
-      <ListItemText
-        primary={(data.target! as Applicant).name}
-        secondary={
-          <Typography
-            color="text.secondary"
-            style={{
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              textOverflow: 'ellipsis',
-              overflow: 'hidden',
-              WebkitBoxOrient: 'vertical',
-            }}
-            variant="body2"
-          >
-            {(data.target! as Applicant).additionalInfo ??
-              (data.target! as Applicant).companyDescription}
-          </Typography>
-        }
-        primaryTypographyProps={{
-          sx: { fontWeight: 500, marginBottom: 1 },
-        }}
-      />
-      <Stack direction="row" sx={{ minWidth: 240 }} spacing={1.5}>
-        {selectedOption
-          ? [
-              <IconButton
-                key="btn-cancel"
-                color="inherit"
-                sx={{
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  borderRadius: 1,
-                  paddingX: 2,
-                }}
-                onClick={event => {
-                  event.stopPropagation();
-                  setSelectedOption(null);
-                }}
-              >
-                <Cancel />
-              </IconButton>,
-              <Button
-                key="btn-confirm"
-                fullWidth
-                startIcon={<CheckCircle />}
-                variant="contained"
-                loading={!!confirmedOption}
-                loadingPosition="start"
-                color={selectedOption.value ? 'success' : 'error'}
-                onClick={confirmVoting(selectedOption)}
-              >
-                Confirm {selectedOption.label}
-              </Button>,
-            ]
-          : actionButtons}
-      </Stack>
+    <Stack
+      direction="row"
+      sx={{ minWidth: showFullText ? '100%' : 240 }}
+      spacing={1.5}
+    >
+      {selectedOption
+        ? [
+            <Button
+              key="btn-cancel"
+              fullWidth
+              variant={'outlined'}
+              startIcon={showFullText ? <Cancel /> : null}
+              onClick={cancelConfirm}
+              color="inherit"
+            >
+              {showFullText ? 'Cancel' : <Cancel />}
+            </Button>,
+            <Button
+              key="btn-confirm"
+              fullWidth
+              startIcon={<CheckCircle />}
+              variant="contained"
+              loading={!!confirmedOption}
+              loadingPosition="start"
+              color={selectedOption.value ? 'success' : 'error'}
+              onClick={confirmVoting(selectedOption)}
+            >
+              Confirm {selectedOption.label}
+            </Button>,
+          ]
+        : actionButtons}
     </Stack>
   );
 };
-export default GrantProgramVoting;
+export default GrantProgramVotingOptions;

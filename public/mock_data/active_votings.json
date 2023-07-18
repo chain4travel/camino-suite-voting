@@ -296,7 +296,7 @@
     "status": "ACTIVE"
   },
   {
-    "id": 41,
+    "id": 45,
     "type": "GRANT",
     "startDateTime": 1684252800,
     "endDateTime": 1690646400,
@@ -316,7 +316,7 @@
     "status": "ACTIVE"
   },
   {
-    "id": 42,
+    "id": 46,
     "type": "GRANT",
     "startDateTime": 1684252800,
     "endDateTime": 1690646400,
@@ -333,10 +333,10 @@
       "additionalInfo": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus."
     },
     "description": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus.",
-    "status": "ACTIVE"
+    "status": "ONGOING"
   },
   {
-    "id": 43,
+    "id": 47,
     "type": "GRANT",
     "startDateTime": 1684252800,
     "endDateTime": 1690646400,
@@ -346,13 +346,13 @@
     ],
     "multisig": { "threshold": 3, "voted": { "option": 1, "count": 2 } },
     "target": {
-      "name": "Applicant 2",
+      "name": "Max Mustermann",
       "email": "applicant1@example.com",
       "companyStage": "MVP",
       "companyIndustry": "consulting",
       "companyDescription": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus."
     },
     "voted": [{ "option": 1 }],
-    "status": "ACTIVE"
+    "status": "ONGOING"
   }
 ]

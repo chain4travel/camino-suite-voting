@@ -7,7 +7,7 @@ import BaseFeeVoting from './BaseFeeVoting';
 import ListItemStatus from '@/components/ListItemStatus';
 import ExcludeMemberVoting from './ExcludeMemberVoting';
 import FeeDistributionVoting from './FeeDistributionVoting';
-import GrantProgramVoting from './GrantProgramVoting';
+import GrantProgramVoting from './GrantProgram';
 
 interface VotingListProps {
   data: { type: string; name: string; data: Proposal[] };
@@ -74,7 +74,7 @@ const VotingList = ({ data }: VotingListProps) => {
             key={proposal.id}
             divider={index !== data.data.length - 1}
             sx={{ padding: 2.5, width: '100%' }}
-            onClick={() => navigate(`/proposal/${data.type}/${proposal.id}`)}
+            onClick={() => navigate(`${data.type}/${proposal.id}`)}
             disableRipple
           >
             {Vote}
