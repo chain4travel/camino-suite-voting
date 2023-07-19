@@ -1,0 +1,27 @@
+{
+  "id": 47,
+  "type": "GRANT",
+  "startDateTime": 1684252800,
+  "endDateTime": 1690646400,
+  "options": [
+    { "option": 1, "value": true, "label": "Accept" },
+    { "option": 2, "value": false, "label": "Decline" }
+  ],
+  "multisig": { "threshold": 3, "voted": { "option": 1, "count": 2 } },
+  "target": {
+    "name": "Max Mustermann",
+    "email": "max.mustermann@companyname.com",
+    "companyName": "Company Name",
+    "companyWebsite": "https://www.companyname.com",
+    "companyStage": "MVP",
+    "companyIndustry": "consulting",
+    "companyDescription": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu.",
+    "pchainAddress": "P-camino1jt0...d964",
+    "numberOfFunds": "CAM",
+    "useOfFunds": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.",
+    "pitchDeck": "https://www.companyname.com/pitchdeck.pdf",
+    "additionalInfo": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu."
+  },
+  "voted": [{ "option": 1 }],
+  "status": "ONGOING"
+}

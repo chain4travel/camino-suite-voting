@@ -1,36 +1,33 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Stack, Typography } from '@mui/material';
 import { map } from 'lodash';
 import type { Proposal, VotingOption } from '@/types';
-import { useVote } from '@/hooks/useRpc';
 import VotingOptionCard from './VotingOptionCard';
 import DistributionBar, {
   VOTE_DISTRIBUTION_COLORS,
 } from '@/components/DistributionBar';
 import { Circle } from '@mui/icons-material';
+import useVote from '@/hooks/useVote';
 interface FeeDistributionVotingProps {
   data: Proposal;
-  disableParentRipple?: (disabled: boolean) => void;
 }
-const FeeDistributionVoting = ({
-  data,
-  disableParentRipple,
-}: FeeDistributionVotingProps) => {
-  const [selectToVote, setSelectToVote] = useState<string | number | null>(
-    null
-  );
-  const [votingOption, setVotingOption] = useState<string | number | null>(
-    null
-  );
-  const vote = useVote({ onSettled: () => setVotingOption(null) });
+const FeeDistributionVoting = ({ data }: FeeDistributionVotingProps) => {
+  const {
+    selectedOption,
+    setSelectedOption,
+    confirmedOption,
+    setConfirmedOption,
+    submitVote,
+  } = useVote();
 
-  const handleSelectChange = (option: string | number | null) => {
-    setSelectToVote(selectToVote === option ? null : option);
-    disableParentRipple && disableParentRipple(true);
+  const handleSelectChange = (option: VotingOption | null) => {
+    setSelectedOption(
+      selectedOption?.option === option?.option ? null : option
+    );
   };
   const handleConfirmToVote = (option: VotingOption) => {
-    setVotingOption(option.option);
-    vote.mutate({
+    setConfirmedOption(option.option);
+    submitVote({
       proposalId: data.id,
       votingType: data.type,
       votes: [option],
@@ -45,10 +42,10 @@ const FeeDistributionVoting = ({
           option={opt}
           title={`Distribution #${opt.option}`}
           voted={data.voted}
-          selected={selectToVote}
+          selected={selectedOption?.option}
           onSelect={handleSelectChange}
           onVote={() => handleConfirmToVote(opt)}
-          isSubmitting={votingOption === opt.option}
+          isSubmitting={confirmedOption === opt.option}
           renderContent={(option: VotingOption) => {
             const values = option.value as number[];
             const labels = option.label as string[];

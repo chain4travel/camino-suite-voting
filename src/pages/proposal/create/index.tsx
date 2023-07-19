@@ -21,6 +21,7 @@ import FeeDistributionForm, {
   feeDistributionFormSchema,
 } from './FeeDistributionForm';
 import GeneralProposalForm, { generalFormSchema } from './GeneralProposalForm';
+import GrantProgramForm, { grantProgramFormSchema } from './GrantProgramForm';
 
 const CreateNewVoting = () => {
   const { data: votingTypes } = useLoaderData() as { data: VotingType[] };
@@ -55,6 +56,10 @@ const CreateNewVoting = () => {
       case 'FEE_DISTRIBUTION':
         ProposalForm = <FeeDistributionForm />;
         formSchema = feeDistributionFormSchema;
+        break;
+      case 'GRANT':
+        ProposalForm = <GrantProgramForm />;
+        formSchema = grantProgramFormSchema;
         break;
       default:
         console.warn(`Unsupported voting type ${selectedVotingType}`);

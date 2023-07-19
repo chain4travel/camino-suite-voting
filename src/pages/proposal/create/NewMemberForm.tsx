@@ -3,7 +3,6 @@ import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { z } from 'zod';
 import Header from '@/components/Header';
-import Paragraph from '@/components/Paragraph';
 import TextEditor from '@/components/TextEditor';
 import FormSection from './FormSection';
 

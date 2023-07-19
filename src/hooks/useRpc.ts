@@ -35,7 +35,7 @@ export const useFeeDistribution = () => {
   };
 };
 
-export const useVote = (option?: { onSettled?: () => void }) => {
+export const useSubmitVote = (option?: { onSettled?: () => void }) => {
   const toast = useToast();
   const mutation = useMutation({
     mutationFn: ({

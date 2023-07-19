@@ -1,21 +1,20 @@
 import React, { useMemo } from 'react';
-import { Box, Container, Divider, Stack, Typography } from '@mui/material';
+import { Container, Divider, Stack, Typography } from '@mui/material';
 import { useLoaderData, useNavigate, useParams } from 'react-router-dom';
 import { find, countBy, reduce, filter, map } from 'lodash';
 import { DateTime } from 'luxon';
 import Big from 'big.js';
 
-import { Percentage, Vote, VotingOption, VotingType } from '@/types';
+import { Statistics, Vote, VotingOption, VotingType } from '@/types';
 import Header from '@/components/Header';
 import Button from '@/components/Button';
 import { useProposal } from '@/hooks/useProposals';
 import { useBaseFee, useFeeDistribution } from '@/hooks/useRpc';
-import DistributionBar from '@/components/DistributionBar';
 import ProposalStatus from './ProposalStatus';
-import VoteResultTable from './VoteResultTable';
 import VoteResult from './VoteResult';
-import { toPastTense } from '@/helpers/string';
 import VoteOptions from './VoteOptions';
+import OngoingState from './OngoingState';
+import CompletedStatistics from './CompletedStatistics';
 
 const Detail = () => {
   const { data: votingTypes } = useLoaderData() as { data: VotingType[] };
@@ -30,12 +29,12 @@ const Detail = () => {
   const { feeDistribution } = useFeeDistribution();
 
   const votingType = votingTypes.find(vtype => vtype.id === type);
-  const { result, statistics, votes } = useMemo(() => {
-    if (proposal) {
+  const { result, statistics, votes, isCompleted } = useMemo(() => {
+    if (proposal?.votes) {
       const summary = countBy(proposal.votes, 'option');
       const turnouts = countBy(proposal.votes, v => !!v.option);
       const totalVotes = filter(proposal.votes, v => !!v.option).length;
-      const statistics = {
+      const statistics: Statistics = {
         eligibleVotes: proposal.votes.length,
         totalVotes,
         summary: reduce(
@@ -90,6 +89,7 @@ const Detail = () => {
         ),
         statistics,
         votes,
+        isCompleted: proposal.status === 'PASSED',
       };
     }
     return {};
@@ -100,7 +100,7 @@ const Detail = () => {
         case 'BASE_FEE':
           return {
             label: votingType?.abbr ?? votingType?.name,
-            value: result?.value,
+            value: baseFee,
           };
         case 'FEE_DISTRIBUTION':
           return map(feeDistribution, distribution => ({
@@ -110,7 +110,7 @@ const Detail = () => {
         default:
       }
     }
-  }, [votingType, result]);
+  }, [votingType, result, baseFee]);
 
   return (
     <>
@@ -118,13 +118,13 @@ const Detail = () => {
         <Button
           variant="outlined"
           color="inherit"
-          onClick={() => navigate('/proposal/completed')}
+          onClick={() => navigate(-1)}
           sx={{ py: 1.25, px: 2 }}
         >
           Back to all Proposals
         </Button>
       </Stack>
-      <Container sx={{ paddingBottom: 5 }}>
+      <Container>
         <Stack direction="row" spacing={4} alignItems="flex-start">
           <Stack spacing={2}>
             <Stack spacing={2}>
@@ -155,6 +155,7 @@ const Detail = () => {
             <Stack>
               <Header variant="h6" headline="Vote options" />
               <VoteOptions
+                proposal={proposal}
                 options={proposal?.options.map((opt: VotingOption) => ({
                   ...opt,
                   percent: statistics?.summary[opt.option]?.percent ?? 0,
@@ -182,127 +183,20 @@ const Detail = () => {
           </Stack>
           <ProposalStatus proposal={proposal} extraInfo={extraInfo} />
         </Stack>
-        <Divider color="divider" variant="fullWidth" sx={{ my: 4 }} />
-        <Stack spacing={3}>
-          <Stack spacing={1}>
-            <Typography variant="h5">Proposal Distribution</Typography>
-            <Typography variant="body2" color="text.secondary">
-              Cast votes: {statistics?.totalVotes}
-            </Typography>
-            <DistributionBar
-              variant="proposal"
-              data={proposal?.options.map((option: VotingOption) => ({
-                ...option,
-                percent: statistics.summary?.[option.option]?.percent ?? 0,
-              }))}
-              renderContent={(option: VotingOption & Percentage) => {
-                let extraInfo = null;
-                let label = (
-                  <Typography color="grey.50" variant="caption">
-                    {option.label}
-                  </Typography>
-                );
-                switch (votingType?.id) {
-                  case 'BASE_FEE':
-                    {
-                      const absoluteChange = new Big(
-                        option.value as number
-                      ).minus(baseFee);
-                      const percentageChange = new Big(absoluteChange)
-                        .times(100)
-                        .div(baseFee)
-                        .toFixed(2);
-                      const sign = absoluteChange.s > 0 ? '+' : '';
-                      extraInfo = (
-                        <>
-                          <Typography
-                            color="text.primary"
-                            variant="caption"
-                            component="p"
-                          >
-                            {option.value} nCAM
-                          </Typography>
-                          <Typography
-                            color="text.primary"
-                            variant="caption"
-                            component="p"
-                          >
-                            {sign} {absoluteChange.toString()} nCAM
-                          </Typography>
-                          <Typography
-                            color="text.primary"
-                            variant="caption"
-                            component="p"
-                          >
-                            {sign} {Number(percentageChange)}%
-                          </Typography>
-                        </>
-                      );
-                    }
-                    break;
-                  case 'FEE_DISTRIBUTION':
-                    label = (
-                      <Typography color="text.primary" variant="body2">
-                        {`Distribution #${option.option}`}
-                      </Typography>
-                    );
-                    break;
-                }
-                return (
-                  <>
-                    {label}
-                    <Typography color="text.primary" fontWeight={700}>
-                      {statistics.summary?.[option.option]?.count ?? 0} /{' '}
-                      {statistics.summary?.[option.option]?.percent ?? 0}%
-                    </Typography>
-                    {extraInfo}
-                  </>
-                );
-              }}
-            />
-          </Stack>
-          <Stack spacing={1}>
-            <Typography variant="h5">Proposal Turnouts</Typography>
-            <Typography variant="body2" color="text.secondary">
-              Eligible votes: {statistics?.eligibleVotes}
-            </Typography>
-            <DistributionBar
-              variant="turnouts"
-              data={map(
-                statistics?.turnouts,
-                (t: Percentage, key: 'true' | 'false') => ({
-                  ...t,
-                  isParticipated: key,
-                  percent: t.percent,
-                })
-              )}
-              renderContent={(
-                turnout: Percentage & {
-                  isParticipated: 'true' | 'false';
-                  count: number;
-                }
-              ) => (
-                <>
-                  <Typography color="grey.900" variant="caption">
-                    {turnout.isParticipated === 'true'
-                      ? 'Participated'
-                      : 'Did not participate'}
-                  </Typography>
-                  <Typography color="grey.900" fontWeight={700}>
-                    {turnout.count} / {turnout.percent}%
-                  </Typography>
-                </>
-              )}
-            />
-          </Stack>
-          <Stack spacing={1}>
-            <Typography variant="h5">Vote result per validator</Typography>
-            <Typography variant="body2" color="text.secondary">
-              Eligible validators: {statistics?.eligibleVotes}
-            </Typography>
-            <VoteResultTable votes={votes} />
-          </Stack>
-        </Stack>
+      </Container>
+      <Divider color="divider" variant="fullWidth" sx={{ my: 4 }} />
+      <Container sx={{ paddingBottom: 5 }}>
+        {isCompleted ? (
+          <CompletedStatistics
+            statistics={statistics}
+            options={proposal.options}
+            votingType={votingType?.id}
+            baseFee={baseFee}
+            votes={votes}
+          />
+        ) : (
+          <OngoingState />
+        )}
       </Container>
     </>
   );

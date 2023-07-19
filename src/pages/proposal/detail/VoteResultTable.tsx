@@ -1,4 +1,4 @@
-import { Vote } from '@/types';
+import { VoteData } from '@/types';
 import { AccountBalanceWalletOutlined } from '@mui/icons-material';
 import {
   Box,
@@ -33,10 +33,6 @@ const columns: ColumnField[] = [
   { dataKey: 'option', label: 'Voted for', width: 260 },
 ];
 
-interface VoteData extends Omit<Vote, 'votedDateTime'> {
-  id: number;
-  votedDateTime: string;
-}
 const VirtuosoTableComponents: TableComponents<VoteData> = {
   Scroller: forwardRef<HTMLDivElement>((props, ref) => (
     <TableContainer component={TablePaper} {...props} ref={ref} />
@@ -54,7 +50,7 @@ const VirtuosoTableComponents: TableComponents<VoteData> = {
   )),
 };
 interface VoteResultTableProps {
-  votes: VoteData[];
+  votes?: VoteData[];
 }
 const VoteResultTable = ({ votes }: VoteResultTableProps) => {
   return (

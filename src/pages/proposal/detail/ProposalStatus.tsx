@@ -18,9 +18,10 @@ interface ProposalStatusProps {
   extraInfo?: ExtraInfo | ExtraInfo[];
 }
 const ProposalStatus = ({ proposal, extraInfo }: ProposalStatusProps) => {
-  const voted = proposal?.voted.flatMap((v: Vote) =>
+  const voted = proposal?.voted?.flatMap((v: Vote) =>
     filter(proposal.options, (opt: VotingOption) => opt.option === v.option)
   );
+  const isCompleted = proposal?.status === 'PASSED';
   const { getVotedState, extraInfoComponent } = useMemo(() => {
     let extraInfoComponent = null;
     let getVotedState = (option: VotingOption) =>
@@ -101,7 +102,10 @@ const ProposalStatus = ({ proposal, extraInfo }: ProposalStatusProps) => {
             alignItems="center"
           >
             <Typography variant="h5">Status</Typography>
-            <Tag color="success" label={proposal?.status} />
+            <Tag
+              color={isCompleted ? 'success' : 'default'}
+              label={proposal?.status}
+            />
           </Stack>
         </Paragraph>
         <Paragraph spacing={1.5} divider>
@@ -143,17 +147,23 @@ const ProposalStatus = ({ proposal, extraInfo }: ProposalStatusProps) => {
             Your vote
           </Typography>
           <Paragraph spacing="sm" alignItems="flex-start">
-            {voted?.map((v: VotingOption) => (
-              <StateButton
-                key={v.option}
-                variant="contained"
-                color={v.value ? 'success' : 'error'}
-                startIcon={v.value ? <CheckCircle /> : <Cancel />}
-                sx={{ textTransform: 'none' }}
-              >
-                {getVotedState(v)}
-              </StateButton>
-            ))}
+            {voted ? (
+              voted.map((v: VotingOption) => (
+                <StateButton
+                  key={v.option}
+                  variant="contained"
+                  color={v.value ? 'success' : 'error'}
+                  startIcon={v.value ? <CheckCircle /> : <Cancel />}
+                  sx={{ textTransform: 'none' }}
+                >
+                  {getVotedState(v)}
+                </StateButton>
+              ))
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                You have not voted yet
+              </Typography>
+            )}
           </Paragraph>
         </Paragraph>
       </Paragraph>

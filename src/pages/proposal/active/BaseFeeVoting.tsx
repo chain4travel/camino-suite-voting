@@ -1,30 +1,31 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Stack, Typography } from '@mui/material';
 import Big from 'big.js';
 import type { Proposal, VotingOption } from '@/types';
-import { useBaseFee, useVote } from '@/hooks/useRpc';
+import { useBaseFee } from '@/hooks/useRpc';
 import VotingOptionCard from './VotingOptionCard';
+import useVote from '@/hooks/useVote';
 interface BaseFeeVotingProps {
   data: Proposal;
-  disableParentRipple?: (disabled: boolean) => void;
 }
-const BaseFeeVoting = ({ data, disableParentRipple }: BaseFeeVotingProps) => {
-  const [selectToVote, setSelectToVote] = useState<string | number | null>(
-    null
-  );
-  const [votingOption, setVotingOption] = useState<string | number | null>(
-    null
-  );
+const BaseFeeVoting = ({ data }: BaseFeeVotingProps) => {
+  const {
+    selectedOption,
+    setSelectedOption,
+    confirmedOption,
+    setConfirmedOption,
+    submitVote,
+  } = useVote();
   const { baseFee } = useBaseFee();
-  const vote = useVote({ onSettled: () => setVotingOption(null) });
 
-  const handleSelectChange = (option: string | number | null) => {
-    setSelectToVote(selectToVote === option ? null : option);
-    disableParentRipple && disableParentRipple(true);
+  const handleSelectChange = (option: VotingOption | null) => {
+    setSelectedOption(
+      selectedOption?.option === option?.option ? null : option
+    );
   };
   const handleConfirmToVote = (option: VotingOption) => {
-    setVotingOption(option.option);
-    vote.mutate({
+    setConfirmedOption(option.option);
+    submitVote({
       proposalId: data.id,
       votingType: data.type,
       votes: [option],
@@ -39,10 +40,10 @@ const BaseFeeVoting = ({ data, disableParentRipple }: BaseFeeVotingProps) => {
           option={opt}
           title={String(opt.label)}
           voted={data.voted}
-          selected={selectToVote}
+          selected={selectedOption?.option}
           onSelect={handleSelectChange}
           onVote={() => handleConfirmToVote(opt)}
-          isSubmitting={votingOption === opt.option}
+          isSubmitting={confirmedOption === opt.option}
           renderContent={(option: VotingOption) => {
             if (baseFee <= 0) {
               console.warn('Invalid number of base fee: ', baseFee);
