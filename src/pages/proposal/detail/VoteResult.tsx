@@ -187,44 +187,6 @@ const VoteResult = ({ result, votingType }: VoteResultProps) => {
                     {applicant.additionalInfo}
                   </Typography>
                 </Stack>
-                <Paragraph>
-                  <Stack direction="row" justifyContent="space-between">
-                    <Typography variant="caption" color="text.secondary">
-                      New Base Fee
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      fontWeight={600}
-                    >
-                      {result?.value} nCAM
-                    </Typography>
-                  </Stack>
-                  <Stack direction="row" justifyContent="space-between">
-                    <Typography variant="caption" color="text.secondary">
-                      Percentage Change
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      fontWeight={600}
-                    >
-                      {sign} {Number(percentageChange.toFixed(2))}%
-                    </Typography>
-                  </Stack>
-                  <Stack direction="row" justifyContent="space-between">
-                    <Typography variant="caption" color="text.secondary">
-                      Absolute Change
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      fontWeight={600}
-                    >
-                      {sign} {absoluteChange.toString()} nCAM
-                    </Typography>
-                  </Stack>
-                </Paragraph>
               </Paragraph>
             );
           }
