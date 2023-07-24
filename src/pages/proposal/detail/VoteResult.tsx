@@ -20,6 +20,13 @@ const VoteResult = ({ result, votingType }: VoteResultProps) => {
     // No matter result.value, default display
     if (result.target) {
       switch (votingType) {
+        case 'GENERAL':
+          content = (
+            <Stack spacing={1} alignItems="flex-start">
+              <Typography fontWeight={600}>{String(result.target)}</Typography>
+            </Stack>
+          );
+          break;
         case 'NEW_MEMBER':
           content = (
             <Stack spacing={1} alignItems="flex-start">
@@ -197,6 +204,17 @@ const VoteResult = ({ result, votingType }: VoteResultProps) => {
     // Has result value
     if (result.value) {
       switch (votingType) {
+        case 'GENERAL':
+          content = (
+            <Stack spacing={1} alignItems="flex-start">
+              <Typography fontWeight={600}>{String(result.target)}</Typography>
+              <Tag
+                color={result.value ? 'success' : 'error'}
+                label={result.value ? 'ACCEPTED' : 'Declined'}
+              />
+            </Stack>
+          );
+          break;
         case 'BASE_FEE':
           {
             if (!result.baseFee) {

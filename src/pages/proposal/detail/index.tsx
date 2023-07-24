@@ -136,7 +136,7 @@ const Detail = () => {
                   votingType?.name ??
                   ''
                 }
-                sx={{ marginBottom: 0 }}
+                sx={{ margin: 0 }}
               />
               <Typography
                 variant="caption"
