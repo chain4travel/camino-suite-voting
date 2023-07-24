@@ -25,7 +25,8 @@ import TransactionFeeDistribution from './FeeDistribution';
 import { useVotingTypeStore } from '@/store';
 
 const CompletedVotes = () => {
-  const { select: votingType, setSelect } = useVotingTypeStore();
+  const { selectVotingType: votingType, setSelectVotingType } =
+    useVotingTypeStore();
   const { data: votingTypes } = useLoaderData() as { data: VotingType[] };
   const { votes, error, isLoading } = useCompletedVotes(votingType);
   const toast = useToast();
@@ -37,7 +38,7 @@ const CompletedVotes = () => {
   }, [error]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelect((event.target as HTMLInputElement).value);
+    setSelectVotingType((event.target as HTMLInputElement).value);
   };
 
   const { voteItem } = useMemo(() => {

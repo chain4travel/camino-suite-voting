@@ -23,12 +23,7 @@ const GrantProgram = ({ data, voteTypeName }: GrantProgramProps) => {
   }
 
   return (
-    <Stack
-      direction="row"
-      spacing="12px"
-      marginRight="24px"
-      alignItems="center"
-    >
+    <Stack direction="row" spacing={1.5} marginRight={3} alignItems="center">
       {isApplicant(data.target) && (
         <ListItemText
           primary={data.target.name ?? voteTypeName}

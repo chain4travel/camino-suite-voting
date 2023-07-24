@@ -1,4 +1,4 @@
 export type CompletedVotingTypeState = {
-  select: string;
-  setSelect: (select: string) => void;
+  selectVotingType: string;
+  setSelectVotingType: (select: string) => void;
 };
