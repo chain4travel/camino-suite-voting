@@ -17,6 +17,7 @@ interface VoteOptionsProps {
   result?: Vote;
   votingType?: string;
   baseFee?: number;
+  isConsortiumMember?: boolean;
 }
 const VoteOptions = ({
   proposal,
@@ -24,6 +25,7 @@ const VoteOptions = ({
   votingType,
   result,
   baseFee,
+  isConsortiumMember,
 }: VoteOptionsProps) => {
   if (!options) return null;
 
@@ -31,10 +33,17 @@ const VoteOptions = ({
     let item;
     switch (votingType) {
       case 'BASE_FEE':
-        item = <BaseFeeVoting data={proposal} />;
+        item = (
+          <BaseFeeVoting
+            data={proposal}
+            isConsortiumMember={isConsortiumMember}
+          />
+        );
         break;
       case 'GRANT':
-        item = <GrantProgramVotingOptions data={proposal} showFullText />;
+        item = isConsortiumMember && (
+          <GrantProgramVotingOptions data={proposal} showFullText />
+        );
         break;
     }
     return (
