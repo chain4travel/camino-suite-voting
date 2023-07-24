@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useLoaderData, useNavigate } from 'react-router-dom';
 import {
   Paper,
@@ -22,10 +22,10 @@ import GeneralVote from './GeneralVote';
 import GrantProgram from './GrantProgram';
 import TransactionFee from './BaseFee';
 import TransactionFeeDistribution from './FeeDistribution';
-import { useRadioStore } from '@/store';
+import { useVotingTypeStore } from '@/store';
 
 const CompletedVotes = () => {
-  const { select: votingType, setSelect } = useRadioStore();
+  const { select: votingType, setSelect } = useVotingTypeStore();
   const { data: votingTypes } = useLoaderData() as { data: VotingType[] };
   const { votes, error, isLoading } = useCompletedVotes(votingType);
   const toast = useToast();
@@ -37,7 +37,6 @@ const CompletedVotes = () => {
   }, [error]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    // setVotingType((event.target as HTMLInputElement).value);
     setSelect((event.target as HTMLInputElement).value);
   };
 
@@ -114,7 +113,6 @@ const CompletedVotes = () => {
               control={
                 <RadioButton
                   label={vtype.abbr ?? vtype.name}
-                  onClick={() => setVotingType(vtype.id)}
                   checked={votingType === vtype.id}
                 />
               }
