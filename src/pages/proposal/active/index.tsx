@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { NavLink, useLoaderData } from 'react-router-dom';
-import { Paper, FormControlLabel, Stack } from '@mui/material';
+import { FormControlLabel, Stack } from '@mui/material';
 import { ExpandMore } from '@mui/icons-material';
 import { filter } from 'lodash';
 import { useActiveVotings } from '@/hooks/useProposals';
@@ -17,6 +17,7 @@ import GroupHeader from './GroupHeader';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useDialogStore } from '@/store';
 import Checkbox from '@/components/Checkbox';
+import Paper from '@/components/Paper';
 
 const ActiveVotings = () => {
   const { data: votingTypes } = useLoaderData() as { data: VotingType[] };

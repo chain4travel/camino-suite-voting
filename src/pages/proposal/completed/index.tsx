@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLoaderData, useNavigate } from 'react-router-dom';
 import {
-  Paper,
   FormControlLabel,
   List,
   ListItemButton,
@@ -20,6 +19,7 @@ import NewMemberVote from './NewMemberVote';
 import ExcludeMember from './ExcludeMember';
 import TransactionFee from './BaseFee';
 import TransactionFeeDistribution from './FeeDistribution';
+import Paper from '@/components/Paper';
 
 const CompletedVotes = () => {
   const { data: votingTypes } = useLoaderData() as { data: VotingType[] };

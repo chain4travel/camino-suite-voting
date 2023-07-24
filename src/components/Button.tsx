@@ -2,12 +2,6 @@ import React from 'react';
 import { alpha, styled } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 
-declare module '@mui/material/Button' {
-  interface ButtonPropsColorOverrides {
-    accent: true;
-  }
-}
-
 const Button = styled(LoadingButton)(({ theme }) => ({
   '&, &.MuiButton-root': {
     boxShadow: 'none',

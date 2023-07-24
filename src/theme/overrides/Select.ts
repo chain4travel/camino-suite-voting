@@ -10,12 +10,6 @@ const Select = {
       select: {
         padding: '1rem',
       },
-      root: {
-        '&:before': { borderBottom: 0 },
-        '&:hover': {
-          '&:not(.Mui-disabled, .Mui-error):before': { borderBottom: 0 },
-        },
-      },
       icon: ({ theme }: { theme: Theme }) => ({
         color: theme.palette.text.primary,
         right: '1rem',

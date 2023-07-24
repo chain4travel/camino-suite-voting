@@ -1,8 +1,6 @@
-import { VoteData } from '@/types';
 import { AccountBalanceWalletOutlined } from '@mui/icons-material';
 import {
   Box,
-  Paper,
   Stack,
   Table,
   TableBody,
@@ -15,9 +13,10 @@ import {
 } from '@mui/material';
 import React, { forwardRef } from 'react';
 import { TableVirtuoso, TableComponents } from 'react-virtuoso';
+import { VoteData } from '@/types';
+import Paper from '@/components/Paper';
 
 const TablePaper = styled(Paper)(({ theme }) => ({
-  boxShadow: 'none',
   border: '1px solid',
   borderColor: theme.palette.divider,
 }));
