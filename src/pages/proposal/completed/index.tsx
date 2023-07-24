@@ -22,10 +22,11 @@ import GeneralVote from './GeneralVote';
 import GrantProgram from './GrantProgram';
 import TransactionFee from './BaseFee';
 import TransactionFeeDistribution from './FeeDistribution';
+import { useRadioStore } from '@/store';
 
 const CompletedVotes = () => {
+  const { select: votingType, setSelect } = useRadioStore();
   const { data: votingTypes } = useLoaderData() as { data: VotingType[] };
-  const [votingType, setVotingType] = useState('GENERAL');
   const { votes, error, isLoading } = useCompletedVotes(votingType);
   const toast = useToast();
   const navigate = useNavigate();
@@ -36,7 +37,8 @@ const CompletedVotes = () => {
   }, [error]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setVotingType((event.target as HTMLInputElement).value);
+    // setVotingType((event.target as HTMLInputElement).value);
+    setSelect((event.target as HTMLInputElement).value);
   };
 
   const { voteItem } = useMemo(() => {
