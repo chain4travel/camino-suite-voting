@@ -18,12 +18,14 @@ import ListItemStatus from '@/components/ListItemStatus';
 import RadioButton from '@/components/RadioButton';
 import NewMemberVote from './NewMemberVote';
 import ExcludeMember from './ExcludeMember';
+import GeneralVote from './GeneralVote';
+import GrantProgram from './GrantProgram';
 import TransactionFee from './BaseFee';
 import TransactionFeeDistribution from './FeeDistribution';
 
 const CompletedVotes = () => {
   const { data: votingTypes } = useLoaderData() as { data: VotingType[] };
-  const [votingType, setVotingType] = useState('NEW_MEMBER');
+  const [votingType, setVotingType] = useState('GENERAL');
   const { votes, error, isLoading } = useCompletedVotes(votingType);
   const toast = useToast();
   const navigate = useNavigate();
@@ -44,9 +46,19 @@ const CompletedVotes = () => {
     const voteTypeName = selectedVotingType?.abbr ?? selectedVotingType?.name;
     let voteItem = (_data: Proposal): JSX.Element | null => null;
     switch (votingType) {
+      case 'GENERAL':
+        voteItem = (data: Proposal) => (
+          <GeneralVote data={data} voteTypeName={voteTypeName} />
+        );
+        break;
       case 'NEW_MEMBER':
         voteItem = (data: Proposal) => (
           <NewMemberVote data={data} voteTypeName={voteTypeName} />
+        );
+        break;
+      case 'GRANT':
+        voteItem = (data: Proposal) => (
+          <GrantProgram data={data} voteTypeName={voteTypeName} />
         );
         break;
       case 'EXCLUDE_MEMBER':
