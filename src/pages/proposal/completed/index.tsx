@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useLoaderData, useNavigate } from 'react-router-dom';
 import {
   FormControlLabel,
@@ -17,13 +17,17 @@ import ListItemStatus from '@/components/ListItemStatus';
 import RadioButton from '@/components/RadioButton';
 import NewMemberVote from './NewMemberVote';
 import ExcludeMember from './ExcludeMember';
+import GeneralVote from './GeneralVote';
+import GrantProgram from './GrantProgram';
 import TransactionFee from './BaseFee';
 import TransactionFeeDistribution from './FeeDistribution';
+import { useVotingTypeStore } from '@/store';
 import Paper from '@/components/Paper';
 
 const CompletedVotes = () => {
+  const { selectVotingType: votingType, setSelectVotingType } =
+    useVotingTypeStore();
   const { data: votingTypes } = useLoaderData() as { data: VotingType[] };
-  const [votingType, setVotingType] = useState('NEW_MEMBER');
   const { votes, error, isLoading } = useCompletedVotes(votingType);
   const toast = useToast();
   const navigate = useNavigate();
@@ -34,7 +38,7 @@ const CompletedVotes = () => {
   }, [error]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setVotingType((event.target as HTMLInputElement).value);
+    setSelectVotingType((event.target as HTMLInputElement).value);
   };
 
   const { voteItem } = useMemo(() => {
@@ -44,9 +48,19 @@ const CompletedVotes = () => {
     const voteTypeName = selectedVotingType?.abbr ?? selectedVotingType?.name;
     let voteItem = (_data: Proposal): JSX.Element | null => null;
     switch (votingType) {
+      case 'GENERAL':
+        voteItem = (data: Proposal) => (
+          <GeneralVote data={data} voteTypeName={voteTypeName} />
+        );
+        break;
       case 'NEW_MEMBER':
         voteItem = (data: Proposal) => (
           <NewMemberVote data={data} voteTypeName={voteTypeName} />
+        );
+        break;
+      case 'GRANT':
+        voteItem = (data: Proposal) => (
+          <GrantProgram data={data} voteTypeName={voteTypeName} />
         );
         break;
       case 'EXCLUDE_MEMBER':
@@ -100,7 +114,6 @@ const CompletedVotes = () => {
               control={
                 <RadioButton
                   label={vtype.abbr ?? vtype.name}
-                  onClick={() => setVotingType(vtype.id)}
                   checked={votingType === vtype.id}
                 />
               }

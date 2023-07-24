@@ -20,6 +20,13 @@ const VoteResult = ({ result, votingType }: VoteResultProps) => {
     // No matter result.value, default display
     if (result.target) {
       switch (votingType) {
+        case 'GENERAL':
+          content = (
+            <Stack spacing={1} alignItems="flex-start">
+              <Typography fontWeight={600}>{String(result.target)}</Typography>
+            </Stack>
+          );
+          break;
         case 'NEW_MEMBER':
           content = (
             <Stack spacing={1} alignItems="flex-start">
@@ -197,183 +204,17 @@ const VoteResult = ({ result, votingType }: VoteResultProps) => {
     // Has result value
     if (result.value) {
       switch (votingType) {
-        case 'NEW_MEMBER':
+        case 'GENERAL':
           content = (
             <Stack spacing={1} alignItems="flex-start">
               <Typography fontWeight={600}>{String(result.target)}</Typography>
+              <Tag
+                color={result.value ? 'success' : 'error'}
+                label={result.value ? 'ACCEPTED' : 'Declined'}
+              />
             </Stack>
           );
           break;
-        case 'EXCLUDE_MEMBER':
-          content = (
-            <Stack spacing={1} alignItems="flex-start">
-              <Typography fontWeight={600}>{String(result.target)}</Typography>
-            </Stack>
-          );
-          break;
-        case 'GRANT':
-          {
-            const applicant = result.target as Applicant;
-            noBox = true;
-            content = (
-              <Paragraph spacing="md">
-                <Stack direction="row">
-                  <Stack spacing={0.5} flex={1}>
-                    <Typography
-                      variant="caption"
-                      fontWeight={600}
-                      color="grey.400"
-                    >
-                      Company name
-                    </Typography>
-                    <Typography variant="body2" color="grey.100">
-                      {applicant.companyName}
-                    </Typography>
-                  </Stack>
-                  <Stack spacing={0.5} flex={1}>
-                    <Typography
-                      variant="caption"
-                      fontWeight={600}
-                      color="grey.400"
-                    >
-                      Company website
-                    </Typography>
-                    <Typography variant="body2" color="grey.100">
-                      {applicant.companyWebsite}
-                    </Typography>
-                  </Stack>
-                </Stack>
-                <Stack direction="row">
-                  <Stack spacing={0.5} flex={1}>
-                    <Typography
-                      variant="caption"
-                      fontWeight={600}
-                      color="grey.400"
-                    >
-                      Applicant name
-                    </Typography>
-                    <Typography variant="body2" color="grey.100">
-                      {applicant.name}
-                    </Typography>
-                  </Stack>
-                  <Stack spacing={0.5} flex={1}>
-                    <Typography
-                      variant="caption"
-                      fontWeight={600}
-                      color="grey.400"
-                    >
-                      Applicant email
-                    </Typography>
-                    <Typography variant="body2" color="grey.100">
-                      {applicant.email}
-                    </Typography>
-                  </Stack>
-                </Stack>
-                <Stack direction="row">
-                  <Stack spacing={0.5} flex={1}>
-                    <Typography
-                      variant="caption"
-                      fontWeight={600}
-                      color="grey.400"
-                    >
-                      Applicant p-chain address
-                    </Typography>
-                    <Typography variant="body2" color="grey.100">
-                      {applicant.pchainAddress}
-                    </Typography>
-                  </Stack>
-                  <Stack spacing={0.5} flex={1} alignItems="flex-start">
-                    <Typography
-                      variant="caption"
-                      fontWeight={600}
-                      color="grey.400"
-                    >
-                      Company industry
-                    </Typography>
-                    <Tag label={applicant.companyIndustry.toUpperCase()} />
-                  </Stack>
-                </Stack>
-                <Stack spacing={0.5} alignItems="flex-start">
-                  <Typography
-                    variant="caption"
-                    fontWeight={600}
-                    color="grey.400"
-                  >
-                    Company stage
-                  </Typography>
-                  <Tag
-                    color="success"
-                    label={applicant.companyStage.toUpperCase()}
-                  />
-                </Stack>
-                <Stack spacing={0.5} alignItems="flex-start">
-                  <Typography
-                    variant="caption"
-                    fontWeight={600}
-                    color="grey.400"
-                  >
-                    Company description
-                  </Typography>
-                  <Typography variant="body2" color="grey.100">
-                    {applicant.companyDescription}
-                  </Typography>
-                </Stack>
-                <Stack spacing={0.5} alignItems="flex-start">
-                  <Typography
-                    variant="caption"
-                    fontWeight={600}
-                    color="grey.400"
-                  >
-                    Number of funds
-                  </Typography>
-                  <Tag label={String(applicant.numberOfFunds).toUpperCase()} />
-                </Stack>
-                <Stack spacing={0.5} alignItems="flex-start">
-                  <Typography
-                    variant="caption"
-                    fontWeight={600}
-                    color="grey.400"
-                  >
-                    Use of funds
-                  </Typography>
-                  <Typography variant="body2" color="grey.100">
-                    {applicant.useOfFunds}
-                  </Typography>
-                </Stack>
-                <Stack spacing={0.5} alignItems="flex-start">
-                  <Typography
-                    variant="caption"
-                    fontWeight={600}
-                    color="grey.400"
-                  >
-                    Pitch deck
-                  </Typography>
-                  <Typography variant="body2" color="grey.100">
-                    {applicant.pitchDeck}
-                  </Typography>
-                </Stack>
-                <Stack spacing={0.5} alignItems="flex-start">
-                  <Typography
-                    variant="caption"
-                    fontWeight={600}
-                    color="grey.400"
-                  >
-                    Additional info about the application / company
-                  </Typography>
-                  <Typography variant="body2" color="grey.100">
-                    {applicant.additionalInfo}
-                  </Typography>
-                </Stack>
-              </Paragraph>
-            );
-          }
-          break;
-        default:
-      }
-    }
-    // Has result value
-    if (result.value) {
-      switch (votingType) {
         case 'BASE_FEE':
           {
             if (!result.baseFee) {

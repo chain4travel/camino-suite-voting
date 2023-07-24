@@ -5,11 +5,11 @@ import type { Proposal, VotingOption } from '@/types';
 import StateButton from '@/components/StateButton';
 import { toPastTense } from '@/helpers/string';
 
-interface NewMemberVoteProps {
+interface GeneralVoteProps {
   data: Proposal;
   voteTypeName?: string;
 }
-const GeneralVote = ({ data, voteTypeName }: NewMemberVoteProps) => {
+const GeneralVote = ({ data, voteTypeName }: GeneralVoteProps) => {
   const votedList: VotingOption[] = useMemo(
     () =>
       data.options.filter(opt =>
