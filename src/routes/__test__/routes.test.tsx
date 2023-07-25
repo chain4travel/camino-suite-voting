@@ -7,7 +7,7 @@ import { getRoutes } from '..';
 describe('render routes', () => {
   test('test click button to skip page', () => {
     const router = createMemoryRouter(getRoutes(), {
-      initialEntries: ['/proposal'],
+      initialEntries: ['/dac'],
     });
     render(<RouterProvider router={router} />);
     const elements = screen.getAllByTestId('skip-page');

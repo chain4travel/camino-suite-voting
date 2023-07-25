@@ -71,7 +71,7 @@ const ActiveVotings = () => {
             label="Show only TODO"
           />
           {wallet.isConsortiumMember && (
-            <NavLink to="/proposal/create">
+            <NavLink to="/dac/create">
               <Button variant="contained" color="primary">
                 Create new
               </Button>

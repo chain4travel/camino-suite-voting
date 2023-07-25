@@ -1,14 +1,17 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { bnToAvaxP } from '@c4tplatform/camino-wallet-sdk';
 import { getFeeDistribution, getTxFee, vote } from '@/helpers/rpc';
 import { VotingOption } from '@/types';
 import useToast from './useToast';
+import useNetwork from './useNetwork';
 
 // TODO: base RPC call
 
 export const useBaseFee = () => {
+  const { caminoClient } = useNetwork();
   const { data, isLoading, error, isSuccess } = useQuery(
     ['getBaseFee'],
-    async () => getTxFee()
+    async () => caminoClient?.Info().getTxFee()
   );
 
   console.debug('useBaseFee data: ', data, isLoading, error, isSuccess);
@@ -16,7 +19,7 @@ export const useBaseFee = () => {
   return {
     isLoading,
     error,
-    baseFee: data ?? 0,
+    baseFee: bnToAvaxP(data?.txFee ?? 0),
   };
 };
 

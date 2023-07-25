@@ -13,10 +13,10 @@ export const getRoutes = (queryClient: QueryClient) => {
   const routes = [
     {
       path: '/',
-      loader: () => redirect('/proposal/active'),
+      loader: () => redirect('/dac/active'),
     },
     {
-      path: '/proposal',
+      path: '/dac',
       element: <Layout />,
       children: [
         {

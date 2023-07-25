@@ -9,7 +9,7 @@ interface NavItemProps {
 const NavItem = ({ to, text }: NavItemProps) => {
   const theme = useTheme();
   return (
-    <NavLink to={`/proposal/${to}`} style={{ textDecoration: 'none' }}>
+    <NavLink to={`/dac/${to}`} style={{ textDecoration: 'none' }}>
       {({ isActive }) => (
         <>
           <Typography

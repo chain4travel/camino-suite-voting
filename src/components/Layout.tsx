@@ -8,6 +8,7 @@ const Layout = () => {
   return (
     <Paper
       style={{
+        width: '100%',
         height: '100%',
         paddingBottom: '40px',
       }}

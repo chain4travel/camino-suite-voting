@@ -37,7 +37,7 @@ const BaseFeeVoting = ({ data, isConsortiumMember }: BaseFeeVotingProps) => {
     <Stack direction="row" sx={{ marginRight: 3 }} spacing={3} width="100%">
       {data.options.map(opt => (
         <VotingOptionCard
-          key={`${opt.option}`}
+          key={`basefee-${data.id}-${opt.option}`}
           option={opt}
           title={String(opt.label)}
           isConsortiumMember={isConsortiumMember}

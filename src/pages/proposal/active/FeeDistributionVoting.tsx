@@ -42,7 +42,7 @@ const FeeDistributionVoting = ({
     <Stack direction="row" sx={{ marginRight: 3 }} spacing={3} width="100%">
       {data.options.map(opt => (
         <VotingOptionCard
-          key={`${opt.option}`}
+          key={`fee-dist-${data.id}-${opt.option}`}
           option={opt}
           isConsortiumMember={isConsortiumMember}
           title={`Distribution #${opt.option}`}
