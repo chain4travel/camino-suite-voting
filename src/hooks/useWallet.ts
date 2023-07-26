@@ -19,9 +19,9 @@ const useWallet = () => {
         );
       console.log('address states: ', states);
     };
-    if (store.state.activeWallet) {
-      getAddressState();
-    }
+    // if (store.state.activeWallet) {
+    getAddressState();
+    // }
   }, [store.state.activeWallet]);
 
   // Fake wallet
