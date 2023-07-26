@@ -47,7 +47,7 @@ const BaseFeeVoting = ({ data, isConsortiumMember }: BaseFeeVotingProps) => {
           onVote={() => handleConfirmToVote(opt)}
           isSubmitting={confirmedOption === opt.option}
           renderContent={(option: VotingOption) => {
-            if (baseFee <= 0) {
+            if (Number(baseFee) <= 0) {
               console.warn('Invalid number of base fee: ', baseFee);
               return null;
             }
