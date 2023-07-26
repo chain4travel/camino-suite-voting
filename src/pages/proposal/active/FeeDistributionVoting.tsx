@@ -63,7 +63,12 @@ const FeeDistributionVoting = ({
                 <DistributionBar data={distributions} variant="vote" />
                 <Stack spacing={0.5}>
                   {map(distributions, (distribution, idx: number) => (
-                    <Stack direction="row" alignItems="center" spacing={1}>
+                    <Stack
+                      key={`fee-dist-${data.id}-${opt.option}-${idx}`}
+                      direction="row"
+                      alignItems="center"
+                      spacing={1}
+                    >
                       <Circle
                         sx={{
                           color: VOTE_DISTRIBUTION_COLORS[idx],
