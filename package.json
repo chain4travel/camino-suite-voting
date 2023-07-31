@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@c4tplatform/camino-wallet-sdk": "^0.0.2",
-    "@c4tplatform/caminojs": "^1.0.0",
+    "@c4tplatform/camino-wallet-sdk": "file:camino-wallet-sdk",
+    "@c4tplatform/caminojs": "file:./camino-wallet-sdk/caminojs",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@hookform/resolvers": "^3.1.1",

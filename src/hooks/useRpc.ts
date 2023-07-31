@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { bnToAvaxP } from '@c4tplatform/camino-wallet-sdk';
+import { bnToAvaxP } from '@c4tplatform/camino-wallet-sdk/dist';
 import { getFeeDistribution, getTxFee, vote } from '@/helpers/rpc';
 import { VotingOption } from '@/types';
 import useToast from './useToast';

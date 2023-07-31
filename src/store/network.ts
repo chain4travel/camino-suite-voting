@@ -1,5 +1,5 @@
 import create from 'zustand';
-import { Avalanche as Camino } from '@c4tplatform/caminojs';
+import { Avalanche as Camino } from '@c4tplatform/caminojs/dist';
 import type { NetworkStore } from '@/types';
 
 export const useNetworkStore = create<NetworkStore>(set => ({
@@ -11,11 +11,12 @@ export const useNetworkStore = create<NetworkStore>(set => ({
       console.log('~state: ', state);
       console.log('~network: ', network);
       if (network) {
+        const { ip, port, protocol, networkId } = network;
         client = new Camino(
-          network.ip,
-          network.port,
-          network.protocol,
-          network.id
+          ip,
+          port,
+          protocol,
+          !isNaN(networkId) ? networkId : 12345
         );
       }
       return { activeNetwork: network, caminoClient: client };
