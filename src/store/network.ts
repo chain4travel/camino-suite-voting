@@ -1,5 +1,5 @@
 import create from 'zustand';
-import { Avalanche as Camino } from '@c4tplatform/caminojs';
+import { Avalanche as Camino } from '@c4tplatform/caminojs/dist';
 import type { NetworkStore } from '@/types';
 
 export const useNetworkStore = create<NetworkStore>(set => ({
