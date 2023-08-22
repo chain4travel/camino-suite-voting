@@ -8,17 +8,11 @@ export const useNetworkStore = create<NetworkStore>(set => ({
   setActiveNetwork: network =>
     set(state => {
       let client = state.caminoClient;
-      console.log('~state: ', state);
-      console.log('~network: ', network);
       if (network) {
         const { ip, port, protocol, networkId } = network;
-        client = new Camino(
-          ip,
-          port,
-          protocol,
-          !isNaN(networkId) ? networkId : 12345
-        );
+        client = new Camino(ip, port, protocol, networkId);
       }
       return { activeNetwork: network, caminoClient: client };
     }),
+  setCaminoClient: client => set({ caminoClient: client }),
 }));

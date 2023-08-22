@@ -3,14 +3,25 @@ import { Network } from '@/types';
 import { useEffect } from 'react';
 
 const useNetwork = (network?: Network) => {
-  const { activeNetwork, caminoClient, setActiveNetwork } = useNetworkStore();
+  const { activeNetwork, caminoClient, setActiveNetwork, setCaminoClient } =
+    useNetworkStore();
 
   useEffect(() => {
-    console.debug('network changed ?', network);
     if (network) {
       setActiveNetwork(network);
     }
   }, [network]);
+
+  useEffect(() => {
+    const updateCaminoClient = async () => {
+      await caminoClient.fetchNetworkSettings();
+      setCaminoClient(caminoClient);
+    };
+
+    if (caminoClient && !caminoClient.network) {
+      updateCaminoClient();
+    }
+  }, [caminoClient]);
 
   return {
     activeNetwork,

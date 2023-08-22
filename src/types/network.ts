@@ -15,4 +15,5 @@ export type NetworkStore = {
   activeNetwork: Network | null;
   caminoClient: Camino | null;
   setActiveNetwork: (network: Network | null) => void;
+  setCaminoClient: (client: Camino | null) => void;
 };
