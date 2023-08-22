@@ -3,7 +3,7 @@ import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 const DEFAULT_ERR_MESSAGE = 'something wrong';
 
 const axiosInstance = axios.create({
-  baseURL: '/mock_data/',
+  baseURL: process.env.MAGELLAN_API_HOST ?? '/mock_data/',
 });
 
 export const post = (url: string, data: any, config?: AxiosRequestConfig) => {

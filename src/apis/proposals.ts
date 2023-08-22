@@ -1,6 +1,7 @@
 import { get } from '@/helpers/http';
 
-export const fetchActiveVotings = async () => get('active_votings.json');
+export const fetchActiveVotings = async (proposalType: number) =>
+  get(`/proposals?proposalType=${proposalType}&proposalStatus=0`);
 
 export const fetchCompletedVotes = async (type: string) =>
   get(`completed_votes/${type.toLowerCase()}.json`);

@@ -5,3 +5,12 @@ export const toPastTense = (word?: string) => {
   }
   return `${word}ed`;
 };
+
+export const getTxExplorerUrl = (
+  network: string,
+  chain: string,
+  txHash: string
+) =>
+  `${
+    location.host
+  }/explorer/${network}/${chain.toLowerCase()}-chain/tx/${txHash}`;
