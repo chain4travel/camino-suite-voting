@@ -9,30 +9,30 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Paragraph from '@/components/Paragraph';
 import Header from '@/components/Header';
-import {
-  FormHelperText,
-  InputLabel,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { FormHelperText, InputLabel, Stack, Typography } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { DateTime } from 'luxon';
 import Button from '@/components/Button';
 import useToast from '@/hooks/useToast';
 import FormContainer from './FormContainer';
 import FormSection from './FormSection';
+import { useAddProposal } from '@/hooks/useProposals';
+import useNetwork from '@/hooks/useNetwork';
+import { getTxExplorerUrl } from '@/helpers/string';
 
 export const essentialSchema = z.object({
   startDate: z
     .custom<DateTime>()
     .refine(
-      d => d.isValid && d.diffNow(['days', 'hours']).days >= 0,
+      (d: DateTime) => d.isValid && d.diffNow(['days', 'hours']).days >= 0,
       'invalid start date'
     ),
   endDate: z
     .custom<DateTime>()
-    .refine(d => d.isValid && d.diffNow(['days']).days > 0, 'invalid end date'),
+    .refine(
+      (d: DateTime) => d.isValid && d.diffNow(['days']).days > 0,
+      'invalid end date'
+    ),
   forumLink: z.preprocess(url => {
     if (!url || typeof url !== 'string') return undefined;
     return url === '' ? undefined : url;
@@ -40,10 +40,15 @@ export const essentialSchema = z.object({
 });
 
 interface EssentialFormProps {
+  proposalType: number | string;
   children?: ReactNode;
   formSchema?: z.ZodRawShape;
 }
-const EssentialForm = ({ children, formSchema = {} }: EssentialFormProps) => {
+const EssentialForm = ({
+  proposalType,
+  children,
+  formSchema = {},
+}: EssentialFormProps) => {
   const schema = essentialSchema.extend(formSchema).refine(
     fields => {
       const diffDays = fields.endDate
@@ -60,13 +65,30 @@ const EssentialForm = ({ children, formSchema = {} }: EssentialFormProps) => {
   const methods = useForm<CreateProposalSchema>({
     resolver: zodResolver(schema),
   });
-  const { handleSubmit, control, getValues } = methods;
+  const { handleSubmit, control, getValues, reset } = methods;
   const toast = useToast();
+  const { activeNetwork } = useNetwork();
+  const addProposal = useAddProposal(proposalType, {
+    onSuccess: data => {
+      reset({});
+      toast.success(
+        'AddProposalTx sent successfully',
+        data,
+        <Button
+          href={getTxExplorerUrl(activeNetwork.name, 'p', data)}
+          target="_blank"
+          variant="outlined"
+          color="inherit"
+        >
+          View on explorer
+        </Button>
+      );
+    },
+  });
 
-  const onSubmit: SubmitHandler<CreateProposalSchema> = async data => {
+  const onFormSubmit: SubmitHandler<CreateProposalSchema> = async data => {
     try {
-      // TODO: call API
-      console.log('data: ', data);
+      addProposal(data);
     } catch (error) {
       if (error instanceof Error) {
         console.error('failed to submit to create proposal: ', error);
@@ -77,7 +99,7 @@ const EssentialForm = ({ children, formSchema = {} }: EssentialFormProps) => {
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onFormSubmit)}>
         <FormContainer>
           <Paragraph spacing="lg">
             <FormSection spacing="md" divider>

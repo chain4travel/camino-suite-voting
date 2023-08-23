@@ -1,7 +1,8 @@
-import React, { ReactNode, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { ComponentsProps, Stack, Typography, styled } from '@mui/material';
-import type { Group } from '@/types';
+import { ProposalTypes, type Group } from '@/types';
 import ListItemStatus from '@/components/ListItemStatus';
+import { DateTime } from 'luxon';
 
 interface GroupHeaderProps {
   group: Group;
@@ -10,12 +11,16 @@ const GroupHeader = styled(
   ({ group, ...props }: GroupHeaderProps & ComponentsProps) => {
     const extraInfo = useMemo(() => {
       switch (group.type) {
-        case 'BASE_FEE':
-        case 'FEE_DISTRIBUTION':
+        case ProposalTypes.BaseFee:
+        case ProposalTypes.FeeDistribution:
           return (
             <ListItemStatus
-              startTimestamp={group.data[0]?.startDateTime}
-              endTimestamp={group.data[0]?.endDateTime}
+              startTimestamp={DateTime.fromISO(
+                group.data[0]?.startTime
+              ).toUnixInteger()}
+              endTimestamp={DateTime.fromISO(
+                group.data[0]?.endTime
+              ).toUnixInteger()}
             />
           );
         default:

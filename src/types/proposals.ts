@@ -1,9 +1,17 @@
 import { ReactElement } from 'react';
 
-export type VotingType = {
-  id: string;
+export enum ProposalTypes {
+  BaseFee = 'Transaction Fees',
+  General = 'General Proposal',
+  NewMember = 'Admittance of new consortium members',
+  ExcludeMember = 'Exlusion of consortium member',
+  FeeDistribution = 'Transaction Fee Distribution',
+  GrantProgram = 'TAKEOFF Camino Grant Program',
+}
+export type ProposalType = {
+  id: number;
   name: string;
-  abbr?: string;
+  abbr: string;
   icon?: ReactElement;
 };
 export type VotingOption = {

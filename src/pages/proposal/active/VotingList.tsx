@@ -1,7 +1,7 @@
 import React from 'react';
 import { List, ListItemButton, Stack } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import type { Applicant, Proposal } from '@/types';
+import { ProposalTypes, type Applicant, type Proposal } from '@/types';
 import NewMemberVoting from './NewMemberVoting';
 import BaseFeeVoting from './BaseFeeVoting';
 import ListItemStatus from '@/components/ListItemStatus';
@@ -20,7 +20,15 @@ const VotingList = ({ data, isConsortiumMember }: VotingListProps) => {
       {data.data.map((proposal: Proposal, index: number) => {
         let Vote: JSX.Element | null = null;
         switch (data.type) {
-          case 'NEW_MEMBER':
+          case ProposalTypes.BaseFee:
+            Vote = (
+              <BaseFeeVoting
+                data={proposal}
+                isConsortiumMember={isConsortiumMember}
+              />
+            );
+            break;
+          case ProposalTypes.NewMember:
             Vote = (
               <Stack width="100%">
                 <NewMemberVoting
@@ -35,7 +43,7 @@ const VotingList = ({ data, isConsortiumMember }: VotingListProps) => {
               </Stack>
             );
             break;
-          case 'EXCLUDE_MEMBER':
+          case ProposalTypes.ExcludeMember:
             Vote = (
               <Stack width="100%">
                 <ExcludeMemberVoting
@@ -50,15 +58,7 @@ const VotingList = ({ data, isConsortiumMember }: VotingListProps) => {
               </Stack>
             );
             break;
-          case 'BASE_FEE':
-            Vote = (
-              <BaseFeeVoting
-                data={proposal}
-                isConsortiumMember={isConsortiumMember}
-              />
-            );
-            break;
-          case 'FEE_DISTRIBUTION':
+          case ProposalTypes.FeeDistribution:
             Vote = (
               <FeeDistributionVoting
                 data={proposal}
@@ -66,7 +66,7 @@ const VotingList = ({ data, isConsortiumMember }: VotingListProps) => {
               />
             );
             break;
-          case 'GRANT':
+          case ProposalTypes.GrantProgram:
             {
               const applicant = proposal.target! as Applicant;
               Vote = (

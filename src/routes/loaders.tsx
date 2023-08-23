@@ -8,20 +8,19 @@ import {
   HighlightOffOutlined,
   HelpCenterOutlined,
 } from '@mui/icons-material';
-import { fetchVotingTypes } from '@/apis';
-import { VotingType } from '@/types';
+import { ProposalTypes, ProposalType } from '@/types';
 
 const iconSelector = (type: string) => {
   switch (type) {
-    case 'NEW_MEMBER':
+    case ProposalTypes.NewMember:
       return <PersonAddAlt1Outlined />;
-    case 'GRANT':
+    case ProposalTypes.GrantProgram:
       return <MoveUpOutlined />;
-    case 'FEE_DISTRIBUTION':
+    case ProposalTypes.FeeDistribution:
       return <DatasetOutlined />;
-    case 'BASE_FEE':
+    case ProposalTypes.BaseFee:
       return <IsoOutlined />;
-    case 'EXCLUDE_MEMBER':
+    case ProposalTypes.ExcludeMember:
       return <HighlightOffOutlined />;
     default:
       console.warn(`Unsupported voting type ${type}, use default icon`);
@@ -30,19 +29,28 @@ const iconSelector = (type: string) => {
 };
 
 export const votingTypeLoader = (queryClient: QueryClient) => async () => {
-  const query = {
-    queryKey: ['getVotingType'],
-    queryFn: async () => fetchVotingTypes(),
+  // The following used when voting(proposal) types are fetching from backend API
+  // const query = {
+  //   queryKey: ['getVotingType'],
+  //   queryFn: async () => fetchVotingTypes(),
+  // };
+  // // ⬇️ return data or fetch it
+  // const result =
+  //   queryClient.getQueryData(query.queryKey) ??
+  //   (await queryClient.fetchQuery(query));
+
+  const result = {
+    data: Object.keys(ProposalTypes).map((key, idx) => ({
+      id: idx,
+      name: ProposalTypes[key],
+      abbr: key,
+    })),
   };
-  // ⬇️ return data or fetch it
-  const result =
-    queryClient.getQueryData(query.queryKey) ??
-    (await queryClient.fetchQuery(query));
   return {
     ...result,
-    data: result?.data?.map((vtype: VotingType) => ({
+    data: result?.data?.map((vtype: ProposalType) => ({
       ...vtype,
-      icon: iconSelector(vtype.id),
+      icon: iconSelector(vtype.abbr),
     })),
   };
 };

@@ -12,7 +12,7 @@ import {
   AccordionDetails,
 } from '@/components/Accordion';
 import Button from '@/components/Button';
-import { VotingType } from '@/types';
+import { ProposalType } from '@/types';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useDialogStore } from '@/store';
 import Checkbox from '@/components/Checkbox';
@@ -21,7 +21,7 @@ import VotingList from './VotingList';
 import GroupHeader from './GroupHeader';
 
 const ActiveVotings = () => {
-  const { data: votingTypes } = useLoaderData() as { data: VotingType[] };
+  const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
   const wallet = useWallet();
   const [onlyTodo, setOnlyTodo] = useState(false);
   const { proposals, error, isLoading } = useActiveVotings();
@@ -37,25 +37,25 @@ const ActiveVotings = () => {
       );
     }
     return filteredProposals.reduce((result: any, proposal: any) => {
-      const votingType = votingTypes.find(
-        (vtype: VotingType) => vtype.id === proposal.type
+      const proposalType = proposalTypes.find(
+        (vtype: ProposalType) => vtype.id === proposal.typeId
       );
-      if (votingType) {
-        const currentData = result[votingType.id]
-          ? result[votingType.id].data
+      if (proposalType) {
+        const currentData = result[proposalType.id]
+          ? result[proposalType.id].data
           : [];
         return {
           ...result,
-          [votingType.id]: {
-            type: votingType.id,
-            name: votingType.name,
-            icon: votingType.icon,
+          [proposalType.id]: {
+            type: proposal.type,
+            name: proposalType.name,
+            icon: proposalType.icon,
             data: [...currentData, proposal],
           },
         };
       } else {
         console.warn(
-          `unsupported voting type(${proposal.type}) of proposal(${proposal.id})`
+          `unsupported proposal type(${proposal.type}) of proposal(${proposal.id})`
         );
       }
       return result;
@@ -80,8 +80,8 @@ const ActiveVotings = () => {
         </Stack>
       </Header>
       {Object.entries(groupedProposals ?? {}).map(
-        ([votingType, group]: [string, any]) => (
-          <Accordion key={votingType} defaultExpanded={group.data.length > 0}>
+        ([proposalType, group]: [string, any]) => (
+          <Accordion key={proposalType} defaultExpanded={group.data.length > 0}>
             <AccordionSummary
               expandIcon={<ExpandMore />}
               sx={{

@@ -1,11 +1,18 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+const webpack = require('webpack');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const path = require('path');
 const deps = require('./package.json').dependencies;
+require('dotenv').config();
 module.exports = {
   resolve: {
+    fallback: {
+      net: false,
+      tls: false,
+      fs: false,
+    },
     extensions: ['.vue', '.tsx', '.ts', '.jsx', '.js', '.json'],
     alias: {
       '@': path.resolve(__dirname, 'src'),
@@ -77,6 +84,9 @@ module.exports = {
       template: path.resolve(__dirname, 'public/index.html'),
       favicon: './public/favicon.ico',
       manifest: './public/manifest.json',
+    }),
+    new webpack.DefinePlugin({
+      'process.env': JSON.stringify(process.env),
     }),
   ],
 };

@@ -3,20 +3,40 @@ import { Stack, Typography } from '@mui/material';
 import Big from 'big.js';
 import type { Proposal, VotingOption } from '@/types';
 import { useBaseFee } from '@/hooks/useRpc';
-import VotingOptionCard from './VotingOptionCard';
 import useVote from '@/hooks/useVote';
+import useToast from '@/hooks/useToast';
+import Button from '@/components/Button';
+import { getTxExplorerUrl } from '@/helpers/string';
+import useNetwork from '@/hooks/useNetwork';
+import VotingOptionCard from './VotingOptionCard';
+
 interface BaseFeeVotingProps {
   data: Proposal;
   isConsortiumMember?: boolean;
 }
 const BaseFeeVoting = ({ data, isConsortiumMember }: BaseFeeVotingProps) => {
+  const toast = useToast();
+  const { activeNetwork } = useNetwork();
   const {
     selectedOption,
     setSelectedOption,
     confirmedOption,
     setConfirmedOption,
     submitVote,
-  } = useVote();
+  } = useVote(data => {
+    toast.success(
+      'AddProposalTx sent successfully',
+      data,
+      <Button
+        href={getTxExplorerUrl(activeNetwork.name, 'p', data)}
+        target="_blank"
+        variant="outlined"
+        color="inherit"
+      >
+        View on explorer
+      </Button>
+    );
+  });
   const { baseFee } = useBaseFee();
 
   const handleSelectChange = (option: VotingOption | null) => {
@@ -35,47 +55,71 @@ const BaseFeeVoting = ({ data, isConsortiumMember }: BaseFeeVotingProps) => {
 
   return (
     <Stack direction="row" sx={{ marginRight: 3 }} spacing={3} width="100%">
-      {data.options.map(opt => (
-        <VotingOptionCard
-          key={`basefee-${data.id}-${opt.option}`}
-          option={opt}
-          title={String(opt.label)}
-          isConsortiumMember={isConsortiumMember}
-          voted={data.voted}
-          selected={selectedOption?.option}
-          onSelect={handleSelectChange}
-          onVote={() => handleConfirmToVote(opt)}
-          isSubmitting={confirmedOption === opt.option}
-          renderContent={(option: VotingOption) => {
-            if (Number(baseFee) <= 0) {
-              console.warn('Invalid number of base fee: ', baseFee);
-              return null;
-            }
-            const absoluteChange = new Big(Number(option.value)).minus(baseFee);
-            const percentageChange = absoluteChange.times(100).div(baseFee);
-            return (
-              <>
-                <Stack direction="row" justifyContent="space-between">
-                  <Typography variant="body2" color="text.secondary">
-                    Percentage Change:
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {percentageChange.toFixed(2)}%
-                  </Typography>
-                </Stack>
-                <Stack direction="row" justifyContent="space-between">
-                  <Typography variant="body2" color="text.secondary">
-                    Absolute Change:
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {absoluteChange.toString()} nCAM
-                  </Typography>
-                </Stack>
-              </>
-            );
-          }}
-        />
-      ))}
+      {data.options
+        .map(opt => {
+          const compare = Number(opt.value) - Number(baseFee);
+          const label =
+            compare > 0
+              ? 'Increase Base Fee'
+              : compare < 0
+              ? 'Decrease Base Fee'
+              : 'Retain Base Fee';
+          return {
+            ...opt,
+            label,
+          };
+        })
+        .map(opt => (
+          <VotingOptionCard
+            key={`basefee-${data.id}-${opt.option}`}
+            option={opt}
+            title={String(opt.label)}
+            isConsortiumMember={isConsortiumMember}
+            voted={data.voted}
+            selected={selectedOption?.option}
+            onSelect={handleSelectChange}
+            onVote={() => handleConfirmToVote(opt)}
+            isSubmitting={confirmedOption === opt.option}
+            renderContent={(option: VotingOption) => {
+              if (Number(baseFee) <= 0) {
+                console.warn('Invalid number of base fee: ', baseFee);
+                return null;
+              }
+              const absoluteChange = new Big(Number(option.value)).minus(
+                baseFee
+              );
+              const percentageChange = absoluteChange.times(100).div(baseFee);
+              return (
+                <>
+                  <Stack direction="row" justifyContent="space-between">
+                    <Typography variant="body2" color="text.secondary">
+                      Future Base Fee:
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {option.value} nCAM
+                    </Typography>
+                  </Stack>
+                  <Stack direction="row" justifyContent="space-between">
+                    <Typography variant="body2" color="text.secondary">
+                      Percentage Change:
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {percentageChange.toFixed(2)}%
+                    </Typography>
+                  </Stack>
+                  <Stack direction="row" justifyContent="space-between">
+                    <Typography variant="body2" color="text.secondary">
+                      Absolute Change:
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {absoluteChange.toString()} nCAM
+                    </Typography>
+                  </Stack>
+                </>
+              );
+            }}
+          />
+        ))}
     </Stack>
   );
 };

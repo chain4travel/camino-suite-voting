@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Container,
   Divider,
@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import { useLoaderData } from 'react-router-dom';
 import Header from '@/components/Header';
-import type { VotingType } from '@/types';
+import { ProposalTypes, type ProposalType } from '@/types';
 import NoVotingType from './NoVotingType';
 import BaseFeeForm, { baseFeeFormSchema } from './BaseFeeForm';
 import EssentialForm from './EssentialForm';
@@ -22,54 +22,64 @@ import FeeDistributionForm, {
 } from './FeeDistributionForm';
 import GeneralProposalForm, { generalFormSchema } from './GeneralProposalForm';
 import GrantProgramForm, { grantProgramFormSchema } from './GrantProgramForm';
+import useWallet from '@/hooks/useWallet';
 
 const CreateNewVoting = () => {
-  const { data: votingTypes } = useLoaderData() as { data: VotingType[] };
-  const [selectedVotingType, setSelectedVotingType] = useState<string>('0');
-
-  const handleChange = (event: SelectChangeEvent<string>) => {
-    const {
-      target: { value },
-    } = event;
-    setSelectedVotingType(value);
-  };
+  const { signer } = useWallet();
+  const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
+  const [selectedProposalType, setSelectedProposalType] = useState<number>(-1);
 
   const { ProposalForm, formSchema } = useMemo(() => {
     let ProposalForm, formSchema;
-    switch (selectedVotingType) {
-      case 'GENERAL':
-        ProposalForm = <GeneralProposalForm />;
-        formSchema = generalFormSchema;
-        break;
-      case 'BASE_FEE':
+    const proposalType = Object.values(ProposalTypes)[selectedProposalType];
+    switch (proposalType) {
+      case ProposalTypes.BaseFee:
         ProposalForm = <BaseFeeForm />;
         formSchema = baseFeeFormSchema;
         break;
-      case 'NEW_MEMBER':
+      case ProposalTypes.General:
+        ProposalForm = <GeneralProposalForm />;
+        formSchema = generalFormSchema;
+        break;
+      case ProposalTypes.NewMember:
         ProposalForm = <NewMemberForm />;
         formSchema = newMemberFormSchema;
         break;
-      case 'EXCLUDE_MEMBER':
+      case ProposalTypes.ExcludeMember:
         ProposalForm = <ExcludeMemberVoting />;
         formSchema = excludeMemberFormSchema;
         break;
-      case 'FEE_DISTRIBUTION':
+      case ProposalTypes.FeeDistribution:
         ProposalForm = <FeeDistributionForm />;
         formSchema = feeDistributionFormSchema;
         break;
-      case 'GRANT':
+      case ProposalTypes.GrantProgram:
         ProposalForm = <GrantProgramForm />;
         formSchema = grantProgramFormSchema;
         break;
       default:
-        console.warn(`Unsupported voting type ${selectedVotingType}`);
+        console.warn(`Unsupported voting type ${selectedProposalType}`);
         ProposalForm = <NoVotingType />;
     }
     return {
       ProposalForm,
       formSchema,
     };
-  }, [selectedVotingType]);
+  }, [selectedProposalType]);
+
+  useEffect(() => {
+    if (!signer) {
+      location.pathname = '/login';
+    }
+  }, [signer]);
+
+  const handleChange = (event: SelectChangeEvent<string>) => {
+    const {
+      target: { value },
+    } = event;
+    setSelectedProposalType(value);
+  };
+
   return (
     <Container>
       <Header headline="Create Proposal" variant="h2" fontFamily="Inter" />
@@ -80,12 +90,14 @@ const CreateNewVoting = () => {
       </Typography>
       <Select
         fullWidth
-        value={selectedVotingType}
-        renderValue={selected => {
-          if (selected === '0') {
+        value={selectedProposalType}
+        renderValue={(selected: number) => {
+          if (selected === -1) {
             return 'Please choose...';
           }
-          const selectedType = votingTypes.find(vtype => vtype.id === selected);
+          const selectedType = proposalTypes.find(
+            vtype => vtype.id === selected
+          );
           return selectedType?.name;
         }}
         onChange={handleChange}
@@ -97,7 +109,7 @@ const CreateNewVoting = () => {
           hidden
           sx={{ padding: 0 }}
         ></MenuItem>
-        {votingTypes.map(vtype => (
+        {proposalTypes.map(vtype => (
           <MenuItem key={vtype.id} value={vtype.id}>
             {vtype.name}
           </MenuItem>
@@ -105,7 +117,12 @@ const CreateNewVoting = () => {
       </Select>
       <Divider sx={{ marginY: 4 }} />
       {formSchema ? (
-        <EssentialForm formSchema={formSchema}>{ProposalForm}</EssentialForm>
+        <EssentialForm
+          proposalType={selectedProposalType}
+          formSchema={formSchema}
+        >
+          {ProposalForm}
+        </EssentialForm>
       ) : (
         ProposalForm
       )}
