@@ -15,12 +15,8 @@ const GroupHeader = styled(
         case ProposalTypes.FeeDistribution:
           return (
             <ListItemStatus
-              startTimestamp={DateTime.fromISO(
-                group.data[0]?.startTime
-              ).toUnixInteger()}
-              endTimestamp={DateTime.fromISO(
-                group.data[0]?.endTime
-              ).toUnixInteger()}
+              startTimestamp={group.data[0]?.startTimestamp}
+              endTimestamp={group.data[0]?.endTimestamp}
             />
           );
         default:

@@ -8,6 +8,12 @@ export enum ProposalTypes {
   FeeDistribution = 'Transaction Fee Distribution',
   GrantProgram = 'TAKEOFF Camino Grant Program',
 }
+export enum ProposalStatuses {
+  InProgress = 'In Progress',
+  Success = 'Success',
+  Failed = 'Failed',
+  Completed = 'Completed',
+}
 export type ProposalType = {
   id: number;
   name: string;
@@ -47,17 +53,32 @@ export type Applicant = {
   pitchDeck: string;
   additionalInfo?: string;
 };
+export type APIProposal = {
+  id: string;
+  proposerAddr: string;
+  startTime: string;
+  endTime: string;
+  type: number;
+  options: string;
+  memo: string;
+  status: number;
+  outcome?: number;
+};
 export type Proposal = {
-  id: number | string;
+  id: string;
   type: string;
-  description: string;
-  startDateTime: number;
-  endDateTime: number;
+  typeId: number;
+  startTime: string;
+  endTime: string;
+  startTimestamp: number;
+  endTimestamp: number;
   options: VotingOption[];
+  status: number;
+  outcome?: number;
   result?: Vote[];
   voted?: Vote[];
   votes?: Vote[];
-  status: string;
+  description?: string;
   forumLink?: string;
   target?: string | Applicant;
   multisig?: MultisigVote;

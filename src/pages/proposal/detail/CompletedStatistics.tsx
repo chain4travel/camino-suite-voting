@@ -3,20 +3,26 @@ import React from 'react';
 import { map } from 'lodash';
 import Big from 'big.js';
 import DistributionBar from '@/components/DistributionBar';
-import { Percentage, Statistics, VoteData, VotingOption } from '@/types';
+import {
+  Percentage,
+  ProposalTypes,
+  Statistics,
+  VoteData,
+  VotingOption,
+} from '@/types';
 import VoteResultTable from './VoteResultTable';
 
 interface CompletedStatisticsProps {
   statistics?: Statistics;
   options?: VotingOption[];
-  votingType?: string;
+  proposalType?: string;
   baseFee?: string | number;
   votes?: VoteData[];
 }
 const CompletedStatistics = ({
   statistics,
   options,
-  votingType,
+  proposalType,
   baseFee,
   votes,
 }: CompletedStatisticsProps) => {
@@ -40,8 +46,8 @@ const CompletedStatistics = ({
                 {option.label}
               </Typography>
             );
-            switch (votingType) {
-              case 'BASE_FEE':
+            switch (proposalType) {
+              case ProposalTypes.BaseFee:
                 {
                   const absoluteChange = new Big(option.value as number).minus(
                     baseFee!
@@ -78,7 +84,7 @@ const CompletedStatistics = ({
                   );
                 }
                 break;
-              case 'FEE_DISTRIBUTION':
+              case ProposalTypes.FeeDistribution:
                 label = (
                   <Typography color="text.primary" variant="body2">
                     {`Distribution #${option.option}`}

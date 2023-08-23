@@ -1,11 +1,17 @@
 import React from 'react';
 import { filter } from 'lodash';
 import { Stack, Typography } from '@mui/material';
+import { Cancel, CheckCircle } from '@mui/icons-material';
 import Big from 'big.js';
-import { Percentage, Proposal, Vote, VotingOption } from '@/types';
+import {
+  Percentage,
+  Proposal,
+  ProposalTypes,
+  Vote,
+  VotingOption,
+} from '@/types';
 import DistributionBar from '@/components/DistributionBar';
 import Tag from '@/components/Tag';
-import { Cancel, CheckCircle } from '@mui/icons-material';
 import GrantProgramVotingOptions from '../active/GrantProgram/GrantProgramVotingOptions';
 import BaseFeeVoting from '../active/BaseFeeVoting';
 
@@ -15,14 +21,12 @@ interface VoteOptionsProps {
   proposal: Proposal;
   options: VotedOption[];
   result?: Vote;
-  votingType?: string;
   baseFee?: number;
   isConsortiumMember?: boolean;
 }
 const VoteOptions = ({
   proposal,
   options,
-  votingType,
   result,
   baseFee,
   isConsortiumMember,
@@ -31,8 +35,8 @@ const VoteOptions = ({
 
   if (!result) {
     let item;
-    switch (votingType) {
-      case 'BASE_FEE':
+    switch (proposal.type) {
+      case ProposalTypes.BaseFee:
         item = (
           <BaseFeeVoting
             data={proposal}
@@ -40,7 +44,7 @@ const VoteOptions = ({
           />
         );
         break;
-      case 'GRANT':
+      case ProposalTypes.GrantProgram:
         item = isConsortiumMember && (
           <GrantProgramVotingOptions data={proposal} showFullText />
         );
@@ -63,8 +67,8 @@ const VoteOptions = ({
         let extraInfo = null;
         let labelDirection = 'column';
         let labelSpacing = 1;
-        switch (votingType) {
-          case 'BASE_FEE':
+        switch (proposal.type) {
+          case ProposalTypes.BaseFee:
             {
               if (baseFee) {
                 label = (
@@ -105,7 +109,7 @@ const VoteOptions = ({
               }
             }
             break;
-          case 'FEE_DISTRIBUTION':
+          case ProposalTypes.FeeDistribution:
             {
               label = (
                 <Typography

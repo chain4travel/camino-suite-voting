@@ -4,10 +4,17 @@ import { DateTime } from 'luxon';
 import { filter, map } from 'lodash';
 import Paragraph from '@/components/Paragraph';
 import StateButton from '@/components/StateButton';
-import { Proposal, Vote, VotingOption } from '@/types';
+import {
+  Proposal,
+  ProposalStatuses,
+  ProposalTypes,
+  Vote,
+  VotingOption,
+} from '@/types';
 import { toPastTense } from '@/helpers/string';
 import Tag from '@/components/Tag';
 import { Cancel, CheckCircle } from '@mui/icons-material';
+import Button from '@/components/Button';
 
 interface ExtraInfo {
   label: string;
@@ -15,19 +22,26 @@ interface ExtraInfo {
 }
 interface ProposalStatusProps {
   proposal: Proposal;
+  isLoggedIn: boolean;
   extraInfo?: ExtraInfo | ExtraInfo[];
 }
-const ProposalStatus = ({ proposal, extraInfo }: ProposalStatusProps) => {
+const ProposalStatus = ({
+  proposal,
+  isLoggedIn,
+  extraInfo,
+}: ProposalStatusProps) => {
   const voted = proposal?.voted?.flatMap((v: Vote) =>
     filter(proposal.options, (opt: VotingOption) => opt.option === v.option)
   );
-  const isCompleted = proposal?.status === 'PASSED';
+  const isCompleted =
+    proposal?.status ===
+    Object.values(ProposalStatuses).indexOf(ProposalStatuses.Completed);
   const { getVotedState, extraInfoComponent } = useMemo(() => {
     let extraInfoComponent = null;
     let getVotedState = (option: VotingOption) =>
       toPastTense(String(option.label));
     switch (proposal?.type) {
-      case 'BASE_FEE':
+      case ProposalTypes.BaseFee:
         {
           const info = extraInfo as ExtraInfo;
           extraInfoComponent = (
@@ -47,7 +61,7 @@ const ProposalStatus = ({ proposal, extraInfo }: ProposalStatusProps) => {
             `New Base Fee ${option.value} nCAM`;
         }
         break;
-      case 'FEE_DISTRIBUTION':
+      case ProposalTypes.FeeDistribution:
         {
           const info = extraInfo as ExtraInfo[];
           extraInfoComponent = (
@@ -90,7 +104,7 @@ const ProposalStatus = ({ proposal, extraInfo }: ProposalStatusProps) => {
   return (
     <Box
       padding={2.5}
-      minWidth={339}
+      minWidth={280}
       borderRadius={1.5}
       sx={{ backgroundColor: 'grey.900' }}
     >
@@ -104,7 +118,7 @@ const ProposalStatus = ({ proposal, extraInfo }: ProposalStatusProps) => {
             <Typography variant="h5">Status</Typography>
             <Tag
               color={isCompleted ? 'success' : 'default'}
-              label={proposal?.status}
+              label={Object.values(ProposalStatuses)[proposal?.status]}
             />
           </Stack>
         </Paragraph>
@@ -120,13 +134,13 @@ const ProposalStatus = ({ proposal, extraInfo }: ProposalStatusProps) => {
           <Paragraph spacing={1.5}>
             <Typography variant="body2" color="text.secondary">
               Start:{' '}
-              {DateTime.fromSeconds(proposal?.startDateTime ?? 0).toFormat(
+              {DateTime.fromSeconds(proposal?.startTimestamp ?? 0).toFormat(
                 'dd.MM.yyyy - hh:mm:ss a'
               )}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               End:{' '}
-              {DateTime.fromSeconds(proposal?.endDateTime ?? 0).toFormat(
+              {DateTime.fromSeconds(proposal?.endTimestamp ?? 0).toFormat(
                 'dd.MM.yyyy - hh:mm:ss a'
               )}
             </Typography>
@@ -159,10 +173,18 @@ const ProposalStatus = ({ proposal, extraInfo }: ProposalStatusProps) => {
                   {getVotedState(v)}
                 </StateButton>
               ))
-            ) : (
+            ) : isLoggedIn ? (
               <Typography variant="body2" color="text.secondary">
                 You have not voted yet
               </Typography>
+            ) : (
+              <Button
+                variant="outlined"
+                color="inherit"
+                onClick={() => (location.pathname = '/login')}
+              >
+                Please login to vote
+              </Button>
             )}
           </Paragraph>
         </Paragraph>

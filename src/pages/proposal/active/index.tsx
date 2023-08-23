@@ -13,8 +13,6 @@ import {
 } from '@/components/Accordion';
 import Button from '@/components/Button';
 import { ProposalType } from '@/types';
-import ConfirmDialog from '@/components/ConfirmDialog';
-import { useDialogStore } from '@/store';
 import Checkbox from '@/components/Checkbox';
 import Paper from '@/components/Paper';
 import VotingList from './VotingList';
@@ -25,9 +23,6 @@ const ActiveVotings = () => {
   const wallet = useWallet();
   const [onlyTodo, setOnlyTodo] = useState(false);
   const { proposals, error, isLoading } = useActiveVotings();
-  const { option: dialogOption } = useDialogStore(state => ({
-    option: state.option,
-  }));
   const groupedProposals = useMemo(() => {
     let filteredProposals = proposals;
     if (onlyTodo) {
@@ -48,6 +43,7 @@ const ActiveVotings = () => {
           ...result,
           [proposalType.id]: {
             type: proposal.type,
+            typeId: proposal.typeId,
             name: proposalType.name,
             icon: proposalType.icon,
             data: [...currentData, proposal],
@@ -101,7 +97,6 @@ const ActiveVotings = () => {
           </Accordion>
         )
       )}
-      <ConfirmDialog {...dialogOption} />
     </Paper>
   );
 };

@@ -10,6 +10,8 @@ export const useBaseFee = () => {
     queryKey: ['getBaseFee'],
     queryFn: async () => await caminoClient?.Info().getTxFee(),
     refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
   });
 
   console.debug('useBaseFee data: ', data, isLoading, error, isSuccess);

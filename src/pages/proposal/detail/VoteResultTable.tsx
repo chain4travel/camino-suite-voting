@@ -1,3 +1,4 @@
+import React, { forwardRef } from 'react';
 import { AccountBalanceWalletOutlined } from '@mui/icons-material';
 import {
   Box,
@@ -11,7 +12,6 @@ import {
   Typography,
   styled,
 } from '@mui/material';
-import React, { forwardRef } from 'react';
 import { TableVirtuoso, TableComponents } from 'react-virtuoso';
 import { VoteData } from '@/types';
 import Paper from '@/components/Paper';

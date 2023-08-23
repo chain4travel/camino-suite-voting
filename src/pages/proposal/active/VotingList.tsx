@@ -10,7 +10,7 @@ import FeeDistributionVoting from './FeeDistributionVoting';
 import GrantProgramVoting from './GrantProgram';
 
 interface VotingListProps {
-  data: { type: string; name: string; data: Proposal[] };
+  data: { type: string; typeId: number; name: string; data: Proposal[] };
   isConsortiumMember?: boolean;
 }
 const VotingList = ({ data, isConsortiumMember }: VotingListProps) => {
@@ -36,8 +36,8 @@ const VotingList = ({ data, isConsortiumMember }: VotingListProps) => {
                   isConsortiumMember={isConsortiumMember}
                 />
                 <ListItemStatus
-                  startTimestamp={proposal.startDateTime}
-                  endTimestamp={proposal.endDateTime}
+                  startTimestamp={proposal.startTimestamp}
+                  endTimestamp={proposal.endTimestamp}
                   multisig={proposal.multisig}
                 />
               </Stack>
@@ -51,8 +51,8 @@ const VotingList = ({ data, isConsortiumMember }: VotingListProps) => {
                   isConsortiumMember={isConsortiumMember}
                 />
                 <ListItemStatus
-                  startTimestamp={proposal.startDateTime}
-                  endTimestamp={proposal.endDateTime}
+                  startTimestamp={proposal.startTimestamp}
+                  endTimestamp={proposal.endTimestamp}
                   multisig={proposal.multisig}
                 />
               </Stack>
@@ -76,8 +76,8 @@ const VotingList = ({ data, isConsortiumMember }: VotingListProps) => {
                     isConsortiumMember={isConsortiumMember}
                   />
                   <ListItemStatus
-                    startTimestamp={proposal.startDateTime}
-                    endTimestamp={proposal.endDateTime}
+                    startTimestamp={proposal.startTimestamp}
+                    endTimestamp={proposal.endTimestamp}
                     multisig={proposal.multisig}
                     stage={applicant.companyStage}
                     industry={applicant.companyIndustry}
@@ -94,7 +94,7 @@ const VotingList = ({ data, isConsortiumMember }: VotingListProps) => {
             key={proposal.id}
             divider={index !== data.data.length - 1}
             sx={{ padding: 2.5, width: '100%' }}
-            onClick={() => navigate(`${data.type}/${proposal.id}`)}
+            onClick={() => navigate(`${data.typeId}/${proposal.id}`)}
             disableRipple
           >
             {Vote}

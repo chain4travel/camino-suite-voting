@@ -5,7 +5,13 @@ import { find, countBy, reduce, filter, map } from 'lodash';
 import { DateTime } from 'luxon';
 import Big from 'big.js';
 
-import { Statistics, Vote, VotingOption, VotingType } from '@/types';
+import {
+  Statistics,
+  Vote,
+  VotingOption,
+  ProposalType,
+  ProposalTypes,
+} from '@/types';
 import Header from '@/components/Header';
 import Button from '@/components/Button';
 import { useProposal } from '@/hooks/useProposals';
@@ -18,7 +24,7 @@ import OngoingState from './OngoingState';
 import CompletedStatistics from './CompletedStatistics';
 
 const Detail = () => {
-  const { data: votingTypes } = useLoaderData() as { data: VotingType[] };
+  const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
   const wallet = useWallet();
   const { type, id } = useParams();
   const navigate = useNavigate();
@@ -30,7 +36,7 @@ const Detail = () => {
   const { baseFee } = useBaseFee();
   const { feeDistribution } = useFeeDistribution();
 
-  const votingType = votingTypes.find(vtype => vtype.id === type);
+  const proposalType = proposalTypes.find(vtype => vtype.id === Number(type));
   const { result, statistics, votes, isCompleted } = useMemo(() => {
     if (proposal?.votes) {
       const summary = countBy(proposal.votes, 'option');
@@ -85,10 +91,7 @@ const Detail = () => {
         };
       });
       return {
-        result: find(
-          proposal.options,
-          opt => opt.option === proposal.result?.[0]?.option
-        ),
+        result: find(proposal.options, opt => opt.option === proposal.outcome),
         statistics,
         votes,
         isCompleted: proposal.status === 'PASSED',
@@ -97,14 +100,14 @@ const Detail = () => {
     return {};
   }, [proposal]);
   const extraInfo = useMemo(() => {
-    if (votingType) {
-      switch (votingType.id) {
-        case 'BASE_FEE':
+    if (proposalType) {
+      switch (proposalType.name) {
+        case ProposalTypes.BaseFee:
           return {
-            label: votingType?.abbr ?? votingType?.name,
+            label: proposalType?.abbr ?? proposalType?.name,
             value: baseFee,
           };
-        case 'FEE_DISTRIBUTION':
+        case ProposalTypes.FeeDistribution:
           return map(feeDistribution, distribution => ({
             label: distribution.label,
             value: distribution.value,
@@ -112,7 +115,7 @@ const Detail = () => {
         default:
       }
     }
-  }, [votingType, result, baseFee]);
+  }, [proposalType, result, baseFee]);
 
   return (
     <>
@@ -133,9 +136,9 @@ const Detail = () => {
               <Header
                 variant="h3"
                 headline={
-                  votingType?.brief ??
-                  votingType?.abbr ??
-                  votingType?.name ??
+                  proposalType?.brief ??
+                  proposalType?.abbr ??
+                  proposalType?.name ??
                   ''
                 }
                 sx={{ margin: 0 }}
@@ -145,17 +148,17 @@ const Detail = () => {
                 color="info.light"
                 letterSpacing={2}
               >
-                {DateTime.fromSeconds(proposal?.endDateTime ?? 0).toFormat(
+                {DateTime.fromSeconds(proposal?.endTimestamp ?? 0).toFormat(
                   'dd.MM.yyyy hh:mm:ss a'
                 )}
               </Typography>
               <VoteResult
                 result={{ ...result, baseFee, target: proposal?.target }}
-                votingType={votingType?.id}
+                proposalType={proposalType?.name}
               />
             </Stack>
             <Stack>
-              <Header variant="h6" headline="Vote options" />
+              <Header variant="h6" headline="Voting options" />
               <VoteOptions
                 proposal={proposal}
                 isConsortiumMember={wallet.isConsortiumMember}
@@ -163,13 +166,15 @@ const Detail = () => {
                   ...opt,
                   percent: statistics?.summary[opt.option]?.percent ?? 0,
                 }))}
-                votingType={votingType?.id}
                 result={result}
                 baseFee={baseFee}
               />
             </Stack>
             <Stack spacing={1.5} alignItems="flex-start">
-              <Typography color="grey.400">{proposal?.description}</Typography>
+              <Typography
+                color="grey.400"
+                dangerouslySetInnerHTML={{ __html: proposal?.description }}
+              />
               {proposal?.forumLink && (
                 <Button
                   sx={{
@@ -184,7 +189,11 @@ const Detail = () => {
               )}
             </Stack>
           </Stack>
-          <ProposalStatus proposal={proposal} extraInfo={extraInfo} />
+          <ProposalStatus
+            proposal={proposal}
+            extraInfo={extraInfo}
+            isLoggedIn={wallet.signer}
+          />
         </Stack>
       </Container>
       <Divider color="divider" variant="fullWidth" sx={{ my: 4 }} />
@@ -193,7 +202,7 @@ const Detail = () => {
           <CompletedStatistics
             statistics={statistics}
             options={proposal.options}
-            votingType={votingType?.id}
+            proposalType={proposalType?.name}
             baseFee={baseFee}
             votes={votes}
           />

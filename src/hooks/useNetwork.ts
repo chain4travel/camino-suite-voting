@@ -1,3 +1,4 @@
+import { updateBaseUrl } from '@/helpers/http';
 import { useNetworkStore } from '@/store/network';
 import { Network } from '@/types';
 import { useEffect } from 'react';
@@ -9,6 +10,7 @@ const useNetwork = (network?: Network) => {
   useEffect(() => {
     if (network) {
       setActiveNetwork(network);
+      updateBaseUrl(network.explorerUrl!);
     }
   }, [network]);
 

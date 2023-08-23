@@ -1,47 +1,47 @@
-import { Applicant, VotingOption } from '@/types';
-import { Box, Stack, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
+import { Box, Stack, Typography } from '@mui/material';
+import { Circle } from '@mui/icons-material';
 import Big from 'big.js';
+import { Applicant, ProposalTypes, VotingOption } from '@/types';
 import Paragraph from '@/components/Paragraph';
 import DistributionBar, {
   VOTE_DISTRIBUTION_COLORS,
 } from '@/components/DistributionBar';
-import { Circle } from '@mui/icons-material';
 import Tag from '@/components/Tag';
 
 interface VoteResultProps {
   result: VotingOption & { baseFee?: number; target?: string | Applicant };
-  votingType?: string;
+  proposalType?: string;
 }
-const VoteResult = ({ result, votingType }: VoteResultProps) => {
+const VoteResult = ({ result, proposalType }: VoteResultProps) => {
   const { content, noBox } = useMemo(() => {
     let content,
       noBox = false;
     // No matter result.value, default display
     if (result.target) {
-      switch (votingType) {
-        case 'GENERAL':
+      switch (proposalType) {
+        case ProposalTypes.General:
           content = (
             <Stack spacing={1} alignItems="flex-start">
               <Typography fontWeight={600}>{String(result.target)}</Typography>
             </Stack>
           );
           break;
-        case 'NEW_MEMBER':
+        case ProposalTypes.NewMember:
           content = (
             <Stack spacing={1} alignItems="flex-start">
               <Typography fontWeight={600}>{String(result.target)}</Typography>
             </Stack>
           );
           break;
-        case 'EXCLUDE_MEMBER':
+        case ProposalTypes.ExcludeMember:
           content = (
             <Stack spacing={1} alignItems="flex-start">
               <Typography fontWeight={600}>{String(result.target)}</Typography>
             </Stack>
           );
           break;
-        case 'GRANT':
+        case ProposalTypes.GrantProgram:
           {
             const applicant = result.target as Applicant;
             noBox = true;
@@ -203,19 +203,8 @@ const VoteResult = ({ result, votingType }: VoteResultProps) => {
     }
     // Has result value
     if (result.value) {
-      switch (votingType) {
-        case 'GENERAL':
-          content = (
-            <Stack spacing={1} alignItems="flex-start">
-              <Typography fontWeight={600}>{String(result.target)}</Typography>
-              <Tag
-                color={result.value ? 'success' : 'error'}
-                label={result.value ? 'ACCEPTED' : 'Declined'}
-              />
-            </Stack>
-          );
-          break;
-        case 'BASE_FEE':
+      switch (proposalType) {
+        case ProposalTypes.BaseFee:
           {
             if (!result.baseFee) {
               console.error('type BASE_FEE must provide current baseFee');
@@ -280,7 +269,18 @@ const VoteResult = ({ result, votingType }: VoteResultProps) => {
             );
           }
           break;
-        case 'NEW_MEMBER':
+        case ProposalTypes.General:
+          content = (
+            <Stack spacing={1} alignItems="flex-start">
+              <Typography fontWeight={600}>{String(result.target)}</Typography>
+              <Tag
+                color={result.value ? 'success' : 'error'}
+                label={result.value ? 'ACCEPTED' : 'Declined'}
+              />
+            </Stack>
+          );
+          break;
+        case ProposalTypes.NewMember:
           content = (
             <Stack spacing={1} alignItems="flex-start">
               <Typography fontWeight={600}>{String(result.target)}</Typography>
@@ -291,7 +291,7 @@ const VoteResult = ({ result, votingType }: VoteResultProps) => {
             </Stack>
           );
           break;
-        case 'EXCLUDE_MEMBER':
+        case ProposalTypes.ExcludeMember:
           content = (
             <Stack spacing={1} alignItems="flex-start">
               <Typography fontWeight={600}>{String(result.target)}</Typography>
@@ -302,7 +302,7 @@ const VoteResult = ({ result, votingType }: VoteResultProps) => {
             </Stack>
           );
           break;
-        case 'FEE_DISTRIBUTION': {
+        case ProposalTypes.FeeDistribution: {
           const values = result.value as number[];
           const labels = result.label as string[];
           content = (
@@ -349,7 +349,7 @@ const VoteResult = ({ result, votingType }: VoteResultProps) => {
       content,
       noBox,
     };
-  }, [result, votingType]);
+  }, [result, proposalType]);
 
   return content ? (
     <Box
