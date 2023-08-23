@@ -109,11 +109,13 @@ const CreateNewVoting = () => {
           hidden
           sx={{ padding: 0 }}
         ></MenuItem>
-        {proposalTypes.map(vtype => (
-          <MenuItem key={vtype.id} value={vtype.id}>
-            {vtype.name}
-          </MenuItem>
-        ))}
+        {proposalTypes
+          .filter(pType => pType.id === 0)
+          .map(pType => (
+            <MenuItem key={pType.id} value={pType.id}>
+              {pType.name}
+            </MenuItem>
+          ))}
       </Select>
       <Divider sx={{ marginY: 4 }} />
       {formSchema ? (

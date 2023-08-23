@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import Header from '@/components/Header';
 import Button from '@/components/Button';
-import { Proposal, VotingType } from '@/types';
+import { Proposal, ProposalType, ProposalTypes } from '@/types';
 import { useCompletedVotes } from '@/hooks/useProposals';
 import useToast from '@/hooks/useToast';
 import { DatePicker } from '@mui/x-date-pickers';
@@ -27,8 +27,10 @@ import Paper from '@/components/Paper';
 const CompletedVotes = () => {
   const { selectVotingType: votingType, setSelectVotingType } =
     useVotingTypeStore();
-  const { data: votingTypes } = useLoaderData() as { data: VotingType[] };
-  const { votes, error, isLoading } = useCompletedVotes(votingType);
+  const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
+  const { votes, error, isLoading } = useCompletedVotes(
+    Object.values(ProposalTypes).indexOf(votingType)
+  );
   const toast = useToast();
   const navigate = useNavigate();
   useEffect(() => {
@@ -42,36 +44,36 @@ const CompletedVotes = () => {
   };
 
   const { voteItem } = useMemo(() => {
-    const selectedVotingType = votingTypes.find(
-      vtype => vtype.id === votingType
+    const selectedVotingType = proposalTypes.find(
+      vtype => vtype.name === votingType
     );
     const voteTypeName = selectedVotingType?.abbr ?? selectedVotingType?.name;
     let voteItem = (_data: Proposal): JSX.Element | null => null;
     switch (votingType) {
-      case 'GENERAL':
+      case ProposalTypes.General:
         voteItem = (data: Proposal) => (
           <GeneralVote data={data} voteTypeName={voteTypeName} />
         );
         break;
-      case 'NEW_MEMBER':
+      case ProposalTypes.NewMember:
         voteItem = (data: Proposal) => (
           <NewMemberVote data={data} voteTypeName={voteTypeName} />
         );
         break;
-      case 'GRANT':
+      case ProposalTypes.GrantProgram:
         voteItem = (data: Proposal) => (
           <GrantProgram data={data} voteTypeName={voteTypeName} />
         );
         break;
-      case 'EXCLUDE_MEMBER':
+      case ProposalTypes.ExcludeMember:
         voteItem = (data: Proposal) => (
           <ExcludeMember data={data} voteTypeName={voteTypeName} />
         );
         break;
-      case 'BASE_FEE':
+      case ProposalTypes.BaseFee:
         voteItem = (data: Proposal) => <TransactionFee data={data} />;
         break;
-      case 'FEE_DISTRIBUTION':
+      case ProposalTypes.FeeDistribution:
         voteItem = (data: Proposal) => (
           <TransactionFeeDistribution data={data} />
         );
@@ -105,20 +107,22 @@ const CompletedVotes = () => {
           onChange={handleChange}
           row
         >
-          {votingTypes.map(vtype => (
-            <FormControlLabel
-              key={vtype.id}
-              label={vtype.abbr ?? vtype.name}
-              value={vtype.id}
-              sx={{ marginLeft: 0 }}
-              control={
-                <RadioButton
-                  label={vtype.abbr ?? vtype.name}
-                  checked={votingType === vtype.id}
-                />
-              }
-            />
-          ))}
+          {proposalTypes
+            .filter(pType => pType.id === 0)
+            .map(pType => (
+              <FormControlLabel
+                key={pType.id}
+                label={pType.abbr ?? pType.name}
+                value={pType.id}
+                sx={{ marginLeft: 0 }}
+                control={
+                  <RadioButton
+                    label={pType.abbr ?? pType.name}
+                    checked={votingType === pType.name}
+                  />
+                }
+              />
+            ))}
         </RadioGroup>
       </Stack>
       <List>
@@ -134,8 +138,8 @@ const CompletedVotes = () => {
                 <Stack>
                   {voteItem(vote)}
                   <ListItemStatus
-                    startTimestamp={vote.startDateTime}
-                    endTimestamp={vote.endDateTime}
+                    startTimestamp={vote.startTimestamp}
+                    endTimestamp={vote.endTimestamp}
                   />
                 </Stack>
                 <Stack></Stack>

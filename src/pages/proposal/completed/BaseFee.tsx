@@ -9,16 +9,10 @@ interface TransactionFeeProps {
 }
 
 const TransactionFee = ({ data }: TransactionFeeProps) => {
-  const [proposal] = data.options.map((option: VotingOption) => {
-    return (option.value as number[]).map((v: number, idx: number) => {
-      return {
-        option: option.option,
-        value: v,
-        label: option.label?.[idx],
-        percent: v as number,
-      };
-    });
-  });
+  const [proposal] = data.options.map((option: VotingOption) => ({
+    ...option,
+    percent: 0,
+  }));
   return (
     <Container sx={{ paddingBottom: 2 }} maxWidth="xl" disableGutters>
       <Paragraph spacing="sm">

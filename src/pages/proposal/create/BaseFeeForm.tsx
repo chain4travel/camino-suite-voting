@@ -22,7 +22,7 @@ import FormSection from './FormSection';
 
 const MAX_OPTIONS = 3;
 export const baseFeeFormSchema = {
-  description: z.string(),
+  description: z.string().optional(),
   votingOptions: z
     .array(
       z.custom<VotingOption>().refine(
