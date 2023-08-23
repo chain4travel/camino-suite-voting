@@ -34,6 +34,10 @@ const Alert = styled(
     borderBottomLeftRadius: theme.shape.borderRadius,
     borderBottomRightRadius: theme.shape.borderRadius,
   },
+  '.MuiButtonBase-root.MuiButton-root.MuiLoadingButton-root.MuiButton-outlined':
+    {
+      borderColor: theme.palette.text.primary,
+    },
 }));
 
 const useCountdown = (duration: number, started = false) => {
