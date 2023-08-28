@@ -22,7 +22,7 @@ const ActiveVotings = () => {
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
   const wallet = useWallet();
   const [onlyTodo, setOnlyTodo] = useState(false);
-  const { proposals, error, isLoading } = useActiveVotings();
+  const { proposals, error, isLoading } = useActiveVotings(wallet.signer);
   const groupedProposals = useMemo(() => {
     let filteredProposals = proposals;
     if (onlyTodo) {

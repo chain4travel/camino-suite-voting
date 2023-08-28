@@ -1,5 +1,5 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { platformvm } from '@c4tplatform/caminojs/dist';
+import { BinTools, platformvm } from '@c4tplatform/caminojs/dist';
 import { Serialization } from '@c4tplatform/caminojs/dist/utils/serialization';
 import { DateTime } from 'luxon';
 
@@ -12,6 +12,8 @@ import { APIProposal, ProposalTypes, VotingOption } from '@/types';
 import useWallet from './useWallet';
 import useToast from './useToast';
 import { find } from 'lodash';
+import useNetwork from './useNetwork';
+import { KeyPair } from '@c4tplatform/caminojs/dist/apis/platformvm';
 
 const serialization = Serialization.getInstance();
 const parseAPIProposals = (proposals?: APIProposal[]) => {
@@ -38,7 +40,7 @@ const parseAPIProposals = (proposals?: APIProposal[]) => {
   });
 };
 
-export const useActiveVotings = (page = 0) => {
+export const useActiveVotings = (signer: KeyPair, page = 0) => {
   const { data, isInitialLoading, isLoading, isSuccess, error } = useQuery(
     ['getActiveVotings', page],
     async () => fetchActiveVotings(page)
@@ -74,25 +76,48 @@ export const useCompletedVotes = (type: number, page = 0) => {
   };
 };
 
-export const useProposal = (type: string, id: string) => {
+export const useProposal = (type: string, id: string, signer: KeyPair) => {
   const { data, isLoading, isSuccess, error } = useQuery(
     ['getProposalDetail', type, id],
     async () => fetchProposalDetail(id)
   );
 
   console.debug('useProposal data: ', data, isLoading, error, isSuccess);
-  const { isInitialLoading, proposals } = useActiveVotings();
+  const votes = data?.data.dacVotes.map(vote => {
+    const votedOptionsBuf = serialization.typeToBuffer(
+      vote.votedOptions,
+      'base64'
+    );
+    const votedOptions = JSON.parse(votedOptionsBuf.toString());
+    const votedDateTime = DateTime.fromISO(vote.votedAt).toUnixInteger();
+    const voterAddrBuf = serialization.typeToBuffer(vote.voterAddr, 'cb58');
+    const voterAddr = BinTools.getInstance().addressToString(
+      signer.getHRP(),
+      signer.getChainID(),
+      voterAddrBuf
+    );
+    return {
+      ...vote,
+      votedDateTime,
+      votedOptions,
+      voterAddr,
+    };
+  });
+  const { isInitialLoading, proposals } = useActiveVotings(signer);
   const proposal = find(proposals, { id });
   console.debug(
     'isInitialLoading to fetch active votings',
     isInitialLoading,
     proposal
   );
+  // Find voted by current wallet
+  const voted = find(votes, { voterAddr: signer.getAddressString() });
 
   return {
     proposal: {
       ...proposal,
-      votes: data?.data.dacVotes,
+      voted: voted?.votedOptions.map((v: number) => ({ option: v })),
+      votes,
     },
     error,
     isLoading,

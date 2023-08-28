@@ -2,6 +2,7 @@ import { BN } from '@c4tplatform/caminojs/dist';
 import store from 'wallet/store';
 import useNetwork from './useNetwork';
 import { useEffect, useMemo, useState } from 'react';
+import { AddressState } from '@c4tplatform/caminojs/dist/apis/platformvm';
 
 const useWallet = () => {
   const { caminoClient } = useNetwork();
@@ -15,7 +16,9 @@ const useWallet = () => {
         .getAddressStates(
           store?.state?.activeWallet?.platformKeyChain?.getAddressStrings()[0]
         );
-      setIsConsortiumMember(!states.and(BN_ONE.shln(38)).isZero());
+      setIsConsortiumMember(
+        !states.and(BN_ONE.shln(AddressState.CONSORTIUM)).isZero()
+      );
     };
     if (store.state.activeWallet) {
       getAddressState();

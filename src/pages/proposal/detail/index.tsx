@@ -32,16 +32,20 @@ const Detail = () => {
     proposal,
     error: _error,
     isLoading: _isLoading,
-  } = useProposal(type!, id!);
+  } = useProposal(type!, id!, wallet.signer);
   const { baseFee } = useBaseFee();
   const { feeDistribution } = useFeeDistribution();
 
   const proposalType = proposalTypes.find(vtype => vtype.id === Number(type));
   const { result, statistics, votes, isCompleted } = useMemo(() => {
     if (proposal?.votes) {
-      const summary = countBy(proposal.votes, 'option');
-      const turnouts = countBy(proposal.votes, v => !!v.option);
-      const totalVotes = filter(proposal.votes, v => !!v.option).length;
+      const summary = countBy(proposal.votes, 'votedOptions');
+      const turnouts = countBy(proposal.votes, v => v.votedOptions.length > 0);
+      console.debug('proposal.votes; ', proposal.votes, summary);
+      const totalVotes = filter(
+        proposal.votes,
+        v => v.votedOptions.length > 0
+      ).length;
       const statistics: Statistics = {
         eligibleVotes: proposal.votes.length,
         totalVotes,
