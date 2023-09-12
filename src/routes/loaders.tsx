@@ -44,6 +44,7 @@ export const votingTypeLoader = (queryClient: QueryClient) => async () => {
       id: idx,
       name: ProposalTypes[key],
       abbr: key,
+      disabled: key !== 'BaseFee',
     })),
   };
   return {

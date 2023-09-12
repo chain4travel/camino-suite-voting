@@ -110,7 +110,7 @@ const CreateNewVoting = () => {
           sx={{ padding: 0 }}
         ></MenuItem>
         {proposalTypes
-          .filter(pType => pType.id === 0)
+          .filter(pType => !pType.disabled)
           .map(pType => (
             <MenuItem key={pType.id} value={pType.id}>
               {pType.name}

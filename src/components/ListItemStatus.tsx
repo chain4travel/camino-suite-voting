@@ -10,6 +10,7 @@ interface ListItemStatusProps extends ChipProps {
   multisig?: MultisigVote;
   stage?: string;
   industry?: string;
+  status?: string;
 }
 const ListItemStatus = ({
   startTimestamp,
@@ -17,24 +18,27 @@ const ListItemStatus = ({
   multisig,
   stage,
   industry,
+  status,
   ...props
 }: ListItemStatusProps) => {
   let duration;
   if (startTimestamp && endTimestamp) {
     const startDateTime = DateTime.fromSeconds(startTimestamp);
     const endDateTime = DateTime.fromSeconds(endTimestamp);
-    const isNotStartYet =
-      startDateTime.startOf('day') > DateTime.now().startOf('day');
-    duration = isNotStartYet
-      ? startDateTime.toFormat('dd.MM.yyyy hh:mm:ss a')
-      : endDateTime
-          .diffNow(['days', 'hours', 'minutes'])
-          .toFormat("dd'd' hh'h' mm'm'");
+    const today = DateTime.now().startOf('day');
+    const isNotStartYet = startDateTime.startOf('day') > today;
+    const isEnded = today > endDateTime.endOf('day');
+    duration =
+      isNotStartYet || isEnded
+        ? startDateTime.toFormat('dd.MM.yyyy hh:mm:ss a')
+        : endDateTime
+            .diffNow(['days', 'hours', 'minutes'])
+            .toFormat("dd'd' hh'h' mm'm'");
   }
 
   return (
     <Stack direction="row" alignItems="center" spacing={1}>
-      <Tag {...props} label={duration} />
+      {duration && <Tag {...props} label={duration} />}
       {multisig && multisig.voted?.count && (
         <Tag
           color="warning"
@@ -43,6 +47,7 @@ const ListItemStatus = ({
       )}
       {stage && <Tag color="success" label={stage.toUpperCase()} />}
       {industry && <Tag label={industry.toUpperCase()} />}
+      {status && <Tag label={status} />}
     </Stack>
   );
 };

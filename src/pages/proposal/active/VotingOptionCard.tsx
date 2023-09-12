@@ -101,7 +101,7 @@ const VotingOptionCard = ({
             <Button
               variant={isSelected ? 'contained' : 'outlined'}
               color={isSelected ? 'success' : 'inherit'}
-              sx={{ marginTop: 1.5 }}
+              sx={{ marginTop: 1.5, py: 1.25, px: 2 }}
               onClick={isSelected ? confirmSelection : toggleSelected}
               loading={isSubmitting}
               loadingPosition="start"

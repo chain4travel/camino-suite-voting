@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useLoaderData, useNavigate } from 'react-router-dom';
 import {
   FormControlLabel,
@@ -23,13 +23,22 @@ import TransactionFee from './BaseFee';
 import TransactionFeeDistribution from './FeeDistribution';
 import { useVotingTypeStore } from '@/store';
 import Paper from '@/components/Paper';
+import { DateTime } from 'luxon';
 
 const CompletedVotes = () => {
+  const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
   const { selectVotingType: votingType, setSelectVotingType } =
     useVotingTypeStore();
-  const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
+  const startTime = useRef<DateTime | null>(null);
+  const endTime = useRef<DateTime | null>(null);
+  const [filter, setFilter] = useState<{
+    startTime?: DateTime | null;
+    endTime?: DateTime | null;
+  }>({ startTime: null, endTime: null });
   const { votes, error, isLoading } = useCompletedVotes(
-    Object.values(ProposalTypes).indexOf(votingType)
+    Object.values(ProposalTypes).indexOf(votingType),
+    filter.startTime?.toUTC().toISO(),
+    filter.endTime?.toUTC().toISO()
   );
   const toast = useToast();
   const navigate = useNavigate();
@@ -39,16 +48,13 @@ const CompletedVotes = () => {
     }
   }, [error]);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectVotingType((event.target as HTMLInputElement).value);
-  };
-
   const { voteItem } = useMemo(() => {
     const selectedVotingType = proposalTypes.find(
       vtype => vtype.name === votingType
     );
     const voteTypeName = selectedVotingType?.abbr ?? selectedVotingType?.name;
-    let voteItem = (_data: Proposal): JSX.Element | null => null;
+    let voteItem = (_data: Proposal, _index: number): JSX.Element | null =>
+      null;
     switch (votingType) {
       case ProposalTypes.General:
         voteItem = (data: Proposal) => (
@@ -71,7 +77,9 @@ const CompletedVotes = () => {
         );
         break;
       case ProposalTypes.BaseFee:
-        voteItem = (data: Proposal) => <TransactionFee data={data} />;
+        voteItem = (data: Proposal, index: number) => (
+          <TransactionFee data={data} index={index} />
+        );
         break;
       case ProposalTypes.FeeDistribution:
         voteItem = (data: Proposal) => (
@@ -86,17 +94,42 @@ const CompletedVotes = () => {
     };
   }, [votingType]);
 
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectVotingType((event.target as HTMLInputElement).value);
+  };
+
+  const submitFilter = () => {
+    setFilter({
+      startTime: startTime.current?.startOf('day'),
+      endTime: endTime.current?.endOf('day'),
+    });
+  };
+
   return (
     <Paper sx={{ px: 2 }}>
       <Header headline="Completed Proposals" variant="h5" />
       <Stack spacing="16px">
         <Stack direction="row" spacing="12px">
-          <DatePicker sx={{ flex: 1 }} />
-          <DatePicker sx={{ flex: 1 }} />
+          <DatePicker
+            label="From"
+            sx={{ flex: 1 }}
+            onChange={(datetime: DateTime | null) =>
+              (startTime.current = datetime)
+            }
+          />
+          <DatePicker
+            label="To"
+            sx={{ flex: 1 }}
+            onChange={(datetime: DateTime | null) =>
+              (endTime.current = datetime)
+            }
+          />
           <Button
             variant="contained"
             color="primary"
             sx={{ minWidth: '100px' }}
+            onClick={() => submitFilter()}
+            loading={isLoading}
           >
             Apply
           </Button>
@@ -108,7 +141,7 @@ const CompletedVotes = () => {
           row
         >
           {proposalTypes
-            .filter(pType => pType.id === 0)
+            .filter(pType => !pType.disabled)
             .map(pType => (
               <FormControlLabel
                 key={pType.id}
@@ -126,20 +159,20 @@ const CompletedVotes = () => {
         </RadioGroup>
       </Stack>
       <List>
-        {votes.map((vote: Proposal, index: number) => {
+        {votes.map((proposal: Proposal, index: number) => {
           return (
             <ListItemButton
-              key={vote.id}
-              onClick={() => navigate(`${vote.type}/${vote.id}`)}
+              key={proposal.id}
+              onClick={() => navigate(`${proposal.typeId}/${proposal.id}`)}
               divider={votes.length !== index + 1 && true}
-              sx={{ px: 0 }}
+              sx={{ px: 0, py: 2 }}
             >
               <Stack width="100%">
                 <Stack>
-                  {voteItem(vote)}
+                  {voteItem(proposal, index)}
                   <ListItemStatus
-                    startTimestamp={vote.startTimestamp}
-                    endTimestamp={vote.endTimestamp}
+                    startTimestamp={proposal.startTimestamp}
+                    endTimestamp={proposal.endTimestamp}
                   />
                 </Stack>
                 <Stack></Stack>

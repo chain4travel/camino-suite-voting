@@ -9,6 +9,7 @@ import Button from '@/components/Button';
 import { getTxExplorerUrl } from '@/helpers/string';
 import useNetwork from '@/hooks/useNetwork';
 import VotingOptionCard from './VotingOptionCard';
+import { findIndex } from 'lodash';
 
 interface BaseFeeVotingProps {
   data: Proposal;
@@ -25,7 +26,7 @@ const BaseFeeVoting = ({ data, isConsortiumMember }: BaseFeeVotingProps) => {
     submitVote,
   } = useVote(data => {
     toast.success(
-      'AddProposalTx sent successfully',
+      'Successfully voted',
       data,
       <Button
         href={getTxExplorerUrl(activeNetwork.name, 'p', data)}
@@ -46,10 +47,13 @@ const BaseFeeVoting = ({ data, isConsortiumMember }: BaseFeeVotingProps) => {
   };
   const handleConfirmToVote = (option: VotingOption) => {
     setConfirmedOption(option.option);
+    const optionIndex = findIndex(
+      data.options,
+      opt => opt.option === option.option
+    );
     submitVote({
       proposalId: data.id,
-      votingType: data.type,
-      votes: [option],
+      optionIndex,
     });
   };
 

@@ -1,30 +1,40 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { BinTools, platformvm } from '@c4tplatform/caminojs/dist';
-import { Serialization } from '@c4tplatform/caminojs/dist/utils/serialization';
 import { DateTime } from 'luxon';
-
+import { platformvm } from '@c4tplatform/caminojs/dist';
+import { Serialization } from '@c4tplatform/caminojs/dist/utils/serialization';
+import { KeyPair } from '@c4tplatform/caminojs/dist/apis/platformvm';
 import {
   fetchProposalDetail,
   fetchCompletedVotes,
   fetchActiveVotings,
 } from '@/apis/proposals';
-import { APIProposal, ProposalTypes, VotingOption } from '@/types';
+import {
+  APIPRoposalWrapper,
+  APIProposal,
+  APIVote,
+  Proposal,
+  ProposalTypes,
+  VotingOption,
+} from '@/types';
 import useWallet from './useWallet';
 import useToast from './useToast';
 import { find } from 'lodash';
 import useNetwork from './useNetwork';
-import { KeyPair } from '@c4tplatform/caminojs/dist/apis/platformvm';
 
 const serialization = Serialization.getInstance();
-const parseAPIProposals = (proposals?: APIProposal[]) => {
-  if (!proposals) return [];
-
-  return proposals.map(proposal => {
+const parseAPIProposal = (proposal?: APIProposal) => {
+  if (proposal) {
     const optionsBuf = serialization.typeToBuffer(proposal.options, 'base64');
     const options = JSON.parse(optionsBuf.toString());
+    let outcome;
+    if (proposal.outcome) {
+      const outcomeBuf = serialization.typeToBuffer(proposal.outcome, 'base64');
+      outcome = JSON.parse(outcomeBuf.toString());
+    }
     const proposalType = Object.values(ProposalTypes)[proposal.type];
     return {
       ...proposal,
+      outcome,
       typeId: proposal.type,
       type: proposalType,
       options: options.map((opt: number, idx: number) => ({
@@ -37,36 +47,83 @@ const parseAPIProposals = (proposals?: APIProposal[]) => {
         .typeToBuffer(proposal.memo, 'base64')
         .toString(),
     };
+  }
+  return;
+};
+const parseAPIProposals = (
+  hrp: string,
+  proposals?: APIPRoposalWrapper[],
+  signer?: KeyPair
+) => {
+  if (!proposals) return [];
+  return proposals.map(proposalWrapper => {
+    const proposal = parseAPIProposal(proposalWrapper.dacProposal);
+    const votes = proposalWrapper.dacVotes.map(vote => parseAPIVote(vote, hrp));
+    let voted;
+    if (signer) {
+      voted = find(votes, { voterAddr: signer.getAddressString() });
+      voted = voted?.votedOptions.map((v: number) => ({ option: v }));
+    }
+
+    return {
+      ...proposal,
+      votes,
+      voted,
+    };
   });
 };
+const parseAPIVote = (vote: APIVote, hrp: string) => {
+  const votedOptionsBuf = serialization.typeToBuffer(
+    vote.votedOptions,
+    'base64'
+  );
+  const votedOptions = JSON.parse(votedOptionsBuf.toString());
+  const votedDateTime = DateTime.fromISO(vote.votedAt).toUnixInteger();
+  return {
+    ...vote,
+    votedDateTime,
+    votedOptions,
+  };
+};
 
-export const useActiveVotings = (signer: KeyPair, page = 0) => {
+export const useActiveVotings = (signer?: KeyPair, page = 0) => {
+  const { activeNetwork } = useNetwork();
   const { data, isInitialLoading, isLoading, isSuccess, error } = useQuery(
     ['getActiveVotings', page],
     async () => fetchActiveVotings(page)
   );
 
   console.debug('useActiveVotings isInitialLoading: ', isInitialLoading);
-  console.debug('useActiveVotings data: ', data, isLoading, error, isSuccess);
-
-  const proposals = parseAPIProposals(data?.data.dacProposals);
+  const proposals = parseAPIProposals(
+    activeNetwork?.name ?? 'local',
+    data?.data.dacProposals,
+    signer
+  );
 
   return {
     isLoading,
     isInitialLoading,
     error,
-    proposals,
+    proposals: proposals ?? [],
   };
 };
 
-export const useCompletedVotes = (type: number, page = 0) => {
+export const useCompletedVotes = (
+  type: number,
+  startTime?: string,
+  endTime?: string,
+  page = 0
+) => {
+  const { activeNetwork } = useNetwork();
   const { data, isLoading, isSuccess, error } = useQuery(
-    ['getCompletedVotes', type, page],
-    async () => fetchCompletedVotes(type)
+    ['getCompletedVotes', type, startTime, endTime, page],
+    async () => fetchCompletedVotes(type, startTime, endTime),
+    { refetchOnWindowFocus: false }
   );
-
-  console.debug('useCompletedVotes data: ', data, isLoading, error, isSuccess);
-  const votes = parseAPIProposals(data?.data.dacProposals);
+  const votes = parseAPIProposals(
+    activeNetwork?.name ?? 'local',
+    data?.data.dacProposals
+  );
 
   return {
     votes,
@@ -76,46 +133,27 @@ export const useCompletedVotes = (type: number, page = 0) => {
   };
 };
 
-export const useProposal = (type: string, id: string, signer: KeyPair) => {
+export const useProposal = (id: string, signer?: KeyPair) => {
+  const { activeNetwork } = useNetwork();
   const { data, isLoading, isSuccess, error } = useQuery(
-    ['getProposalDetail', type, id],
+    ['getProposalDetail', id],
     async () => fetchProposalDetail(id)
   );
 
-  console.debug('useProposal data: ', data, isLoading, error, isSuccess);
-  const votes = data?.data.dacVotes.map(vote => {
-    const votedOptionsBuf = serialization.typeToBuffer(
-      vote.votedOptions,
-      'base64'
-    );
-    const votedOptions = JSON.parse(votedOptionsBuf.toString());
-    const votedDateTime = DateTime.fromISO(vote.votedAt).toUnixInteger();
-    const voterAddrBuf = serialization.typeToBuffer(vote.voterAddr, 'cb58');
-    const voterAddr = BinTools.getInstance().addressToString(
-      signer.getHRP(),
-      signer.getChainID(),
-      voterAddrBuf
-    );
-    return {
-      ...vote,
-      votedDateTime,
-      votedOptions,
-      voterAddr,
-    };
-  });
-  const { isInitialLoading, proposals } = useActiveVotings(signer);
-  const proposal = find(proposals, { id });
-  console.debug(
-    'isInitialLoading to fetch active votings',
-    isInitialLoading,
-    proposal
+  const proposal = parseAPIProposal(data?.data.dacProposal);
+  const votes = data?.data.dacVotes.map((vote: APIVote) =>
+    parseAPIVote(vote, activeNetwork!.name)
   );
+
   // Find voted by current wallet
-  const voted = find(votes, { voterAddr: signer.getAddressString() });
+  let voted;
+  if (signer) {
+    voted = find(votes, { voterAddr: signer.getAddressString() });
+  }
 
   return {
     proposal: {
-      ...proposal,
+      ...(proposal ?? {}),
       voted: voted?.votedOptions.map((v: number) => ({ option: v })),
       votes,
     },
@@ -148,8 +186,8 @@ export const useAddProposal = (
         case 0:
         case 'BASE_FEE':
           proposal = new platformvm.BaseFeeProposal(
-            startDate.toUnixInteger(),
-            endDate.toUnixInteger()
+            startDate.startOf('day').toUnixInteger(),
+            endDate.endOf('day').toUnixInteger()
           );
           votingOptions
             .map((opt: VotingOption) => opt.value)
@@ -172,7 +210,6 @@ export const useAddProposal = (
         serialization.typeToBuffer(description, 'utf8')
       );
       const tx = unsignedTx.sign(pchainAPI.keyChain());
-      console.debug('tx', tx);
       const txid: string = await pchainAPI.issueTx(tx);
       return txid;
     },
@@ -186,4 +223,19 @@ export const useAddProposal = (
   });
 
   return mutation.mutate;
+};
+
+export const useEligibleCMembers = (proposal: Proposal) => {
+  const { caminoClient } = useNetwork();
+  const { data, error } = useQuery({
+    queryKey: ['getEligibleCMembers', proposal.id],
+    queryFn: async () =>
+      caminoClient?.PChain().getValidatorsAt(proposal.blockHeight),
+  });
+
+  return {
+    ...proposal,
+    error,
+    eligibleCMembers: data?.validators,
+  };
 };

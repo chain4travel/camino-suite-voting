@@ -29,8 +29,6 @@ const GrantProgramVotingOptions = ({
     opt => !!find(data.voted, v => v.option === opt.option)
   );
 
-  console.debug('data.options: ', data.options);
-  console.debug('voted: ', voted);
   const triggerVoting =
     (option: VotingOption): MouseEventHandler<HTMLButtonElement> =>
     (event: MouseEvent<HTMLButtonElement>) => {

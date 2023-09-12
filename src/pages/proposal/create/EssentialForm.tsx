@@ -19,6 +19,7 @@ import FormSection from './FormSection';
 import { useAddProposal } from '@/hooks/useProposals';
 import useNetwork from '@/hooks/useNetwork';
 import { getTxExplorerUrl } from '@/helpers/string';
+import { useNavigate } from 'react-router-dom';
 
 export const essentialSchema = z.object({
   startDate: z
@@ -53,8 +54,8 @@ const EssentialForm = ({
     fields => {
       const diffDays = fields.endDate
         .endOf('day')
-        .diff(fields.startDate, ['days', 'hours']).days;
-      return diffDays > 0 && diffDays <= 30;
+        .diff(fields.startDate.startOf('day'), ['days']).days;
+      return diffDays > 1 && diffDays <= 30;
     },
     {
       path: ['endDate'],
@@ -66,6 +67,7 @@ const EssentialForm = ({
     resolver: zodResolver(schema),
   });
   const { handleSubmit, control, getValues, reset } = methods;
+  const navigate = useNavigate();
   const toast = useToast();
   const { activeNetwork } = useNetwork();
   const addProposal = useAddProposal(proposalType, {
@@ -83,6 +85,7 @@ const EssentialForm = ({
           View on explorer
         </Button>
       );
+      navigate('/dac/active');
     },
   });
 

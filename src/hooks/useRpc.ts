@@ -14,8 +14,6 @@ export const useBaseFee = () => {
     refetchOnReconnect: false,
   });
 
-  console.debug('useBaseFee data: ', data, isLoading, error, isSuccess);
-
   return {
     isLoading,
     error,
@@ -28,7 +26,6 @@ export const useFeeDistribution = () => {
     ['getFeeDistribution'],
     async () => getFeeDistribution()
   );
-
   console.debug('useFeeDistribution data: ', data, isLoading, error, isSuccess);
 
   return {

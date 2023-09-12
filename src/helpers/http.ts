@@ -18,8 +18,6 @@ export const get = async (url: string, config?: AxiosRequestConfig) => {
 };
 
 const onSuccess = (response: AxiosResponse) => {
-  console.debug('successful response', response);
-
   return response;
 };
 

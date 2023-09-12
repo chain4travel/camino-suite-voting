@@ -22,7 +22,7 @@ interface ExtraInfo {
 }
 interface ProposalStatusProps {
   proposal: Proposal;
-  isLoggedIn: boolean;
+  isLoggedIn?: boolean;
   extraInfo?: ExtraInfo | ExtraInfo[];
 }
 const ProposalStatus = ({
@@ -33,9 +33,13 @@ const ProposalStatus = ({
   const voted = proposal?.voted?.flatMap((v: Vote) =>
     filter(proposal.options, (opt: VotingOption) => opt.option === v.option)
   );
-  const isCompleted =
+  const isSuccess =
     proposal?.status ===
-    Object.values(ProposalStatuses).indexOf(ProposalStatuses.Completed);
+    Object.values(ProposalStatuses).indexOf(ProposalStatuses.Success);
+  const isFailed =
+    proposal?.status ===
+    Object.values(ProposalStatuses).indexOf(ProposalStatuses.Failed);
+  const isCompleted = isSuccess || isFailed;
   const { getVotedState, extraInfoComponent } = useMemo(() => {
     let extraInfoComponent = null;
     let getVotedState = (option: VotingOption) =>
@@ -117,8 +121,10 @@ const ProposalStatus = ({
           >
             <Typography variant="h5">Status</Typography>
             <Tag
-              color={isCompleted ? 'success' : 'default'}
-              label={Object.values(ProposalStatuses)[proposal?.status]}
+              color={isSuccess ? 'success' : isFailed ? 'error' : 'default'}
+              label={Object.values(ProposalStatuses)[
+                proposal?.status
+              ]?.toUpperCase()}
             />
           </Stack>
         </Paragraph>
@@ -175,7 +181,7 @@ const ProposalStatus = ({
               ))
             ) : isLoggedIn ? (
               <Typography variant="body2" color="text.secondary">
-                You have not voted yet
+                {isCompleted ? 'Did not participate' : 'You have not voted yet'}
               </Typography>
             ) : (
               <Button

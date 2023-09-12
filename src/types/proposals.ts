@@ -1,7 +1,7 @@
 import { ReactElement } from 'react';
 
 export enum ProposalTypes {
-  BaseFee = 'Transaction Fees',
+  BaseFee = 'Base Fee',
   General = 'General Proposal',
   NewMember = 'Admittance of new consortium members',
   ExcludeMember = 'Exlusion of consortium member',
@@ -19,6 +19,7 @@ export type ProposalType = {
   name: string;
   abbr: string;
   icon?: ReactElement;
+  disabled?: boolean;
 };
 export type VotingOption = {
   option: number | string;
@@ -26,9 +27,15 @@ export type VotingOption = {
   label?: string | string[];
 };
 export type Vote = {
-  option: number;
-  address?: string;
+  votedOptions: number[];
+  voterAddr?: string;
   votedDateTime?: number;
+};
+export type APIVote = {
+  voteTxID: string;
+  votedAt: string;
+  votedOptions: string;
+  voterAddr: string;
 };
 export interface VoteData extends Omit<Vote, 'votedDateTime'> {
   id: number;
@@ -53,6 +60,10 @@ export type Applicant = {
   pitchDeck: string;
   additionalInfo?: string;
 };
+export type APIPRoposalWrapper = {
+  dacProposal: APIProposal;
+  dacVotes: APIVote[];
+};
 export type APIProposal = {
   id: string;
   proposerAddr: string;
@@ -62,6 +73,7 @@ export type APIProposal = {
   options: string;
   memo: string;
   status: number;
+  blockHeight: number;
   outcome?: number;
 };
 export type Proposal = {
@@ -74,6 +86,7 @@ export type Proposal = {
   endTimestamp: number;
   options: VotingOption[];
   status: number;
+  blockHeight: number;
   outcome?: number;
   result?: Vote[];
   voted?: Vote[];

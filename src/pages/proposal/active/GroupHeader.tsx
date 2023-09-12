@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import { ComponentsProps, Stack, Typography, styled } from '@mui/material';
-import { ProposalTypes, type Group } from '@/types';
+import { ProposalTypes, type Group, Proposal } from '@/types';
 import ListItemStatus from '@/components/ListItemStatus';
-import { DateTime } from 'luxon';
+import { countBy } from 'lodash';
 
 interface GroupHeaderProps {
   group: Group;
@@ -23,11 +23,28 @@ const GroupHeader = styled(
       }
       return null;
     }, [group]);
+    const votedCount = countBy(
+      group.data,
+      (p: Proposal) => p.voted && p.voted.length > 0
+    );
     return (
-      <Stack direction="row" alignItems="center" spacing={2.5} {...props}>
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="space-between"
+        width="100%"
+        {...props}
+      >
         {/* {group.icon} */}
-        <Typography variant="h6">{group.name}</Typography>
-        {extraInfo}
+        <Stack direction="row" alignItems="center" spacing={2.5}>
+          <Typography variant="h6">{group.name}</Typography>
+          {extraInfo}
+        </Stack>
+        <Stack direction="row" alignItems="center">
+          <ListItemStatus
+            status={`${votedCount.true ?? 0} / ${group.data.length}`}
+          />
+        </Stack>
       </Stack>
     );
   }

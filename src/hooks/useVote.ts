@@ -31,11 +31,12 @@ const useSubmitVote = (option?: {
         0
       );
       const tx = unsignedTx.sign(pchainAPI.keyChain());
-      console.debug('tx', tx);
       const txid: string = await pchainAPI.issueTx(tx);
       return txid;
     },
-    onSuccess: () => toast.success('Successfully voted'),
+    onSuccess:
+      (option && option.onSuccess) ||
+      (() => toast.success('Successfully voted')),
     onError: (error, any) => toast.error(`Failed to vote: ${error}`),
     onSettled: option && option.onSettled,
   });

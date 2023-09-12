@@ -11,10 +11,11 @@ import {
   VotingOption,
   ProposalType,
   ProposalTypes,
+  ProposalStatuses,
 } from '@/types';
 import Header from '@/components/Header';
 import Button from '@/components/Button';
-import { useProposal } from '@/hooks/useProposals';
+import { useEligibleCMembers, useProposal } from '@/hooks/useProposals';
 import { useBaseFee, useFeeDistribution } from '@/hooks/useRpc';
 import useWallet from '@/hooks/useWallet';
 import ProposalStatus from './ProposalStatus';
@@ -22,6 +23,7 @@ import VoteResult from './VoteResult';
 import VoteOptions from './VoteOptions';
 import OngoingState from './OngoingState';
 import CompletedStatistics from './CompletedStatistics';
+import { countMultipleOptionsBy } from '@/helpers/util';
 
 const Detail = () => {
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
@@ -32,22 +34,37 @@ const Detail = () => {
     proposal,
     error: _error,
     isLoading: _isLoading,
-  } = useProposal(type!, id!, wallet.signer);
+  } = useProposal(id!, wallet.signer);
   const { baseFee } = useBaseFee();
   const { feeDistribution } = useFeeDistribution();
+  const proposalWithEligibles = useEligibleCMembers(proposal);
 
   const proposalType = proposalTypes.find(vtype => vtype.id === Number(type));
   const { result, statistics, votes, isCompleted } = useMemo(() => {
-    if (proposal?.votes) {
-      const summary = countBy(proposal.votes, 'votedOptions');
-      const turnouts = countBy(proposal.votes, v => v.votedOptions.length > 0);
-      console.debug('proposal.votes; ', proposal.votes, summary);
+    if (proposalWithEligibles?.votes) {
+      const summary = countMultipleOptionsBy(
+        proposalWithEligibles.votes,
+        'votedOptions'
+      );
+      const eligibleVotes = Object.keys(
+        proposalWithEligibles.eligibleCMembers ?? {}
+      ).length;
+      const turnouts = countBy(
+        proposalWithEligibles.votes,
+        v => v.votedOptions.length > 0
+      );
+      if (proposalWithEligibles.votes.length < eligibleVotes) {
+        turnouts.false =
+          (turnouts.false ?? 0) +
+          eligibleVotes -
+          proposalWithEligibles.votes.length;
+      }
       const totalVotes = filter(
-        proposal.votes,
+        proposalWithEligibles.votes,
         v => v.votedOptions.length > 0
       ).length;
       const statistics: Statistics = {
-        eligibleVotes: proposal.votes.length,
+        eligibleVotes,
         totalVotes,
         summary: reduce(
           summary,
@@ -66,43 +83,54 @@ const Detail = () => {
             ...acc,
             [option]: {
               count,
-              percent: new Big(count)
-                .div(proposal.votes.length)
-                .times(100)
-                .toFixed(2),
+              percent: eligibleVotes
+                ? new Big(count).div(eligibleVotes).times(100).toFixed(2)
+                : 0,
             },
           }),
           {}
         ),
       };
-      const votes = proposal.votes.map((v: Vote, idx: number) => {
-        return {
-          id: idx,
-          address: v.address,
-          votedDateTime: v.votedDateTime
-            ? DateTime.fromSeconds(v.votedDateTime).toFormat(
-                'dd.MM.yyyy - hh:mm:ss a'
-              )
-            : '-',
-          option: v.option
-            ? `Future Base Fee ${
-                proposal.options.find(
-                  (opt: VotingOption) => opt.option === v.option
-                )?.value
-              } nCAM`
-            : 'Did not participate',
-          disabled: !v.option,
-        };
-      });
+      const votes = map(
+        proposalWithEligibles.eligibleCMembers,
+        (eligible: any, nodeId: string) => {
+          const participant = find(
+            proposalWithEligibles.votes,
+            (v: Vote) => v.voterAddr === eligible.consortiumMemberAddress
+          );
+          return {
+            id: nodeId,
+            address: eligible.consortiumMemberAddress,
+            votedDateTime: participant?.votedDateTime
+              ? DateTime.fromSeconds(participant.votedDateTime).toFormat(
+                  'dd.MM.yyyy - hh:mm:ss a'
+                )
+              : '-',
+            option: participant?.votedOptions
+              ? `Future Base Fee ${
+                  proposalWithEligibles.options.find((opt: VotingOption) =>
+                    participant.votedOptions.includes(opt.option)
+                  )?.value
+                } nCAM`
+              : 'Did not participate',
+            disabled: !participant?.votedOptions,
+          };
+        }
+      );
       return {
-        result: find(proposal.options, opt => opt.option === proposal.outcome),
+        result: find(
+          proposalWithEligibles.options,
+          opt => opt.option === proposalWithEligibles.outcome
+        ),
         statistics,
         votes,
-        isCompleted: proposal.status === 'PASSED',
+        isCompleted:
+          Object.values(ProposalStatuses).indexOf(ProposalStatuses.Completed) &
+          (proposalWithEligibles.status ?? 0),
       };
     }
     return {};
-  }, [proposal]);
+  }, [proposalWithEligibles]);
   const extraInfo = useMemo(() => {
     if (proposalType) {
       switch (proposalType.name) {
@@ -152,24 +180,30 @@ const Detail = () => {
                 color="info.light"
                 letterSpacing={2}
               >
-                {DateTime.fromSeconds(proposal?.endTimestamp ?? 0).toFormat(
-                  'dd.MM.yyyy hh:mm:ss a'
-                )}
+                {DateTime.fromSeconds(
+                  proposalWithEligibles?.endTimestamp ?? 0
+                ).toFormat('dd.MM.yyyy hh:mm:ss a')}
               </Typography>
               <VoteResult
-                result={{ ...result, baseFee, target: proposal?.target }}
+                result={{
+                  ...result,
+                  baseFee,
+                  target: proposalWithEligibles?.target,
+                }}
                 proposalType={proposalType?.name}
               />
             </Stack>
             <Stack>
               <Header variant="h6" headline="Voting options" />
               <VoteOptions
-                proposal={proposal}
+                proposal={proposalWithEligibles}
                 isConsortiumMember={wallet.isConsortiumMember}
-                options={proposal?.options.map((opt: VotingOption) => ({
-                  ...opt,
-                  percent: statistics?.summary[opt.option]?.percent ?? 0,
-                }))}
+                options={proposalWithEligibles?.options?.map(
+                  (opt: VotingOption) => ({
+                    ...opt,
+                    percent: statistics?.summary[opt.option]?.percent ?? 0,
+                  })
+                )}
                 result={result}
                 baseFee={baseFee}
               />
@@ -177,9 +211,11 @@ const Detail = () => {
             <Stack spacing={1.5} alignItems="flex-start">
               <Typography
                 color="grey.400"
-                dangerouslySetInnerHTML={{ __html: proposal?.description }}
+                dangerouslySetInnerHTML={{
+                  __html: proposalWithEligibles?.description,
+                }}
               />
-              {proposal?.forumLink && (
+              {proposalWithEligibles?.forumLink && (
                 <Button
                   sx={{
                     backgroundColor: '#242729',
@@ -194,9 +230,9 @@ const Detail = () => {
             </Stack>
           </Stack>
           <ProposalStatus
-            proposal={proposal}
+            proposal={proposalWithEligibles}
             extraInfo={extraInfo}
-            isLoggedIn={wallet.signer}
+            isLoggedIn={!!wallet?.signer}
           />
         </Stack>
       </Container>
@@ -205,7 +241,7 @@ const Detail = () => {
         {isCompleted ? (
           <CompletedStatistics
             statistics={statistics}
-            options={proposal.options}
+            options={proposalWithEligibles.options}
             proposalType={proposalType?.name}
             baseFee={baseFee}
             votes={votes}

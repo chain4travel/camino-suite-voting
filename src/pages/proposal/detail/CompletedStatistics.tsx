@@ -52,10 +52,12 @@ const CompletedStatistics = ({
                   const absoluteChange = new Big(option.value as number).minus(
                     baseFee!
                   );
-                  const percentageChange = new Big(absoluteChange)
-                    .times(100)
-                    .div(baseFee!)
-                    .toFixed(2);
+                  const percentageChange = baseFee
+                    ? new Big(absoluteChange)
+                        .times(100)
+                        .div(baseFee!)
+                        .toFixed(2)
+                    : 0;
                   const sign = absoluteChange.s > 0 ? '+' : '';
                   extraInfo = (
                     <>
@@ -96,8 +98,8 @@ const CompletedStatistics = ({
               <>
                 {label}
                 <Typography color="text.primary" fontWeight={700}>
-                  {statistics?.summary?.[option.option]?.count ?? 0} /{' '}
-                  {statistics?.summary?.[option.option]?.percent ?? 0}%
+                  {statistics?.summary?.[option.option]?.percent ?? 0}% /{' '}
+                  {statistics?.summary?.[option.option]?.count ?? 0}
                 </Typography>
                 {extraInfo}
               </>
@@ -133,7 +135,7 @@ const CompletedStatistics = ({
                   : 'Did not participate'}
               </Typography>
               <Typography color="grey.900" fontWeight={700}>
-                {turnout.count} / {turnout.percent}%
+                {turnout.percent}% / {turnout.count}
               </Typography>
             </>
           )}
