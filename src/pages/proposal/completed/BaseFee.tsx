@@ -14,10 +14,9 @@ import Big from 'big.js';
 
 interface TransactionFeeProps {
   data: Proposal;
-  index?: number;
 }
 
-const TransactionFee = ({ data, index }: TransactionFeeProps) => {
+const TransactionFee = ({ data }: TransactionFeeProps) => {
   const isFailed =
     Object.values(ProposalStatuses).indexOf(ProposalStatuses.Failed) ===
     data.status;
@@ -34,7 +33,7 @@ const TransactionFee = ({ data, index }: TransactionFeeProps) => {
     <Container sx={{ paddingBottom: 2 }} maxWidth="xl" disableGutters>
       <Paragraph spacing="sm">
         <Typography variant="h5">
-          {data.type} #{index}
+          {data.type} #{data.seq}
         </Typography>
         <DistributionBar
           data={optionsStatistics}

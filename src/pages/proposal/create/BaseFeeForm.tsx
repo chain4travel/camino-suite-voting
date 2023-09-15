@@ -33,7 +33,7 @@ export const baseFeeFormSchema = {
         { message: 'invalid base fee' }
       )
     )
-    .min(1),
+    .min(1, 'you must add at least one option'),
 };
 const schema = z.object(baseFeeFormSchema);
 type BaseFeeFormSchema = z.infer<typeof schema>;
@@ -141,11 +141,15 @@ const BaseFeeForm = () => {
         >
           Add Option
         </Button>
+        {errors.votingOptions?.message && (
+          <FormHelperText error>{errors.votingOptions?.message}</FormHelperText>
+        )}
       </FormSection>
       <FormSection>
         <Controller
           name="description"
           control={control}
+          defaultValue=""
           render={({ field, fieldState: { error } }) => (
             <>
               <TextEditor

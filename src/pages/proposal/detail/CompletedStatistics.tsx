@@ -52,12 +52,13 @@ const CompletedStatistics = ({
                   const absoluteChange = new Big(option.value as number).minus(
                     baseFee!
                   );
-                  const percentageChange = baseFee
-                    ? new Big(absoluteChange)
-                        .times(100)
-                        .div(baseFee!)
-                        .toFixed(2)
-                    : 0;
+                  const percentageChange =
+                    Number(baseFee) > 0
+                      ? new Big(absoluteChange)
+                          .times(100)
+                          .div(baseFee!)
+                          .toFixed(2)
+                      : 0;
                   const sign = absoluteChange.s > 0 ? '+' : '';
                   extraInfo = (
                     <>

@@ -24,6 +24,7 @@ import TransactionFeeDistribution from './FeeDistribution';
 import { useVotingTypeStore } from '@/store';
 import Paper from '@/components/Paper';
 import { DateTime } from 'luxon';
+import NoProposals from '../active/NoProposals';
 
 const CompletedVotes = () => {
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
@@ -35,7 +36,7 @@ const CompletedVotes = () => {
     startTime?: DateTime | null;
     endTime?: DateTime | null;
   }>({ startTime: null, endTime: null });
-  const { votes, error, isLoading } = useCompletedVotes(
+  const { proposals, error, isLoading } = useCompletedVotes(
     Object.values(ProposalTypes).indexOf(votingType),
     filter.startTime?.toUTC().toISO(),
     filter.endTime?.toUTC().toISO()
@@ -44,7 +45,7 @@ const CompletedVotes = () => {
   const navigate = useNavigate();
   useEffect(() => {
     if (error) {
-      toast.error('Failed to fetch votes');
+      toast.error('Failed to fetch proposals');
     }
   }, [error]);
 
@@ -53,8 +54,7 @@ const CompletedVotes = () => {
       vtype => vtype.name === votingType
     );
     const voteTypeName = selectedVotingType?.abbr ?? selectedVotingType?.name;
-    let voteItem = (_data: Proposal, _index: number): JSX.Element | null =>
-      null;
+    let voteItem = (_data: Proposal): JSX.Element | null => null;
     switch (votingType) {
       case ProposalTypes.General:
         voteItem = (data: Proposal) => (
@@ -77,9 +77,7 @@ const CompletedVotes = () => {
         );
         break;
       case ProposalTypes.BaseFee:
-        voteItem = (data: Proposal, index: number) => (
-          <TransactionFee data={data} index={index} />
-        );
+        voteItem = (data: Proposal) => <TransactionFee data={data} />;
         break;
       case ProposalTypes.FeeDistribution:
         voteItem = (data: Proposal) => (
@@ -159,27 +157,31 @@ const CompletedVotes = () => {
         </RadioGroup>
       </Stack>
       <List>
-        {votes.map((proposal: Proposal, index: number) => {
-          return (
-            <ListItemButton
-              key={proposal.id}
-              onClick={() => navigate(`${proposal.typeId}/${proposal.id}`)}
-              divider={votes.length !== index + 1 && true}
-              sx={{ px: 0, py: 2 }}
-            >
-              <Stack width="100%">
-                <Stack>
-                  {voteItem(proposal, index)}
-                  <ListItemStatus
-                    startTimestamp={proposal.startTimestamp}
-                    endTimestamp={proposal.endTimestamp}
-                  />
+        {proposals.length > 0 ? (
+          proposals.map((proposal, index: number) => {
+            return (
+              <ListItemButton
+                key={proposal.id}
+                onClick={() => navigate(`${proposal.typeId}/${proposal.id}`)}
+                divider={proposals.length !== index + 1 && true}
+                sx={{ px: 0, py: 2 }}
+              >
+                <Stack width="100%">
+                  <Stack>
+                    {voteItem(proposal as Proposal)}
+                    <ListItemStatus
+                      startTimestamp={proposal.startTimestamp}
+                      endTimestamp={proposal.endTimestamp}
+                    />
+                  </Stack>
+                  <Stack></Stack>
                 </Stack>
-                <Stack></Stack>
-              </Stack>
-            </ListItemButton>
-          );
-        })}
+              </ListItemButton>
+            );
+          })
+        ) : (
+          <NoProposals type="completed" />
+        )}
       </List>
     </Paper>
   );

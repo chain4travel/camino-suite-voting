@@ -91,10 +91,13 @@ export type Proposal = {
   result?: Vote[];
   voted?: Vote[];
   votes?: Vote[];
+  inactive?: boolean;
+  isCompleted?: boolean;
   description?: string;
   forumLink?: string;
   target?: string | Applicant;
   multisig?: MultisigVote;
+  seq?: number;
 };
 export type Group = {
   type: string;

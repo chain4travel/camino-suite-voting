@@ -1,38 +1,24 @@
-import React, { useMemo, useState } from 'react';
-import { NavLink, useLoaderData } from 'react-router-dom';
-import { FormControlLabel, Stack } from '@mui/material';
+import React, { useMemo } from 'react';
+import { useLoaderData } from 'react-router-dom';
 import { ExpandMore } from '@mui/icons-material';
-import { filter } from 'lodash';
-import { useActiveVotings } from '@/hooks/useProposals';
-import useWallet from '@/hooks/useWallet';
+import { useUpcomingVotings } from '@/hooks/useProposals';
 import Header from '@/components/Header';
 import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
 } from '@/components/Accordion';
-import Button from '@/components/Button';
 import { ProposalType } from '@/types';
-import Checkbox from '@/components/Checkbox';
 import Paper from '@/components/Paper';
-import VotingList from './VotingList';
+import VotingList from '../active/VotingList';
 import GroupHeader from './GroupHeader';
-import NoProposals from './NoProposals';
+import NoProposals from '../active/NoProposals';
 
-const ActiveVotings = () => {
+const UpcomingVotings = () => {
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
-  const wallet = useWallet();
-  const [onlyTodo, setOnlyTodo] = useState(false);
-  const { proposals, error, refetch } = useActiveVotings(wallet.signer);
+  const { proposals, error, isLoading } = useUpcomingVotings();
   const groupedProposals = useMemo(() => {
-    let filteredProposals = filter(proposals, proposal => !proposal.inactive);
-    if (onlyTodo) {
-      filteredProposals = filter(
-        proposals,
-        proposal => !proposal.voted || proposal.voted.length === 0
-      );
-    }
-    return filteredProposals.reduce((result: any, proposal: any) => {
+    return proposals.reduce((result: any, proposal: any) => {
       const proposalType = proposalTypes.find(
         (vtype: ProposalType) => vtype.id === proposal.typeId
       );
@@ -57,26 +43,11 @@ const ActiveVotings = () => {
       }
       return result;
     }, {});
-  }, [proposals, onlyTodo]);
+  }, [proposals]);
   return (
     <Paper sx={{ px: 2 }}>
-      <Header headline="Ongoing Proposals" variant="h5">
-        <Stack direction="row" alignItems="center" spacing={1}>
-          <FormControlLabel
-            control={<Checkbox />}
-            onChange={(_event, checked) => setOnlyTodo(checked)}
-            label="Show only TODO"
-          />
-          {wallet.isConsortiumMember && (
-            <NavLink to="/dac/create">
-              <Button variant="contained" color="primary">
-                Create new
-              </Button>
-            </NavLink>
-          )}
-        </Stack>
-      </Header>
-      {Object.entries(groupedProposals).length > 0 ? (
+      <Header headline="Upcoming Proposals" variant="h5" />
+      {Object.entries(groupedProposals ?? {}).length > 0 ? (
         Object.entries(groupedProposals ?? {}).map(
           ([proposalType, group]: [string, any]) => (
             <Accordion
@@ -94,19 +65,15 @@ const ActiveVotings = () => {
                 <GroupHeader group={group} />
               </AccordionSummary>
               <AccordionDetails style={{ padding: 0 }}>
-                <VotingList
-                  data={group}
-                  isConsortiumMember={wallet.isConsortiumMember}
-                  refresh={refetch}
-                />
+                <VotingList data={group} />
               </AccordionDetails>
             </Accordion>
           )
         )
       ) : (
-        <NoProposals type="ongoing" />
+        <NoProposals type="upcoming" />
       )}
     </Paper>
   );
 };
-export default ActiveVotings;
+export default UpcomingVotings;

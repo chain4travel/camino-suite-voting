@@ -122,9 +122,13 @@ const ProposalStatus = ({
             <Typography variant="h5">Status</Typography>
             <Tag
               color={isSuccess ? 'success' : isFailed ? 'error' : 'default'}
-              label={Object.values(ProposalStatuses)[
-                proposal?.status
-              ]?.toUpperCase()}
+              label={
+                proposal?.inactive
+                  ? 'INACTIVE'
+                  : Object.values(ProposalStatuses)[
+                      proposal?.status
+                    ]?.toUpperCase()
+              }
             />
           </Stack>
         </Paragraph>
@@ -174,14 +178,18 @@ const ProposalStatus = ({
                   variant="contained"
                   color={v.value ? 'success' : 'error'}
                   startIcon={v.value ? <CheckCircle /> : <Cancel />}
-                  sx={{ textTransform: 'none' }}
+                  sx={{ textTransform: 'none', textAlign: 'left' }}
                 >
                   {getVotedState(v)}
                 </StateButton>
               ))
+            ) : isCompleted ? (
+              <Typography variant="body2" color="text.secondary">
+                Did not participate
+              </Typography>
             ) : isLoggedIn ? (
               <Typography variant="body2" color="text.secondary">
-                {isCompleted ? 'Did not participate' : 'You have not voted yet'}
+                You have not voted yet
               </Typography>
             ) : (
               <Button

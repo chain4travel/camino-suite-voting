@@ -3,13 +3,7 @@ import { filter } from 'lodash';
 import { Stack, Typography } from '@mui/material';
 import { Cancel, CheckCircle } from '@mui/icons-material';
 import Big from 'big.js';
-import {
-  Percentage,
-  Proposal,
-  ProposalTypes,
-  Vote,
-  VotingOption,
-} from '@/types';
+import { Percentage, Proposal, ProposalTypes, VotingOption } from '@/types';
 import DistributionBar from '@/components/DistributionBar';
 import Tag from '@/components/Tag';
 import GrantProgramVotingOptions from '../active/GrantProgram/GrantProgramVotingOptions';
@@ -20,9 +14,10 @@ type VotedOption = VotingOption & Percentage;
 interface VoteOptionsProps {
   proposal: Proposal;
   options: VotedOption[];
-  result?: Vote;
-  baseFee?: number;
+  result?: VotingOption;
+  baseFee?: string | number;
   isConsortiumMember?: boolean;
+  refresh?: () => void;
 }
 const VoteOptions = ({
   proposal,
@@ -30,6 +25,7 @@ const VoteOptions = ({
   result,
   baseFee,
   isConsortiumMember,
+  refresh,
 }: VoteOptionsProps) => {
   if (!options) return null;
 
@@ -41,6 +37,7 @@ const VoteOptions = ({
           <BaseFeeVoting
             data={proposal}
             isConsortiumMember={isConsortiumMember}
+            refresh={refresh}
           />
         );
         break;
@@ -61,7 +58,7 @@ const VoteOptions = ({
   }
 
   return (
-    <Stack direction={options.length < 3 ? 'row' : 'column'} spacing={1.5}>
+    <Stack direction={options.length <= 3 ? 'row' : 'column'} spacing={1.5}>
       {filter(options, opt => opt.value !== baseFee).map(opt => {
         let label;
         let extraInfo = null;
@@ -82,7 +79,10 @@ const VoteOptions = ({
                 const absoluteChange = new Big(opt.value as number).minus(
                   baseFee
                 );
-                const percentageChange = absoluteChange.times(100).div(baseFee);
+                const percentageChange =
+                  Number(baseFee) > 0
+                    ? absoluteChange.times(100).div(baseFee)
+                    : 0;
                 const sign = absoluteChange.s > 0 ? '+' : '';
                 extraInfo = (
                   <Stack spacing={0.5}>

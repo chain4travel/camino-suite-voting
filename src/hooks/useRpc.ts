@@ -11,7 +11,6 @@ export const useBaseFee = () => {
     queryFn: async () => await caminoClient?.Info().getTxFee(),
     refetchOnWindowFocus: false,
     refetchOnMount: false,
-    refetchOnReconnect: false,
   });
 
   return {

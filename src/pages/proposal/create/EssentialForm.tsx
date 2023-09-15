@@ -44,11 +44,13 @@ interface EssentialFormProps {
   proposalType: number | string;
   children?: ReactNode;
   formSchema?: z.ZodRawShape;
+  onCancel?: () => void;
 }
 const EssentialForm = ({
   proposalType,
   children,
   formSchema = {},
+  onCancel,
 }: EssentialFormProps) => {
   const schema = essentialSchema.extend(formSchema).refine(
     fields => {
@@ -66,7 +68,7 @@ const EssentialForm = ({
   const methods = useForm<CreateProposalSchema>({
     resolver: zodResolver(schema),
   });
-  const { handleSubmit, control, getValues, reset } = methods;
+  const { handleSubmit, control, getValues, reset, formState } = methods;
   const navigate = useNavigate();
   const toast = useToast();
   const { activeNetwork } = useNetwork();
@@ -198,7 +200,15 @@ const EssentialForm = ({
           </Paragraph>
         </FormContainer>
         <Stack direction="row" spacing={2}>
-          <Button variant="outlined" sx={{ py: 1.5 }} color="inherit">
+          <Button
+            variant="outlined"
+            sx={{ py: 1.5 }}
+            color="inherit"
+            onClick={() => {
+              reset();
+              onCancel && onCancel();
+            }}
+          >
             Cancel
           </Button>
           <Button
@@ -206,6 +216,7 @@ const EssentialForm = ({
             variant="contained"
             sx={{ py: 1.5 }}
             color="primary"
+            loading={formState.isSubmitting}
           >
             Create
           </Button>

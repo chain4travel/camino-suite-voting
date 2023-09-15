@@ -13,12 +13,13 @@ import {
   APIProposal,
   APIVote,
   Proposal,
+  ProposalStatuses,
   ProposalTypes,
   VotingOption,
 } from '@/types';
 import useWallet from './useWallet';
 import useToast from './useToast';
-import { find } from 'lodash';
+import { filter, find, orderBy } from 'lodash';
 import useNetwork from './useNetwork';
 
 const serialization = Serialization.getInstance();
@@ -32,6 +33,14 @@ const parseAPIProposal = (proposal?: APIProposal) => {
       outcome = JSON.parse(outcomeBuf.toString());
     }
     const proposalType = Object.values(ProposalTypes)[proposal.type];
+    const now = DateTime.now();
+    const startTime = DateTime.fromISO(proposal.startTime);
+    const endTime = DateTime.fromISO(proposal.endTime);
+    const inactive = startTime > now;
+    const isCompleted =
+      (Object.values(ProposalStatuses).indexOf(ProposalStatuses.Completed) &
+        (proposal.status ?? 0)) >
+      0;
     return {
       ...proposal,
       outcome,
@@ -41,8 +50,10 @@ const parseAPIProposal = (proposal?: APIProposal) => {
         option: idx,
         value: opt,
       })),
-      startTimestamp: DateTime.fromISO(proposal.startTime).toUnixInteger(),
-      endTimestamp: DateTime.fromISO(proposal.endTime).toUnixInteger(),
+      startTimestamp: startTime.toUnixInteger(),
+      endTimestamp: endTime.toUnixInteger(),
+      inactive,
+      isCompleted,
       description: serialization
         .typeToBuffer(proposal.memo, 'base64')
         .toString(),
@@ -88,9 +99,10 @@ const parseAPIVote = (vote: APIVote, hrp: string) => {
 
 export const useActiveVotings = (signer?: KeyPair, page = 0) => {
   const { activeNetwork } = useNetwork();
-  const { data, isInitialLoading, isLoading, isSuccess, error } = useQuery(
+  const { data, isInitialLoading, isLoading, refetch, error } = useQuery(
     ['getActiveVotings', page],
-    async () => fetchActiveVotings(page)
+    async () => fetchActiveVotings(page),
+    { notifyOnChangeProps: ['data', 'error'] }
   );
 
   console.debug('useActiveVotings isInitialLoading: ', isInitialLoading);
@@ -104,7 +116,18 @@ export const useActiveVotings = (signer?: KeyPair, page = 0) => {
     isLoading,
     isInitialLoading,
     error,
+    refetch,
     proposals: proposals ?? [],
+  };
+};
+
+export const useUpcomingVotings = (page = 0) => {
+  const { proposals, isLoading, error } = useActiveVotings(undefined, page);
+  const upcomings = filter(proposals, proposal => proposal.inactive);
+  return {
+    proposals: upcomings,
+    isLoading,
+    error,
   };
 };
 
@@ -115,29 +138,38 @@ export const useCompletedVotes = (
   page = 0
 ) => {
   const { activeNetwork } = useNetwork();
-  const { data, isLoading, isSuccess, error } = useQuery(
+  const { data, isLoading, error } = useQuery(
     ['getCompletedVotes', type, startTime, endTime, page],
     async () => fetchCompletedVotes(type, startTime, endTime),
-    { refetchOnWindowFocus: false }
+    {
+      refetchOnWindowFocus: false,
+      notifyOnChangeProps: ['data', 'error'],
+    }
   );
-  const votes = parseAPIProposals(
+  const proposals = parseAPIProposals(
     activeNetwork?.name ?? 'local',
     data?.data.dacProposals
   );
+  const sortedProposals = orderBy(proposals, ['startTimestamp'], ['desc']);
 
   return {
-    votes,
+    proposals: sortedProposals.map((p, idx) => ({
+      ...p,
+      seq: sortedProposals.length - idx,
+    })),
     error,
     isLoading,
-    // totalCount: data?.data?.totalCount ?? 0,
   };
 };
 
 export const useProposal = (id: string, signer?: KeyPair) => {
   const { activeNetwork } = useNetwork();
-  const { data, isLoading, isSuccess, error } = useQuery(
+  const { data, isLoading, error, refetch } = useQuery(
     ['getProposalDetail', id],
-    async () => fetchProposalDetail(id)
+    async () => fetchProposalDetail(id),
+    {
+      notifyOnChangeProps: ['data', 'error'],
+    }
   );
 
   const proposal = parseAPIProposal(data?.data.dacProposal);
@@ -159,7 +191,7 @@ export const useProposal = (id: string, signer?: KeyPair) => {
     },
     error,
     isLoading,
-    // totalCount: data?.data?.totalCount ?? 0,
+    refetch,
   };
 };
 

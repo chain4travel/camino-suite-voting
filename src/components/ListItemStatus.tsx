@@ -25,9 +25,9 @@ const ListItemStatus = ({
   if (startTimestamp && endTimestamp) {
     const startDateTime = DateTime.fromSeconds(startTimestamp);
     const endDateTime = DateTime.fromSeconds(endTimestamp);
-    const today = DateTime.now().startOf('day');
-    const isNotStartYet = startDateTime.startOf('day') > today;
-    const isEnded = today > endDateTime.endOf('day');
+    const now = DateTime.now();
+    const isNotStartYet = startDateTime > now;
+    const isEnded = now > endDateTime;
     duration =
       isNotStartYet || isEnded
         ? startDateTime.toFormat('dd.MM.yyyy hh:mm:ss a')

@@ -44,7 +44,7 @@ const useSubmitVote = (option?: {
   return mutation;
 };
 
-const useVote = (onSuccess: (d: any) => void) => {
+const useVote = (onSuccess?: (d: any) => void, onSettled?: () => void) => {
   const [selectedOption, setSelectedOption] = useState<VotingOption | null>(
     null
   );
@@ -54,6 +54,7 @@ const useVote = (onSuccess: (d: any) => void) => {
   const submitVote = useSubmitVote({
     onSuccess,
     onSettled: () => {
+      setTimeout(() => onSettled && onSettled());
       setConfirmedOption(null);
       setSelectedOption(null);
     },

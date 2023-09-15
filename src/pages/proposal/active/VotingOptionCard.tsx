@@ -50,6 +50,7 @@ interface VotingOptionProps {
   isConsortiumMember?: boolean;
   title?: string;
   voted?: Vote[];
+  inactive?: boolean;
   isSubmitting?: boolean;
   selected?: string | number | null;
   children?: ReactNode;
@@ -62,6 +63,7 @@ const VotingOptionCard = ({
   title,
   isConsortiumMember,
   voted,
+  inactive,
   isSubmitting,
   selected,
   renderContent,
@@ -106,7 +108,7 @@ const VotingOptionCard = ({
               loading={isSubmitting}
               loadingPosition="start"
               startIcon={<CheckCircle />}
-              disabled={hadVoted}
+              disabled={hadVoted || inactive}
             >
               {isSelected ? 'Confirm selection' : 'Select'}
             </Button>

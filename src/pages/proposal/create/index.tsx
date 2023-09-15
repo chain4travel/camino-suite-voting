@@ -122,6 +122,7 @@ const CreateNewVoting = () => {
         <EssentialForm
           proposalType={selectedProposalType}
           formSchema={formSchema}
+          onCancel={() => setSelectedProposalType(-1)}
         >
           {ProposalForm}
         </EssentialForm>

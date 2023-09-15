@@ -12,8 +12,9 @@ import GrantProgramVoting from './GrantProgram';
 interface VotingListProps {
   data: { type: string; typeId: number; name: string; data: Proposal[] };
   isConsortiumMember?: boolean;
+  refresh?: () => void;
 }
-const VotingList = ({ data, isConsortiumMember }: VotingListProps) => {
+const VotingList = ({ data, isConsortiumMember, refresh }: VotingListProps) => {
   const navigate = useNavigate();
   return (
     <List disablePadding>
@@ -25,6 +26,7 @@ const VotingList = ({ data, isConsortiumMember }: VotingListProps) => {
               <BaseFeeVoting
                 data={proposal}
                 isConsortiumMember={isConsortiumMember}
+                refresh={refresh}
               />
             );
             break;

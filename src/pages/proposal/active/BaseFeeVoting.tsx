@@ -1,7 +1,7 @@
 import React from 'react';
 import { Stack, Typography } from '@mui/material';
 import Big from 'big.js';
-import type { Proposal, VotingOption } from '@/types';
+import { ProposalStatuses, type Proposal, type VotingOption } from '@/types';
 import { useBaseFee } from '@/hooks/useRpc';
 import useVote from '@/hooks/useVote';
 import useToast from '@/hooks/useToast';
@@ -14,8 +14,13 @@ import { findIndex } from 'lodash';
 interface BaseFeeVotingProps {
   data: Proposal;
   isConsortiumMember?: boolean;
+  refresh?: () => void;
 }
-const BaseFeeVoting = ({ data, isConsortiumMember }: BaseFeeVotingProps) => {
+const BaseFeeVoting = ({
+  data,
+  isConsortiumMember,
+  refresh,
+}: BaseFeeVotingProps) => {
   const toast = useToast();
   const { activeNetwork } = useNetwork();
   const {
@@ -37,7 +42,7 @@ const BaseFeeVoting = ({ data, isConsortiumMember }: BaseFeeVotingProps) => {
         View on explorer
       </Button>
     );
-  });
+  }, refresh);
   const { baseFee } = useBaseFee();
 
   const handleSelectChange = (option: VotingOption | null) => {
@@ -81,6 +86,7 @@ const BaseFeeVoting = ({ data, isConsortiumMember }: BaseFeeVotingProps) => {
             isConsortiumMember={isConsortiumMember}
             voted={data.voted}
             selected={selectedOption?.option}
+            inactive={data.inactive || data.isCompleted}
             onSelect={handleSelectChange}
             onVote={() => handleConfirmToVote(opt)}
             isSubmitting={confirmedOption === opt.option}

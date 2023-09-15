@@ -11,19 +11,19 @@ import {
   VotingOption,
   ProposalType,
   ProposalTypes,
-  ProposalStatuses,
+  Proposal,
 } from '@/types';
 import Header from '@/components/Header';
 import Button from '@/components/Button';
 import { useEligibleCMembers, useProposal } from '@/hooks/useProposals';
 import { useBaseFee, useFeeDistribution } from '@/hooks/useRpc';
 import useWallet from '@/hooks/useWallet';
+import { countMultipleOptionsBy } from '@/helpers/util';
 import ProposalStatus from './ProposalStatus';
 import VoteResult from './VoteResult';
 import VoteOptions from './VoteOptions';
 import OngoingState from './OngoingState';
 import CompletedStatistics from './CompletedStatistics';
-import { countMultipleOptionsBy } from '@/helpers/util';
 
 const Detail = () => {
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
@@ -34,10 +34,11 @@ const Detail = () => {
     proposal,
     error: _error,
     isLoading: _isLoading,
+    refetch,
   } = useProposal(id!, wallet.signer);
   const { baseFee } = useBaseFee();
   const { feeDistribution } = useFeeDistribution();
-  const proposalWithEligibles = useEligibleCMembers(proposal);
+  const proposalWithEligibles = useEligibleCMembers(proposal as Proposal);
 
   const proposalType = proposalTypes.find(vtype => vtype.id === Number(type));
   const { result, statistics, votes, isCompleted } = useMemo(() => {
@@ -124,9 +125,7 @@ const Detail = () => {
         ),
         statistics,
         votes,
-        isCompleted:
-          Object.values(ProposalStatuses).indexOf(ProposalStatuses.Completed) &
-          (proposalWithEligibles.status ?? 0),
+        isCompleted: proposalWithEligibles.isCompleted,
       };
     }
     return {};
@@ -206,6 +205,7 @@ const Detail = () => {
                 )}
                 result={result}
                 baseFee={baseFee}
+                refresh={refetch}
               />
             </Stack>
             <Stack spacing={1.5} alignItems="flex-start">

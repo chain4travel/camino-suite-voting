@@ -48,6 +48,7 @@ const FeeDistributionVoting = ({
           title={`Distribution #${opt.option}`}
           voted={data.voted}
           selected={selectedOption?.option}
+          inactive={data.inactive}
           onSelect={handleSelectChange}
           onVote={() => handleConfirmToVote(opt)}
           isSubmitting={confirmedOption === opt.option}

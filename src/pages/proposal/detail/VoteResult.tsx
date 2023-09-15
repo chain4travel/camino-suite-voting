@@ -10,7 +10,10 @@ import DistributionBar, {
 import Tag from '@/components/Tag';
 
 interface VoteResultProps {
-  result: VotingOption & { baseFee?: number; target?: string | Applicant };
+  result: VotingOption & {
+    baseFee?: number | string;
+    target?: string | Applicant;
+  };
   proposalType?: string;
 }
 const VoteResult = ({ result, proposalType }: VoteResultProps) => {
@@ -213,9 +216,10 @@ const VoteResult = ({ result, proposalType }: VoteResultProps) => {
             const absoluteChange = new Big(result.value as number).minus(
               result.baseFee
             );
-            const percentageChange = absoluteChange
-              .times(100)
-              .div(result.baseFee);
+            const percentageChange =
+              Number(result.baseFee) > 0
+                ? absoluteChange.times(100).div(result.baseFee)
+                : 0;
             const sign = absoluteChange.s > 0 ? '+' : '';
             content = (
               <Paragraph spacing={1.5}>
