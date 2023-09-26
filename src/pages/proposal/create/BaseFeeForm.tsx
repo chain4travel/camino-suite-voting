@@ -19,6 +19,7 @@ import Header from '@/components/Header';
 import Paragraph from '@/components/Paragraph';
 import { VotingOption } from '@/types';
 import FormSection from './FormSection';
+import { filter, includes, uniqBy } from 'lodash';
 
 const MAX_OPTIONS = 3;
 export const baseFeeFormSchema = {
@@ -33,7 +34,16 @@ export const baseFeeFormSchema = {
         { message: 'invalid base fee' }
       )
     )
-    .min(1, 'you must add at least one option'),
+    .min(1, 'you must add at least one option')
+    .refine(
+      options => {
+        const uniques = uniqBy(options, 'value');
+        return uniques.length === options.length;
+      },
+      {
+        message: 'each option should be different value',
+      }
+    ),
 };
 const schema = z.object(baseFeeFormSchema);
 type BaseFeeFormSchema = z.infer<typeof schema>;
@@ -77,14 +87,13 @@ const BaseFeeForm = () => {
             name={`votingOptions.${index}.value`}
             control={control}
             render={({ field }) => {
-              if (baseFee <= 0) return <></>;
               const absoluteChange = new Big(Number(field.value) || 0).minus(
                 baseFee
               );
-              const percentageChange = absoluteChange
-                .times(100)
-                .div(baseFee)
-                .toFixed(2);
+              const percentageChange =
+                Number(baseFee) > 0
+                  ? absoluteChange.times(100).div(baseFee).toFixed(2)
+                  : 0;
               return (
                 <Paragraph key={item.id} spacing="sm">
                   <Stack
@@ -132,15 +141,17 @@ const BaseFeeForm = () => {
             }}
           />
         ))}
-        <Button
-          variant="text"
-          startIcon={<AddCircle />}
-          onClick={handleAppendOption}
-          fullWidth
-          sx={{ justifyContent: 'flex-start' }}
-        >
-          Add Option
-        </Button>
+        {fields.length < 3 && (
+          <Button
+            variant="text"
+            startIcon={<AddCircle />}
+            onClick={handleAppendOption}
+            fullWidth
+            sx={{ justifyContent: 'flex-start' }}
+          >
+            Add Option
+          </Button>
+        )}
         {errors.votingOptions?.message && (
           <FormHelperText error>{errors.votingOptions?.message}</FormHelperText>
         )}

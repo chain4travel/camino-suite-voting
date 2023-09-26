@@ -23,7 +23,9 @@ const ActiveVotings = () => {
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
   const wallet = useWallet();
   const [onlyTodo, setOnlyTodo] = useState(false);
-  const { proposals, error, refetch } = useActiveVotings(wallet.signer);
+  const { proposals, error, refetch } = useActiveVotings(
+    wallet.currentWalletAddress
+  );
   const groupedProposals = useMemo(() => {
     let filteredProposals = filter(proposals, proposal => !proposal.inactive);
     if (onlyTodo) {
@@ -62,17 +64,19 @@ const ActiveVotings = () => {
     <Paper sx={{ px: 2 }}>
       <Header headline="Ongoing Proposals" variant="h5">
         <Stack direction="row" alignItems="center" spacing={1}>
-          <FormControlLabel
-            control={<Checkbox />}
-            onChange={(_event, checked) => setOnlyTodo(checked)}
-            label="Show only TODO"
-          />
           {wallet.isConsortiumMember && (
-            <NavLink to="/dac/create">
-              <Button variant="contained" color="primary">
-                Create new
-              </Button>
-            </NavLink>
+            <>
+              <FormControlLabel
+                control={<Checkbox />}
+                onChange={(_event, checked) => setOnlyTodo(checked)}
+                label="Show only TODO"
+              />
+              <NavLink to="/dac/create">
+                <Button variant="contained" color="primary">
+                  Create new
+                </Button>
+              </NavLink>
+            </>
           )}
         </Stack>
       </Header>

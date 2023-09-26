@@ -7,10 +7,10 @@ export const toPastTense = (word?: string) => {
 };
 
 export const getTxExplorerUrl = (
-  network: string,
+  network = 'local',
   chain: string,
   txHash: string
 ) =>
   `${
-    location.host
+    location.origin
   }/explorer/${network}/${chain.toLowerCase()}-chain/tx/${txHash}`;

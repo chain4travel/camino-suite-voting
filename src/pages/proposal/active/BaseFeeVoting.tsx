@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Stack, Typography } from '@mui/material';
 import Big from 'big.js';
-import { ProposalStatuses, type Proposal, type VotingOption } from '@/types';
+import { findIndex, map } from 'lodash';
+import { PlatformVMConstants } from '@c4tplatform/caminojs/dist/apis/platformvm';
+import { ModelMultisigTx } from '@c4tplatform/signavaultjs';
+import type { Proposal, VotingOption } from '@/types';
 import { useBaseFee } from '@/hooks/useRpc';
 import useVote from '@/hooks/useVote';
 import useToast from '@/hooks/useToast';
@@ -9,7 +12,7 @@ import Button from '@/components/Button';
 import { getTxExplorerUrl } from '@/helpers/string';
 import useNetwork from '@/hooks/useNetwork';
 import VotingOptionCard from './VotingOptionCard';
-import { findIndex } from 'lodash';
+import { parseUnsignedTx } from '@/helpers/tx';
 
 interface BaseFeeVotingProps {
   data: Proposal;
@@ -23,27 +26,63 @@ const BaseFeeVoting = ({
 }: BaseFeeVotingProps) => {
   const toast = useToast();
   const { activeNetwork } = useNetwork();
+  const onVoteTxSuccess = data => {
+    toast.success(
+      'Successfully voted',
+      data,
+      data && (
+        <Button
+          href={getTxExplorerUrl(activeNetwork.name, 'p', data)}
+          target="_blank"
+          variant="outlined"
+          color="inherit"
+        >
+          View on explorer
+        </Button>
+      )
+    );
+  };
   const {
     selectedOption,
     setSelectedOption,
     confirmedOption,
     setConfirmedOption,
     submitVote,
-  } = useVote(data => {
-    toast.success(
-      'Successfully voted',
-      data,
-      <Button
-        href={getTxExplorerUrl(activeNetwork.name, 'p', data)}
-        target="_blank"
-        variant="outlined"
-        color="inherit"
-      >
-        View on explorer
-      </Button>
-    );
-  }, refresh);
+    pendingMultisigTx,
+    signMultisigTx,
+    abortSignavault,
+    executeMultisigTx,
+  } = useVote(onVoteTxSuccess, refresh);
   const { baseFee } = useBaseFee();
+
+  const { pendingMultisigBaseFeeTx, canExecuteMultisigTx } = useMemo(() => {
+    const pendingMultisigBaseFeeTx = map(
+      pendingMultisigTx,
+      (msigTx: ModelMultisigTx) => {
+        const unsignedTx = parseUnsignedTx(msigTx.unsignedTx);
+        return { ...msigTx, ...unsignedTx };
+      }
+    ).find(
+      unsignedTx =>
+        unsignedTx.typeId === PlatformVMConstants.ADDVOTETX &&
+        unsignedTx.proposalId === data.id
+    );
+
+    let canExecuteMultisigTx = false;
+    const threshold = pendingMultisigBaseFeeTx?.threshold;
+    if (threshold) {
+      let signers = 0;
+      pendingMultisigBaseFeeTx?.owners.forEach(owner => {
+        if (owner.signature) signers++;
+      });
+      canExecuteMultisigTx = signers >= threshold;
+    }
+
+    return {
+      pendingMultisigBaseFeeTx,
+      canExecuteMultisigTx,
+    };
+  }, [pendingMultisigTx]);
 
   const handleSelectChange = (option: VotingOption | null) => {
     setSelectedOption(
@@ -90,6 +129,14 @@ const BaseFeeVoting = ({
             onSelect={handleSelectChange}
             onVote={() => handleConfirmToVote(opt)}
             isSubmitting={confirmedOption === opt.option}
+            pendingMultisigTx={pendingMultisigBaseFeeTx}
+            signMultisigTx={signMultisigTx}
+            abortSignavault={abortSignavault}
+            canExecuteMultisigTx={canExecuteMultisigTx}
+            executeMultisigTx={executeMultisigTx?.(txId => {
+              onVoteTxSuccess(txId);
+              setTimeout(() => refresh?.(), 500);
+            })}
             renderContent={(option: VotingOption) => {
               if (Number(baseFee) <= 0) {
                 console.warn('Invalid number of base fee: ', baseFee);

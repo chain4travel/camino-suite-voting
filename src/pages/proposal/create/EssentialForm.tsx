@@ -78,14 +78,16 @@ const EssentialForm = ({
       toast.success(
         'AddProposalTx sent successfully',
         data,
-        <Button
-          href={getTxExplorerUrl(activeNetwork.name, 'p', data)}
-          target="_blank"
-          variant="outlined"
-          color="inherit"
-        >
-          View on explorer
-        </Button>
+        data && (
+          <Button
+            href={getTxExplorerUrl(activeNetwork.name, 'p', data)}
+            target="_blank"
+            variant="outlined"
+            color="inherit"
+          >
+            View on explorer
+          </Button>
+        )
       );
       navigate('/dac/active');
     },

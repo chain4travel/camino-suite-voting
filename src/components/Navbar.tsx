@@ -41,6 +41,7 @@ const ProposalNavbar = () => (
     paddingX={1.5}
   >
     <NavItem to="active" text="Ongoing proposals" />
+    <NavItem to="creating" text="Creating proposals" />
     <NavItem to="upcoming" text="Upcoming proposals" />
     <NavItem to="completed" text="Completed proposals" />
   </Stack>

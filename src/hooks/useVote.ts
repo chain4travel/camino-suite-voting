@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
+import { BinTools } from '@c4tplatform/caminojs/dist';
 import { VotingOption } from '@/types';
 import useToast from './useToast';
 import useWallet from './useWallet';
@@ -9,7 +10,16 @@ const useSubmitVote = (option?: {
   onSettled?: () => void;
 }) => {
   const toast = useToast();
-  const { pchainAPI, signer } = useWallet();
+  const {
+    pchainAPI,
+    signer,
+    pendingMultisigTx,
+    multisigWallet,
+    tryToSignMultisig,
+    signMultisigTx,
+    abortSignavault,
+    executeMultisigTx,
+  } = useWallet();
   const mutation = useMutation({
     mutationFn: async ({
       proposalId,
@@ -18,30 +28,61 @@ const useSubmitVote = (option?: {
       proposalId: string;
       optionIndex: number;
     }) => {
-      const txs = await pchainAPI.getUTXOs(
-        pchainAPI.keyChain().getAddressStrings()
+      // Non-multisig wallet
+      if (!multisigWallet) {
+        const txs = await pchainAPI.getUTXOs(
+          pchainAPI.keyChain().getAddressStrings()
+        );
+        const unsignedTx = await pchainAPI.buildAddVoteTx(
+          txs.utxos,
+          pchainAPI.keyChain().getAddressStrings(),
+          pchainAPI.keyChain().getAddressStrings(),
+          proposalId,
+          optionIndex,
+          signer.getAddress(),
+          0
+        );
+        const tx = unsignedTx.sign(pchainAPI.keyChain());
+        const txid: string = await pchainAPI.issueTx(tx);
+        return txid;
+      }
+
+      // Multisig Wallet
+      const multisigAlias = BinTools.getInstance().addressToString(
+        multisigWallet.hrp,
+        multisigWallet.pchainId,
+        multisigWallet.keyData.alias
       );
-      const unsignedTx = await pchainAPI.buildAddVoteTx(
+      const txs = await pchainAPI?.getUTXOs([multisigAlias]);
+      const unsignedTx = await pchainAPI?.buildAddVoteTx(
         txs.utxos,
-        pchainAPI.keyChain().getAddressStrings(),
-        pchainAPI.keyChain().getAddressStrings(),
+        [multisigAlias, ...multisigWallet.keyData.owner.addresses],
+        [multisigAlias],
         proposalId,
         optionIndex,
-        signer.getAddress(),
-        0
+        multisigWallet.keyData.alias,
+        0,
+        undefined,
+        undefined,
+        multisigWallet?.keyData.owner.threshold
       );
-      const tx = unsignedTx.sign(pchainAPI.keyChain());
-      const txid: string = await pchainAPI.issueTx(tx);
-      return txid;
+      // - check signavault to get pending Txs
+      tryToSignMultisig && (await tryToSignMultisig(unsignedTx));
     },
     onSuccess:
       (option && option.onSuccess) ||
       (() => toast.success('Successfully voted')),
-    onError: (error, any) => toast.error(`Failed to vote: ${error}`),
+    onError: error => toast.error(`Failed to vote: ${error}`),
     onSettled: option && option.onSettled,
   });
 
-  return mutation;
+  return {
+    submitVote: mutation,
+    pendingMultisigTx,
+    signMultisigTx,
+    abortSignavault,
+    executeMultisigTx,
+  };
 };
 
 const useVote = (onSuccess?: (d: any) => void, onSettled?: () => void) => {
@@ -51,10 +92,16 @@ const useVote = (onSuccess?: (d: any) => void, onSettled?: () => void) => {
   const [confirmedOption, setConfirmedOption] = useState<
     string | number | null
   >(null);
-  const submitVote = useSubmitVote({
+  const {
+    submitVote,
+    pendingMultisigTx,
+    signMultisigTx,
+    abortSignavault,
+    executeMultisigTx,
+  } = useSubmitVote({
     onSuccess,
     onSettled: () => {
-      setTimeout(() => onSettled && onSettled());
+      setTimeout(() => onSettled && onSettled(), 500);
       setConfirmedOption(null);
       setSelectedOption(null);
     },
@@ -66,6 +113,10 @@ const useVote = (onSuccess?: (d: any) => void, onSettled?: () => void) => {
     confirmedOption,
     setConfirmedOption,
     submitVote: submitVote.mutate,
+    pendingMultisigTx,
+    signMultisigTx,
+    abortSignavault,
+    executeMultisigTx,
   };
 };
 export default useVote;

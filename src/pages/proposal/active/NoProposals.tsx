@@ -17,7 +17,7 @@ const NoProposals = ({ type }: NoProposalsProps) => {
     <Wrapper>
       <Box maxWidth="300px" textAlign="center">
         <Typography variant="h6" color="grey.500" sx={{ marginBottom: '8px' }}>
-          {`No ${type} votings`}
+          {`No ${type} proposals`}
         </Typography>
       </Box>
     </Wrapper>

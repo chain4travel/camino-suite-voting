@@ -7,8 +7,9 @@ export interface Network {
   port: number;
   networkId: number; // == id??
   url: string; // provider??
-  explorerUrl: string | undefined;
   ip: string;
+  explorerUrl?: string;
+  signavaultUrl?: string;
 }
 
 export type NetworkStore = {

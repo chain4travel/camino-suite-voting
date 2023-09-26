@@ -9,6 +9,7 @@ import Layout from '@/components/Layout';
 import { votingTypeLoader } from './loaders';
 import Detail from '@/pages/proposal/detail';
 import UpcomingVotings from '@/pages/proposal/upcoming';
+import CreatingProposals from '@/pages/proposal/creating';
 
 export const getRoutes = (queryClient: QueryClient) => {
   const routes = [
@@ -37,9 +38,13 @@ export const getRoutes = (queryClient: QueryClient) => {
           loader: votingTypeLoader(queryClient),
         },
         {
+          path: 'creating',
+          element: <CreatingProposals />,
+          loader: votingTypeLoader(queryClient),
+        },
+        {
           path: 'upcoming',
           element: <UpcomingVotings />,
-          index: true,
           loader: votingTypeLoader(queryClient),
         },
         {

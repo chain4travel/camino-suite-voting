@@ -1,8 +1,14 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
+import { useMemo } from 'react';
 import { DateTime } from 'luxon';
-import { platformvm } from '@c4tplatform/caminojs/dist';
+import { filter, find, map, orderBy } from 'lodash';
+import { BinTools, platformvm } from '@c4tplatform/caminojs/dist';
 import { Serialization } from '@c4tplatform/caminojs/dist/utils/serialization';
-import { KeyPair } from '@c4tplatform/caminojs/dist/apis/platformvm';
+import {
+  KeyPair,
+  PlatformVMConstants,
+} from '@c4tplatform/caminojs/dist/apis/platformvm';
+import { ModelMultisigTx } from '@c4tplatform/signavaultjs';
 import {
   fetchProposalDetail,
   fetchCompletedVotes,
@@ -17,9 +23,9 @@ import {
   ProposalTypes,
   VotingOption,
 } from '@/types';
+import { parseUnsignedTx } from '@/helpers/tx';
 import useWallet from './useWallet';
 import useToast from './useToast';
-import { filter, find, orderBy } from 'lodash';
 import useNetwork from './useNetwork';
 
 const serialization = Serialization.getInstance();
@@ -64,15 +70,15 @@ const parseAPIProposal = (proposal?: APIProposal) => {
 const parseAPIProposals = (
   hrp: string,
   proposals?: APIPRoposalWrapper[],
-  signer?: KeyPair
+  currentWalletAddress?: string
 ) => {
   if (!proposals) return [];
   return proposals.map(proposalWrapper => {
     const proposal = parseAPIProposal(proposalWrapper.dacProposal);
     const votes = proposalWrapper.dacVotes.map(vote => parseAPIVote(vote, hrp));
     let voted;
-    if (signer) {
-      voted = find(votes, { voterAddr: signer.getAddressString() });
+    if (currentWalletAddress) {
+      voted = find(votes, { voterAddr: currentWalletAddress });
       voted = voted?.votedOptions.map((v: number) => ({ option: v }));
     }
 
@@ -97,7 +103,7 @@ const parseAPIVote = (vote: APIVote, hrp: string) => {
   };
 };
 
-export const useActiveVotings = (signer?: KeyPair, page = 0) => {
+export const useActiveVotings = (currentWalletAddress?: string, page = 0) => {
   const { activeNetwork } = useNetwork();
   const { data, isInitialLoading, isLoading, refetch, error } = useQuery(
     ['getActiveVotings', page],
@@ -109,7 +115,7 @@ export const useActiveVotings = (signer?: KeyPair, page = 0) => {
   const proposals = parseAPIProposals(
     activeNetwork?.name ?? 'local',
     data?.data.dacProposals,
-    signer
+    currentWalletAddress
   );
 
   return {
@@ -200,7 +206,7 @@ export const useAddProposal = (
   option?: { onSuccess?: (data: any) => void; onSettled?: (data: any) => void }
 ) => {
   const toast = useToast();
-  const { pchainAPI, signer } = useWallet();
+  const { pchainAPI, signer, multisigWallet, tryToSignMultisig } = useWallet();
   const mutation = useMutation({
     mutationFn: async ({
       startDate,
@@ -229,21 +235,45 @@ export const useAddProposal = (
           throw `Unsupported proposal type: ${proposalType}`;
       }
 
-      const txs = await pchainAPI.getUTXOs(
-        pchainAPI.keyChain().getAddressStrings()
+      // Non-multisig wallet
+      if (!multisigWallet) {
+        const txs = await pchainAPI.getUTXOs(
+          pchainAPI.keyChain().getAddressStrings()
+        );
+        const unsignedTx = await pchainAPI.buildAddProposalTx(
+          txs.utxos,
+          pchainAPI.keyChain().getAddressStrings(),
+          pchainAPI.keyChain().getAddressStrings(),
+          proposal,
+          signer.getAddress(),
+          0,
+          serialization.typeToBuffer(description, 'utf8')
+        );
+        const tx = unsignedTx.sign(pchainAPI.keyChain());
+        const txid: string = await pchainAPI.issueTx(tx);
+        return txid;
+      }
+
+      // Multisig Wallet
+      const multisigAlias = BinTools.getInstance().addressToString(
+        multisigWallet.hrp,
+        multisigWallet.pchainId,
+        multisigWallet.keyData.alias
       );
+      const txs = await pchainAPI?.getUTXOs([multisigAlias]);
       const unsignedTx = await pchainAPI.buildAddProposalTx(
         txs.utxos,
-        pchainAPI.keyChain().getAddressStrings(),
-        pchainAPI.keyChain().getAddressStrings(),
+        [multisigAlias, ...multisigWallet.keyData.owner.addresses],
+        [multisigAlias],
         proposal,
-        signer.getAddress(),
+        multisigWallet.keyData.alias,
         0,
-        serialization.typeToBuffer(description, 'utf8')
+        serialization.typeToBuffer(description, 'utf8'),
+        undefined,
+        multisigWallet.keyData.owner.threshold
       );
-      const tx = unsignedTx.sign(pchainAPI.keyChain());
-      const txid: string = await pchainAPI.issueTx(tx);
-      return txid;
+      // - check signavault to get pending Txs
+      tryToSignMultisig && (await tryToSignMultisig(unsignedTx));
     },
     onSuccess: data => {
       option?.onSuccess
@@ -269,5 +299,62 @@ export const useEligibleCMembers = (proposal: Proposal) => {
     ...proposal,
     error,
     eligibleCMembers: data?.validators,
+  };
+};
+
+export const usePendingMultisigProposals = () => {
+  const {
+    pendingMultisigTx,
+    multisigWallet,
+    signMultisigTx,
+    executeMultisigTx,
+    abortSignavault,
+  } = useWallet();
+
+  const { pendingMultisigAddProposalTxs } = useMemo(() => {
+    let pendingMultisigAddProposalTxs: any[] = [];
+    if (multisigWallet) {
+      pendingMultisigAddProposalTxs = map(
+        pendingMultisigTx,
+        (msigTx: ModelMultisigTx) => {
+          const unsignedTx = parseUnsignedTx(msigTx.unsignedTx);
+          const aliasAddress = BinTools.getInstance().addressToString(
+            multisigWallet.hrp,
+            multisigWallet.pchainId,
+            multisigWallet.keyData.alias
+          );
+          const isCreaterAlias = aliasAddress === msigTx.alias;
+
+          let canExecuteMultisigTx = false;
+          const threshold = msigTx.threshold;
+          if (threshold) {
+            let signers = 0;
+            msigTx.owners.forEach(owner => {
+              if (owner.signature) signers++;
+            });
+            canExecuteMultisigTx = signers >= threshold;
+          }
+          return {
+            ...msigTx,
+            ...unsignedTx,
+            isCreaterAlias,
+            canExecuteMultisigTx,
+          };
+        }
+      ).filter(
+        unsignedTx => unsignedTx.typeId === PlatformVMConstants.ADDPROPOSALTX
+      );
+    }
+
+    return {
+      pendingMultisigAddProposalTxs,
+    };
+  }, [pendingMultisigTx]);
+
+  return {
+    pendingMultisigAddProposalTxs,
+    signMultisigTx,
+    executeMultisigTx,
+    abortSignavault,
   };
 };
