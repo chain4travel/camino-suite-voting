@@ -12,7 +12,7 @@ import { countBy, find } from 'lodash';
 import { ModelMultisigTx } from '@c4tplatform/signavaultjs';
 import Button from '@/components/Button';
 import StateButton from '@/components/StateButton';
-import { Vote, VotingOption } from '@/types';
+import type { PendingMultisigTx, Vote, VotingOption } from '@/types';
 
 interface StyledCardProps {
   active?: boolean;
@@ -51,11 +51,7 @@ interface VotingOptionProps {
   isSubmitting?: boolean;
   selected?: string | number | null;
   children?: ReactNode;
-  pendingMultisigTx?: ModelMultisigTx & {
-    voteOptionIndex?: number;
-    isSigned?: boolean;
-  };
-  canExecuteMultisigTx?: boolean;
+  pendingMultisigTx?: PendingMultisigTx;
   renderContent?: (option: VotingOption) => ReactNode;
   onSelect?: (option: VotingOption | null) => void;
   onVote?: () => void;
@@ -72,7 +68,6 @@ const VotingOptionCard = ({
   isSubmitting,
   selected,
   pendingMultisigTx,
-  canExecuteMultisigTx,
   renderContent,
   onSelect,
   onVote,
@@ -132,19 +127,21 @@ const VotingOptionCard = ({
         <Stack spacing={1} alignItems="flex-start">
           <Button
             variant="contained"
-            color={canExecuteMultisigTx ? 'success' : 'primary'}
+            color={pendingMultisigTx.canExecute ? 'success' : 'primary'}
             sx={{ marginTop: 1.5, py: 1.25, px: 2 }}
             onClick={
-              canExecuteMultisigTx
+              pendingMultisigTx.canExecute
                 ? executePendingMultisigTx
                 : signPendingMultisigTx
             }
             loading={isSubmitting}
             loadingPosition="start"
             startIcon={<CheckCircle />}
-            disabled={pendingMultisigTx.isSigned && !canExecuteMultisigTx}
+            disabled={
+              pendingMultisigTx.isSigned && !pendingMultisigTx.canExecute
+            }
           >
-            {canExecuteMultisigTx
+            {pendingMultisigTx.canExecute
               ? 'Execute the transaction'
               : `Sign the transaction (${signedCount.true ?? 0} / ${
                   pendingMultisigTx.threshold

@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react';
-import { NavLink, useLoaderData } from 'react-router-dom';
-import { FormControlLabel, Stack } from '@mui/material';
-import { ExpandMore } from '@mui/icons-material';
-import { filter } from 'lodash';
+import { useLoaderData } from 'react-router-dom';
+import { FormControlLabel, IconButton, Stack } from '@mui/material';
+import { ExpandMore, Refresh } from '@mui/icons-material';
+import { filter, find } from 'lodash';
 import { useActiveVotings } from '@/hooks/useProposals';
 import useWallet from '@/hooks/useWallet';
 import Header from '@/components/Header';
@@ -11,10 +11,10 @@ import {
   AccordionSummary,
   AccordionDetails,
 } from '@/components/Accordion';
-import Button from '@/components/Button';
 import { ProposalType } from '@/types';
 import Checkbox from '@/components/Checkbox';
 import Paper from '@/components/Paper';
+import { usePendingMultisigAddVoteTxs } from '@/hooks/useMultisig';
 import VotingList from './VotingList';
 import GroupHeader from './GroupHeader';
 import NoProposals from './NoProposals';
@@ -26,6 +26,8 @@ const ActiveVotings = () => {
   const { proposals, error, refetch } = useActiveVotings(
     wallet.currentWalletAddress
   );
+  const { pendingMultisigBaseFeeTxs, refetch: refetchPendingMultisigTxs } =
+    usePendingMultisigAddVoteTxs();
   const groupedProposals = useMemo(() => {
     let filteredProposals = filter(proposals, proposal => !proposal.inactive);
     if (onlyTodo) {
@@ -42,6 +44,10 @@ const ActiveVotings = () => {
         const currentData = result[proposalType.id]
           ? result[proposalType.id].data
           : [];
+        const pendingMultisigTx = find(
+          pendingMultisigBaseFeeTxs,
+          msigTx => msigTx.proposalId === proposal.id
+        );
         return {
           ...result,
           [proposalType.id]: {
@@ -49,7 +55,7 @@ const ActiveVotings = () => {
             typeId: proposal.typeId,
             name: proposalType.name,
             icon: proposalType.icon,
-            data: [...currentData, proposal],
+            data: [...currentData, { ...proposal, pendingMultisigTx }],
           },
         };
       } else {
@@ -65,19 +71,21 @@ const ActiveVotings = () => {
       <Header headline="Ongoing Proposals" variant="h5">
         <Stack direction="row" alignItems="center" spacing={1}>
           {wallet.isConsortiumMember && (
-            <>
-              <FormControlLabel
-                control={<Checkbox />}
-                onChange={(_event, checked) => setOnlyTodo(checked)}
-                label="Show only TODO"
-              />
-              <NavLink to="/dac/create">
-                <Button variant="contained" color="primary">
-                  Create new
-                </Button>
-              </NavLink>
-            </>
+            <FormControlLabel
+              control={<Checkbox />}
+              onChange={(_event, checked) => setOnlyTodo(checked)}
+              label="Show only TODO"
+            />
           )}
+          <IconButton
+            color="inherit"
+            onClick={() => {
+              refetch();
+              refetchPendingMultisigTxs();
+            }}
+          >
+            <Refresh color="inherit" />
+          </IconButton>
         </Stack>
       </Header>
       {Object.entries(groupedProposals).length > 0 ? (

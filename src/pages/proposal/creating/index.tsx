@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react';
-import { useLoaderData } from 'react-router-dom';
-import { ExpandMore } from '@mui/icons-material';
+import { NavLink, useLoaderData, useNavigate } from 'react-router-dom';
+import { ExpandMore, Refresh } from '@mui/icons-material';
+import { IconButton, Stack } from '@mui/material';
 import { omit } from 'lodash';
 import Header from '@/components/Header';
 import { ProposalType } from '@/types';
 import Paper from '@/components/Paper';
 import NoProposals from '../active/NoProposals';
-import { usePendingMultisigProposals } from '@/hooks/useProposals';
 import {
   Accordion,
   AccordionDetails,
@@ -18,15 +18,19 @@ import { getTxExplorerUrl } from '@/helpers/string';
 import useNetwork from '@/hooks/useNetwork';
 import GroupHeader from './GroupHeader';
 import PendingList from './PendingList';
+import useWallet from '@/hooks/useWallet';
+import {
+  useMultisig,
+  usePendingMultisigAddProposalTxs,
+} from '@/hooks/useMultisig';
 
 const CreatingProposals = () => {
+  const navigate = useNavigate();
   const { activeNetwork } = useNetwork();
-  const {
-    pendingMultisigAddProposalTxs,
-    signMultisigTx,
-    executeMultisigTx,
-    abortSignavault,
-  } = usePendingMultisigProposals();
+  const { isConsortiumMember } = useWallet();
+  const { signMultisigTx, executeMultisigTx, abortSignavault } = useMultisig();
+  const { pendingMultisigAddProposalTxs, refetch } =
+    usePendingMultisigAddProposalTxs();
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
   const toast = useToast();
 
@@ -65,11 +69,11 @@ const CreatingProposals = () => {
     }, {});
   }, [pendingMultisigAddProposalTxs]);
 
-  const onVoteTxSuccess = data => {
+  const onAddProposalTxSuccess = (data?: string) => {
     toast.success(
       'Proposal successfully created',
       data,
-      data && (
+      data ? (
         <Button
           href={getTxExplorerUrl(activeNetwork?.name, 'p', data)}
           target="_blank"
@@ -78,8 +82,9 @@ const CreatingProposals = () => {
         >
           View on explorer
         </Button>
-      )
+      ) : undefined
     );
+    navigate('/dac/upcoming');
   };
 
   console.log(
@@ -89,7 +94,20 @@ const CreatingProposals = () => {
 
   return (
     <Paper sx={{ px: 2 }}>
-      <Header headline="Creating Proposals" variant="h5" />
+      <Header headline="Creating Proposals" variant="h5">
+        <Stack direction="row" alignItems="center" spacing={1}>
+          {isConsortiumMember && (
+            <NavLink to="/dac/create">
+              <Button variant="contained" color="primary">
+                Create new
+              </Button>
+            </NavLink>
+          )}
+          <IconButton color="inherit" onClick={() => refetch()}>
+            <Refresh />
+          </IconButton>
+        </Stack>
+      </Header>
       {pendingMultisigAddProposalTxs?.length > 0 ? (
         Object.entries(groupedPendingProposals).map(
           ([proposalType, group]: [string, any]) => (
@@ -111,7 +129,9 @@ const CreatingProposals = () => {
                 <PendingList
                   data={group}
                   signMultisigTx={signMultisigTx}
-                  executeMultisigTx={executeMultisigTx?.(onVoteTxSuccess)}
+                  executeMultisigTx={executeMultisigTx?.(
+                    onAddProposalTxSuccess
+                  )}
                   abortSignavault={abortSignavault}
                 />
               </AccordionDetails>

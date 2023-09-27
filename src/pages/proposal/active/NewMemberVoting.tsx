@@ -54,10 +54,10 @@ const NewMemberVoting = ({
     }
 
     // Multisig pending state
-    const isMultisigPending = !isVoted && data.multisig && data.multisig.voted;
+    const isMultisigPending = !isVoted && data.pendingMultisigTx;
     if (isMultisigPending) {
       const votedOption = find(data.options, {
-        option: data.multisig!.voted.option,
+        option: data.pendingMultisigTx?.voteOptionIndex,
       });
       if (votedOption) {
         const isAccepted = votedOption.value;
@@ -93,7 +93,7 @@ const NewMemberVoting = ({
         </Button>
       ))
       .reverse();
-  }, [voted, data.options, data.multisig]);
+  }, [voted, data.options, data.pendingMultisigTx]);
 
   const confirmVoting =
     (option: VotingOption): MouseEventHandler<HTMLButtonElement> =>

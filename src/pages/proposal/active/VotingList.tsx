@@ -40,7 +40,7 @@ const VotingList = ({ data, isConsortiumMember, refresh }: VotingListProps) => {
                 <ListItemStatus
                   startTimestamp={proposal.startTimestamp}
                   endTimestamp={proposal.endTimestamp}
-                  multisig={proposal.multisig}
+                  pendingMultisigTx={proposal.pendingMultisigTx}
                 />
               </Stack>
             );
@@ -55,7 +55,7 @@ const VotingList = ({ data, isConsortiumMember, refresh }: VotingListProps) => {
                 <ListItemStatus
                   startTimestamp={proposal.startTimestamp}
                   endTimestamp={proposal.endTimestamp}
-                  multisig={proposal.multisig}
+                  pendingMultisigTx={proposal.pendingMultisigTx}
                 />
               </Stack>
             );
@@ -80,7 +80,7 @@ const VotingList = ({ data, isConsortiumMember, refresh }: VotingListProps) => {
                   <ListItemStatus
                     startTimestamp={proposal.startTimestamp}
                     endTimestamp={proposal.endTimestamp}
-                    multisig={proposal.multisig}
+                    pendingMultisigTx={proposal.pendingMultisigTx}
                     stage={applicant.companyStage}
                     industry={applicant.companyIndustry}
                   />

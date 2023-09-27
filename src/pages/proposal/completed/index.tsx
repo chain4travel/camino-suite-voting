@@ -2,11 +2,13 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useLoaderData, useNavigate } from 'react-router-dom';
 import {
   FormControlLabel,
+  IconButton,
   List,
   ListItemButton,
   RadioGroup,
   Stack,
 } from '@mui/material';
+import { Refresh } from '@mui/icons-material';
 import Header from '@/components/Header';
 import Button from '@/components/Button';
 import { Proposal, ProposalType, ProposalTypes } from '@/types';
@@ -36,7 +38,7 @@ const CompletedVotes = () => {
     startTime?: DateTime | null;
     endTime?: DateTime | null;
   }>({ startTime: null, endTime: null });
-  const { proposals, error, isLoading } = useCompletedVotes(
+  const { proposals, error, isLoading, refetch } = useCompletedVotes(
     Object.values(ProposalTypes).indexOf(votingType),
     filter.startTime?.toUTC().toISO(),
     filter.endTime?.toUTC().toISO()
@@ -105,7 +107,11 @@ const CompletedVotes = () => {
 
   return (
     <Paper sx={{ px: 2 }}>
-      <Header headline="Completed Proposals" variant="h5" />
+      <Header headline="Completed Proposals" variant="h5">
+        <IconButton color="inherit" onClick={() => refetch()}>
+          <Refresh />
+        </IconButton>
+      </Header>
       <Stack spacing="16px">
         <Stack direction="row" spacing="12px">
           <DatePicker

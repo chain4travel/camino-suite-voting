@@ -9,8 +9,10 @@ import {
   KeyChain as PlatformKeyChain,
   KeyPair as PlatformKeyPair,
   Owner,
+  Proposal,
 } from '@c4tplatform/caminojs/dist/apis/platformvm';
 import { KeyChain as EVMKeyChain } from '@c4tplatform/caminojs/dist/apis/evm';
+import { ModelMultisigTx } from '@c4tplatform/signavaultjs';
 
 export type WalletType = 'singleton' | 'multisig';
 
@@ -76,3 +78,18 @@ export type MultisigWallet = WalletCore & {
 };
 
 export type Wallet = SingletonWallet | MultisigWallet;
+
+export type PendingMultisigTx = ModelMultisigTx & {
+  typeId: number;
+  proposalId: string;
+  voteOptionIndex: number;
+  canExecute?: boolean;
+  isSigned?: boolean;
+  isCreaterAlias?: boolean;
+  proposal?: Proposal;
+};
+
+export type WalletStore = {
+  pendingMultisigTxs: PendingMultisigTx[];
+  setPendingMultisigTxs: (pendingMultisigTxs: PendingMultisigTx[]) => void;
+};

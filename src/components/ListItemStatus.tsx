@@ -1,13 +1,14 @@
 import React from 'react';
 import { DateTime } from 'luxon';
 import { ChipProps, Stack } from '@mui/material';
-import { MultisigVote } from '@/types';
+import { PendingMultisigTx } from '@/types';
 import Tag from './Tag';
+import { countBy } from 'lodash';
 
 interface ListItemStatusProps extends ChipProps {
   startTimestamp?: number;
   endTimestamp?: number;
-  multisig?: MultisigVote;
+  pendingMultisigTx?: PendingMultisigTx;
   stage?: string;
   industry?: string;
   status?: string;
@@ -15,7 +16,7 @@ interface ListItemStatusProps extends ChipProps {
 const ListItemStatus = ({
   startTimestamp,
   endTimestamp,
-  multisig,
+  pendingMultisigTx,
   stage,
   industry,
   status,
@@ -36,13 +37,18 @@ const ListItemStatus = ({
             .toFormat("dd'd' hh'h' mm'm'");
   }
 
+  let signedCount = 0;
+  if (pendingMultisigTx) {
+    signedCount =
+      countBy(pendingMultisigTx.owners, o => !!o.signature).true ?? 0;
+  }
   return (
     <Stack direction="row" alignItems="center" spacing={1}>
       {duration && <Tag {...props} label={duration} />}
-      {multisig && multisig.voted?.count && (
+      {pendingMultisigTx && (
         <Tag
           color="warning"
-          label={`${multisig.voted?.count} / ${multisig.threshold} PENDING`}
+          label={`${signedCount} / ${pendingMultisigTx.threshold} PENDING`}
         />
       )}
       {stage && <Tag color="success" label={stage.toUpperCase()} />}

@@ -1,4 +1,5 @@
 import { ReactElement } from 'react';
+import { PendingMultisigTx } from './wallet';
 
 export enum ProposalTypes {
   BaseFee = 'Base Fee',
@@ -96,7 +97,7 @@ export type Proposal = {
   description?: string;
   forumLink?: string;
   target?: string | Applicant;
-  multisig?: MultisigVote;
+  pendingMultisigTx?: PendingMultisigTx;
   seq?: number;
 };
 export type Group = {

@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useLoaderData } from 'react-router-dom';
-import { ExpandMore } from '@mui/icons-material';
+import { ExpandMore, Refresh } from '@mui/icons-material';
+import { IconButton } from '@mui/material';
 import { useUpcomingVotings } from '@/hooks/useProposals';
 import Header from '@/components/Header';
 import {
@@ -16,7 +17,7 @@ import NoProposals from '../active/NoProposals';
 
 const UpcomingVotings = () => {
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
-  const { proposals, error, isLoading } = useUpcomingVotings();
+  const { proposals, error, refetch } = useUpcomingVotings();
   const groupedProposals = useMemo(() => {
     return proposals.reduce((result: any, proposal: any) => {
       const proposalType = proposalTypes.find(
@@ -46,7 +47,11 @@ const UpcomingVotings = () => {
   }, [proposals]);
   return (
     <Paper sx={{ px: 2 }}>
-      <Header headline="Upcoming Proposals" variant="h5" />
+      <Header headline="Upcoming Proposals" variant="h5">
+        <IconButton color="inherit" onClick={() => refetch()}>
+          <Refresh />
+        </IconButton>
+      </Header>
       {Object.entries(groupedProposals ?? {}).length > 0 ? (
         Object.entries(groupedProposals ?? {}).map(
           ([proposalType, group]: [string, any]) => (

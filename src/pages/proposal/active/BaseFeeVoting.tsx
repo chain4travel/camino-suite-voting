@@ -1,9 +1,7 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Stack, Typography } from '@mui/material';
 import Big from 'big.js';
-import { findIndex, map } from 'lodash';
-import { PlatformVMConstants } from '@c4tplatform/caminojs/dist/apis/platformvm';
-import { ModelMultisigTx } from '@c4tplatform/signavaultjs';
+import { findIndex } from 'lodash';
 import type { Proposal, VotingOption } from '@/types';
 import { useBaseFee } from '@/hooks/useRpc';
 import useVote from '@/hooks/useVote';
@@ -12,7 +10,7 @@ import Button from '@/components/Button';
 import { getTxExplorerUrl } from '@/helpers/string';
 import useNetwork from '@/hooks/useNetwork';
 import VotingOptionCard from './VotingOptionCard';
-import { parseUnsignedTx } from '@/helpers/tx';
+import { useMultisig } from '@/hooks/useMultisig';
 
 interface BaseFeeVotingProps {
   data: Proposal;
@@ -26,20 +24,20 @@ const BaseFeeVoting = ({
 }: BaseFeeVotingProps) => {
   const toast = useToast();
   const { activeNetwork } = useNetwork();
-  const onVoteTxSuccess = data => {
+  const onVoteTxSuccess = (data?: string) => {
     toast.success(
       'Successfully voted',
       data,
-      data && (
+      data ? (
         <Button
-          href={getTxExplorerUrl(activeNetwork.name, 'p', data)}
+          href={getTxExplorerUrl(activeNetwork?.name, 'p', data)}
           target="_blank"
           variant="outlined"
           color="inherit"
         >
           View on explorer
         </Button>
-      )
+      ) : undefined
     );
   };
   const {
@@ -48,41 +46,9 @@ const BaseFeeVoting = ({
     confirmedOption,
     setConfirmedOption,
     submitVote,
-    pendingMultisigTx,
-    signMultisigTx,
-    abortSignavault,
-    executeMultisigTx,
   } = useVote(onVoteTxSuccess, refresh);
+  const { signMultisigTx, abortSignavault, executeMultisigTx } = useMultisig();
   const { baseFee } = useBaseFee();
-
-  const { pendingMultisigBaseFeeTx, canExecuteMultisigTx } = useMemo(() => {
-    const pendingMultisigBaseFeeTx = map(
-      pendingMultisigTx,
-      (msigTx: ModelMultisigTx) => {
-        const unsignedTx = parseUnsignedTx(msigTx.unsignedTx);
-        return { ...msigTx, ...unsignedTx };
-      }
-    ).find(
-      unsignedTx =>
-        unsignedTx.typeId === PlatformVMConstants.ADDVOTETX &&
-        unsignedTx.proposalId === data.id
-    );
-
-    let canExecuteMultisigTx = false;
-    const threshold = pendingMultisigBaseFeeTx?.threshold;
-    if (threshold) {
-      let signers = 0;
-      pendingMultisigBaseFeeTx?.owners.forEach(owner => {
-        if (owner.signature) signers++;
-      });
-      canExecuteMultisigTx = signers >= threshold;
-    }
-
-    return {
-      pendingMultisigBaseFeeTx,
-      canExecuteMultisigTx,
-    };
-  }, [pendingMultisigTx]);
 
   const handleSelectChange = (option: VotingOption | null) => {
     setSelectedOption(
@@ -129,10 +95,9 @@ const BaseFeeVoting = ({
             onSelect={handleSelectChange}
             onVote={() => handleConfirmToVote(opt)}
             isSubmitting={confirmedOption === opt.option}
-            pendingMultisigTx={pendingMultisigBaseFeeTx}
+            pendingMultisigTx={data.pendingMultisigTx}
             signMultisigTx={signMultisigTx}
             abortSignavault={abortSignavault}
-            canExecuteMultisigTx={canExecuteMultisigTx}
             executeMultisigTx={executeMultisigTx?.(txId => {
               onVoteTxSuccess(txId);
               setTimeout(() => refresh?.(), 500);

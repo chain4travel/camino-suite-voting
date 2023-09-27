@@ -25,16 +25,10 @@ export const parseUnsignedTx = (tx: string) => {
         proposal = proposalPayload.getProposal();
         proposal.startTimestamp = proposal.getStart().readInt32BE(4);
         proposal.endTimestamp = proposal.getEnd().readInt32BE(4);
-        proposal.options = proposal
-          .getOptions()
-          .map((opt, idx) => ({
-            option: idx,
-            value: opt.bytes.readInt32BE(4),
-          }));
-        console.log(
-          '@@@@@',
-          Object.values(ProposalTypes).indexOf(ProposalTypes.BaseFee)
-        );
+        proposal.options = proposal.getOptions().map((opt, idx) => ({
+          option: idx,
+          value: opt.bytes.readInt32BE(4),
+        }));
         proposal.type = ProposalTypes.BaseFee;
         proposal.typeId = Object.values(ProposalTypes).indexOf(
           ProposalTypes.BaseFee
