@@ -2,13 +2,11 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useLoaderData, useNavigate } from 'react-router-dom';
 import {
   FormControlLabel,
-  IconButton,
   List,
   ListItemButton,
   RadioGroup,
   Stack,
 } from '@mui/material';
-import { Refresh } from '@mui/icons-material';
 import Header from '@/components/Header';
 import Button from '@/components/Button';
 import { Proposal, ProposalType, ProposalTypes } from '@/types';
@@ -27,6 +25,7 @@ import { useVotingTypeStore } from '@/store';
 import Paper from '@/components/Paper';
 import { DateTime } from 'luxon';
 import NoProposals from '../active/NoProposals';
+import RefreshButton from '@/components/RefreshButton';
 
 const CompletedVotes = () => {
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
@@ -38,7 +37,7 @@ const CompletedVotes = () => {
     startTime?: DateTime | null;
     endTime?: DateTime | null;
   }>({ startTime: null, endTime: null });
-  const { proposals, error, isLoading, refetch } = useCompletedVotes(
+  const { proposals, error, isFetching, refetch } = useCompletedVotes(
     Object.values(ProposalTypes).indexOf(votingType),
     filter.startTime?.toUTC().toISO(),
     filter.endTime?.toUTC().toISO()
@@ -108,9 +107,7 @@ const CompletedVotes = () => {
   return (
     <Paper sx={{ px: 2 }}>
       <Header headline="Completed Proposals" variant="h5">
-        <IconButton color="inherit" onClick={() => refetch()}>
-          <Refresh />
-        </IconButton>
+        <RefreshButton loading={isFetching} onRefresh={refetch} />
       </Header>
       <Stack spacing="16px">
         <Stack direction="row" spacing="12px">
@@ -133,7 +130,8 @@ const CompletedVotes = () => {
             color="primary"
             sx={{ minWidth: '100px' }}
             onClick={() => submitFilter()}
-            loading={isLoading}
+            loading={isFetching}
+            loadingPosition="start"
           >
             Apply
           </Button>

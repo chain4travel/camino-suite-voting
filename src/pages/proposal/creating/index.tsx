@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { NavLink, useLoaderData, useNavigate } from 'react-router-dom';
-import { ExpandMore, Refresh } from '@mui/icons-material';
-import { IconButton, Stack } from '@mui/material';
+import { ExpandMore } from '@mui/icons-material';
+import { Stack } from '@mui/material';
 import { omit } from 'lodash';
 import Header from '@/components/Header';
 import { ProposalType } from '@/types';
@@ -23,13 +23,14 @@ import {
   useMultisig,
   usePendingMultisigAddProposalTxs,
 } from '@/hooks/useMultisig';
+import RefreshButton from '@/components/RefreshButton';
 
 const CreatingProposals = () => {
   const navigate = useNavigate();
   const { activeNetwork } = useNetwork();
   const { isConsortiumMember } = useWallet();
   const { signMultisigTx, executeMultisigTx, abortSignavault } = useMultisig();
-  const { pendingMultisigAddProposalTxs, refetch } =
+  const { pendingMultisigAddProposalTxs, refetch, isFetching } =
     usePendingMultisigAddProposalTxs();
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
   const toast = useToast();
@@ -89,7 +90,8 @@ const CreatingProposals = () => {
 
   console.log(
     '@CreatingProposals: groupedPendingProposals',
-    groupedPendingProposals
+    groupedPendingProposals,
+    isFetching
   );
 
   return (
@@ -103,9 +105,7 @@ const CreatingProposals = () => {
               </Button>
             </NavLink>
           )}
-          <IconButton color="inherit" onClick={() => refetch()}>
-            <Refresh />
-          </IconButton>
+          <RefreshButton loading={isFetching} onRefresh={refetch} />
         </Stack>
       </Header>
       {pendingMultisigAddProposalTxs?.length > 0 ? (

@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import { useLoaderData } from 'react-router-dom';
-import { ExpandMore, Refresh } from '@mui/icons-material';
-import { IconButton } from '@mui/material';
+import { ExpandMore } from '@mui/icons-material';
 import { useUpcomingVotings } from '@/hooks/useProposals';
 import Header from '@/components/Header';
 import {
@@ -11,13 +10,14 @@ import {
 } from '@/components/Accordion';
 import { ProposalType } from '@/types';
 import Paper from '@/components/Paper';
+import RefreshButton from '@/components/RefreshButton';
 import VotingList from '../active/VotingList';
 import GroupHeader from './GroupHeader';
 import NoProposals from '../active/NoProposals';
 
 const UpcomingVotings = () => {
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
-  const { proposals, error, refetch } = useUpcomingVotings();
+  const { proposals, error, refetch, isFetching } = useUpcomingVotings();
   const groupedProposals = useMemo(() => {
     return proposals.reduce((result: any, proposal: any) => {
       const proposalType = proposalTypes.find(
@@ -48,9 +48,7 @@ const UpcomingVotings = () => {
   return (
     <Paper sx={{ px: 2 }}>
       <Header headline="Upcoming Proposals" variant="h5">
-        <IconButton color="inherit" onClick={() => refetch()}>
-          <Refresh />
-        </IconButton>
+        <RefreshButton loading={isFetching} onRefresh={refetch} />
       </Header>
       {Object.entries(groupedProposals ?? {}).length > 0 ? (
         Object.entries(groupedProposals ?? {}).map(

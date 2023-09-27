@@ -39,7 +39,7 @@ export const usePendingMultisigTx = () => {
     );
   }
 
-  const { data, error, refetch } = useQuery({
+  const { data, error, refetch, isFetching } = useQuery({
     queryKey: ['getPendingMultisigTxs', alias],
     queryFn: async () => {
       if (alias && multisigWallet && signer) {
@@ -82,6 +82,7 @@ export const usePendingMultisigTx = () => {
         return pendingTxs;
       }
     },
+    refetchOnWindowFocus: false,
   });
 
   return {
@@ -89,11 +90,13 @@ export const usePendingMultisigTx = () => {
     alias,
     error,
     refetch,
+    isFetching,
   };
 };
 
 export const usePendingMultisigAddProposalTxs = () => {
-  const { pendingMultisigTxs, alias, refetch } = usePendingMultisigTx();
+  const { pendingMultisigTxs, alias, refetch, isFetching } =
+    usePendingMultisigTx();
 
   let pendingMultisigAddProposalTxs: PendingMultisigTx[] = [];
   if (pendingMultisigTxs) {
@@ -127,11 +130,12 @@ export const usePendingMultisigAddProposalTxs = () => {
   return {
     pendingMultisigAddProposalTxs,
     refetch,
+    isFetching,
   };
 };
 
 export const usePendingMultisigAddVoteTxs = () => {
-  const { pendingMultisigTxs, refetch } = usePendingMultisigTx();
+  const { pendingMultisigTxs, refetch, isFetching } = usePendingMultisigTx();
 
   const pendingMultisigBaseFeeTxs = useMemo(() => {
     const pendingMultisigBaseFeeTxs: PendingMultisigTx[] = map(
@@ -157,6 +161,7 @@ export const usePendingMultisigAddVoteTxs = () => {
   return {
     pendingMultisigBaseFeeTxs,
     refetch,
+    isFetching,
   };
 };
 

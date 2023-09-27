@@ -100,13 +100,17 @@ const parseAPIVote = (vote: APIVote, hrp: string) => {
 
 export const useActiveVotings = (currentWalletAddress?: string, page = 0) => {
   const { activeNetwork } = useNetwork();
-  const { data, isInitialLoading, isLoading, refetch, error } = useQuery(
+  const { data, isInitialLoading, isFetching, refetch, error } = useQuery(
     ['getActiveVotings', page],
     async () => fetchActiveVotings(page),
-    { notifyOnChangeProps: ['data', 'error'] }
+    { notifyOnChangeProps: ['data', 'error'], refetchOnWindowFocus: false }
   );
 
-  console.debug('useActiveVotings isInitialLoading: ', isInitialLoading);
+  console.debug(
+    'useActiveVotings isInitialLoading: ',
+    isInitialLoading,
+    isFetching
+  );
   const proposals = parseAPIProposals(
     activeNetwork?.name ?? 'local',
     data?.data.dacProposals,
@@ -114,7 +118,7 @@ export const useActiveVotings = (currentWalletAddress?: string, page = 0) => {
   );
 
   return {
-    isLoading,
+    isFetching,
     isInitialLoading,
     error,
     refetch,
@@ -123,14 +127,14 @@ export const useActiveVotings = (currentWalletAddress?: string, page = 0) => {
 };
 
 export const useUpcomingVotings = (page = 0) => {
-  const { proposals, isLoading, error, refetch } = useActiveVotings(
+  const { proposals, isFetching, error, refetch } = useActiveVotings(
     undefined,
     page
   );
   const upcomings = filter(proposals, proposal => proposal.inactive);
   return {
     proposals: upcomings,
-    isLoading,
+    isFetching,
     error,
     refetch,
   };
@@ -143,7 +147,7 @@ export const useCompletedVotes = (
   page = 0
 ) => {
   const { activeNetwork } = useNetwork();
-  const { data, isLoading, error, refetch } = useQuery(
+  const { data, isFetching, error, refetch } = useQuery(
     ['getCompletedVotes', type, startTime, endTime, page],
     async () => fetchCompletedVotes(type, startTime, endTime),
     {
@@ -163,7 +167,7 @@ export const useCompletedVotes = (
       seq: sortedProposals.length - idx,
     })),
     error,
-    isLoading,
+    isFetching,
     refetch,
   };
 };

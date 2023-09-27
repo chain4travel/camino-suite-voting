@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useLoaderData } from 'react-router-dom';
-import { FormControlLabel, IconButton, Stack } from '@mui/material';
-import { ExpandMore, Refresh } from '@mui/icons-material';
+import { FormControlLabel, Stack } from '@mui/material';
+import { ExpandMore } from '@mui/icons-material';
 import { filter, find } from 'lodash';
 import { useActiveVotings } from '@/hooks/useProposals';
 import useWallet from '@/hooks/useWallet';
@@ -14,6 +14,7 @@ import {
 import { ProposalType } from '@/types';
 import Checkbox from '@/components/Checkbox';
 import Paper from '@/components/Paper';
+import RefreshButton from '@/components/RefreshButton';
 import { usePendingMultisigAddVoteTxs } from '@/hooks/useMultisig';
 import VotingList from './VotingList';
 import GroupHeader from './GroupHeader';
@@ -23,11 +24,14 @@ const ActiveVotings = () => {
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
   const wallet = useWallet();
   const [onlyTodo, setOnlyTodo] = useState(false);
-  const { proposals, error, refetch } = useActiveVotings(
+  const { proposals, error, refetch, isFetching } = useActiveVotings(
     wallet.currentWalletAddress
   );
-  const { pendingMultisigBaseFeeTxs, refetch: refetchPendingMultisigTxs } =
-    usePendingMultisigAddVoteTxs();
+  const {
+    pendingMultisigBaseFeeTxs,
+    refetch: refetchPendingMultisigTxs,
+    isFetching: isFetchingPendingMultisigTxs,
+  } = usePendingMultisigAddVoteTxs();
   const groupedProposals = useMemo(() => {
     let filteredProposals = filter(proposals, proposal => !proposal.inactive);
     if (onlyTodo) {
@@ -77,15 +81,13 @@ const ActiveVotings = () => {
               label="Show only TODO"
             />
           )}
-          <IconButton
-            color="inherit"
-            onClick={() => {
+          <RefreshButton
+            loading={isFetching || isFetchingPendingMultisigTxs}
+            onRefresh={() => {
               refetch();
               refetchPendingMultisigTxs();
             }}
-          >
-            <Refresh color="inherit" />
-          </IconButton>
+          />
         </Stack>
       </Header>
       {Object.entries(groupedProposals).length > 0 ? (
