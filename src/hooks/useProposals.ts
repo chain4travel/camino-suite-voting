@@ -103,7 +103,7 @@ export const useActiveVotings = (currentWalletAddress?: string, page = 0) => {
   const { data, isInitialLoading, isFetching, refetch, error } = useQuery(
     ['getActiveVotings', page],
     async () => fetchActiveVotings(page),
-    { notifyOnChangeProps: ['data', 'error'], refetchOnWindowFocus: false }
+    { notifyOnChangeProps: ['data', 'error'] }
   );
 
   console.debug(

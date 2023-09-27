@@ -13,7 +13,6 @@ import {
   KeyChain,
   PlatformVMConstants,
   UnsignedTx as PlatformUnsignedTx,
-  BaseFeeProposal,
 } from '@c4tplatform/caminojs/dist/apis/platformvm';
 import useWallet from './useWallet';
 import useToast from './useToast';
@@ -82,7 +81,6 @@ export const usePendingMultisigTx = () => {
         return pendingTxs;
       }
     },
-    refetchOnWindowFocus: false,
   });
 
   return {
