@@ -89,7 +89,7 @@ const EssentialForm = ({
           </Button>
         )
       );
-      navigate('/dac/active');
+      navigate('/dac/upcoming');
     },
   });
 
