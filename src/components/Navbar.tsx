@@ -70,11 +70,7 @@ const ProposalNavbar = () => {
           ? `${pendingAddProposalCount} pending`
           : undefined,
       pendingAddVotes:
-        pendingAddVoteCount > 0
-          ? pendingAddVoteCount > 1
-            ? `${pendingAddVoteCount} votes`
-            : '1 vote'
-          : undefined,
+        pendingAddVoteCount > 0 ? `${pendingAddVoteCount} pending` : undefined,
     };
   }, [pendingMultisigTxs]);
   return (

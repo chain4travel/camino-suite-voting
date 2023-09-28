@@ -102,8 +102,8 @@ export const useActiveVotings = (currentWalletAddress?: string, page = 0) => {
   const { activeNetwork } = useNetwork();
   const { data, isInitialLoading, isFetching, refetch, error } = useQuery(
     ['getActiveVotings', page],
-    async () => fetchActiveVotings(page),
-    { notifyOnChangeProps: ['data', 'error'] }
+    async () => fetchActiveVotings(page)
+    // { notifyOnChangeProps: ['data', 'error'] }
   );
 
   console.debug(
@@ -152,7 +152,7 @@ export const useCompletedVotes = (
     async () => fetchCompletedVotes(type, startTime, endTime),
     {
       refetchOnWindowFocus: false,
-      notifyOnChangeProps: ['data', 'error'],
+      // notifyOnChangeProps: ['data', 'error'],
     }
   );
   const proposals = parseAPIProposals(
