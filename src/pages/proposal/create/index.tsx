@@ -25,7 +25,7 @@ import GrantProgramForm, { grantProgramFormSchema } from './GrantProgramForm';
 import useWallet from '@/hooks/useWallet';
 
 const CreateNewVoting = () => {
-  const { signer } = useWallet();
+  const { signer, pchainAPI } = useWallet();
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
   const [selectedProposalType, setSelectedProposalType] = useState<number>(-1);
 
@@ -43,11 +43,11 @@ const CreateNewVoting = () => {
         break;
       case ProposalTypes.NewMember:
         ProposalForm = <NewMemberForm />;
-        formSchema = newMemberFormSchema;
+        formSchema = newMemberFormSchema(pchainAPI);
         break;
       case ProposalTypes.ExcludeMember:
         ProposalForm = <ExcludeMemberVoting />;
-        formSchema = excludeMemberFormSchema;
+        formSchema = excludeMemberFormSchema(pchainAPI);
         break;
       case ProposalTypes.FeeDistribution:
         ProposalForm = <FeeDistributionForm />;
@@ -73,11 +73,11 @@ const CreateNewVoting = () => {
     }
   }, [signer]);
 
-  const handleChange = (event: SelectChangeEvent<string>) => {
+  const handleChange = (event: SelectChangeEvent<number>) => {
     const {
       target: { value },
     } = event;
-    setSelectedProposalType(value);
+    setSelectedProposalType(Number(value));
   };
 
   return (

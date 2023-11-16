@@ -12,6 +12,7 @@ import { AddCircle, DeleteForever } from '@mui/icons-material';
 import { Controller, useFormContext, useFieldArray } from 'react-hook-form';
 import { z } from 'zod';
 import Big from 'big.js';
+import { uniqBy } from 'lodash';
 import { useBaseFee } from '@/hooks/useRpc';
 import useToast from '@/hooks/useToast';
 import TextEditor from '@/components/TextEditor';
@@ -19,33 +20,34 @@ import Header from '@/components/Header';
 import Paragraph from '@/components/Paragraph';
 import { VotingOption } from '@/types';
 import FormSection from './FormSection';
-import { filter, includes, uniqBy } from 'lodash';
 
 const MAX_OPTIONS = 3;
 export const baseFeeFormSchema = {
-  description: z.string().optional(),
-  votingOptions: z
-    .array(
-      z.custom<VotingOption>().refine(
-        d => {
-          const value = Number(d.value);
-          return typeof value === 'number' && value > 0;
-        },
-        { message: 'invalid base fee' }
+  schema: {
+    description: z.string().optional(),
+    votingOptions: z
+      .array(
+        z.custom<VotingOption>().refine(
+          d => {
+            const value = Number(d.value);
+            return typeof value === 'number' && value > 0;
+          },
+          { message: 'invalid base fee' }
+        )
       )
-    )
-    .min(1, 'you must add at least one option')
-    .refine(
-      options => {
-        const uniques = uniqBy(options, 'value');
-        return uniques.length === options.length;
-      },
-      {
-        message: 'each option should be different value',
-      }
-    ),
+      .min(1, 'you must add at least one option')
+      .refine(
+        options => {
+          const uniques = uniqBy(options, 'value');
+          return uniques.length === options.length;
+        },
+        {
+          message: 'each option should be different value',
+        }
+      ),
+  },
 };
-const schema = z.object(baseFeeFormSchema);
+const schema = z.object(baseFeeFormSchema.schema);
 type BaseFeeFormSchema = z.infer<typeof schema>;
 
 const BaseFeeForm = () => {

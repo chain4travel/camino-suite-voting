@@ -3,10 +3,10 @@ import { NavLink, useLoaderData, useNavigate } from 'react-router-dom';
 import { ExpandMore } from '@mui/icons-material';
 import { Stack } from '@mui/material';
 import { omit } from 'lodash';
+import NoProposals from '../active/NoProposals';
 import Header from '@/components/Header';
 import { ProposalType } from '@/types';
 import Paper from '@/components/Paper';
-import NoProposals from '../active/NoProposals';
 import {
   Accordion,
   AccordionDetails,
@@ -15,10 +15,10 @@ import {
 import useToast from '@/hooks/useToast';
 import Button from '@/components/Button';
 import { getTxExplorerUrl } from '@/helpers/string';
+import useWallet from '@/hooks/useWallet';
 import useNetwork from '@/hooks/useNetwork';
 import GroupHeader from './GroupHeader';
 import PendingList from './PendingList';
-import useWallet from '@/hooks/useWallet';
 import {
   useMultisig,
   usePendingMultisigAddProposalTxs,
@@ -128,11 +128,12 @@ const CreatingProposals = () => {
               <AccordionDetails style={{ padding: 0 }}>
                 <PendingList
                   data={group}
-                  signMultisigTx={signMultisigTx}
-                  executeMultisigTx={executeMultisigTx?.(
-                    onAddProposalTxSuccess
-                  )}
-                  abortSignavault={abortSignavault}
+                  multisigFunctions={{
+                    signMultisigTx,
+                    abortSignavault,
+                    executeMultisigTx,
+                  }}
+                  onTxSuccess={onAddProposalTxSuccess}
                 />
               </AccordionDetails>
             </Accordion>

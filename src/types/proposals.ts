@@ -3,9 +3,9 @@ import { PendingMultisigTx } from './wallet';
 
 export enum ProposalTypes {
   BaseFee = 'Base Fee',
-  General = 'General Proposal',
   NewMember = 'Admittance of new consortium members',
   ExcludeMember = 'Exlusion of consortium member',
+  General = 'General Proposal',
   FeeDistribution = 'Transaction Fee Distribution',
   GrantProgram = 'TAKEOFF Camino Grant Program',
 }
@@ -75,7 +75,12 @@ export type APIProposal = {
   memo: string;
   status: number;
   blockHeight: number;
+  applicantAddr?: string;
   outcome?: number;
+  data?: {
+    applicantAddr?: string;
+    memberAddr?: string;
+  };
 };
 export type Proposal = {
   id: string;
@@ -90,7 +95,7 @@ export type Proposal = {
   blockHeight: number;
   outcome?: number;
   result?: Vote[];
-  voted?: Vote[];
+  voted?: VotingOption[];
   votes?: Vote[];
   inactive?: boolean;
   isCompleted?: boolean;

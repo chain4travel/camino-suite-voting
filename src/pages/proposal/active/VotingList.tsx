@@ -8,6 +8,11 @@ import ListItemStatus from '@/components/ListItemStatus';
 import ExcludeMemberVoting from './ExcludeMemberVoting';
 import FeeDistributionVoting from './FeeDistributionVoting';
 import GrantProgramVoting from './GrantProgram';
+import useToast from '@/hooks/useToast';
+import useNetwork from '@/hooks/useNetwork';
+import Button from '@/components/Button';
+import { getTxExplorerUrl } from '@/helpers/string';
+import { useMultisig } from '@/hooks/useMultisig';
 
 interface VotingListProps {
   data: { type: string; typeId: number; name: string; data: Proposal[] };
@@ -16,6 +21,30 @@ interface VotingListProps {
 }
 const VotingList = ({ data, isConsortiumMember, refresh }: VotingListProps) => {
   const navigate = useNavigate();
+  const toast = useToast();
+  const { activeNetwork } = useNetwork();
+  const { signMultisigTx, abortSignavault, executeMultisigTx } = useMultisig();
+  const onVoteTxSuccess = (data?: string) => {
+    toast.success(
+      'Successfully voted',
+      data,
+      data ? (
+        <Button
+          href={getTxExplorerUrl(activeNetwork?.name, 'p', data)}
+          target="_blank"
+          variant="outlined"
+          color="inherit"
+        >
+          View on explorer
+        </Button>
+      ) : undefined
+    );
+  };
+  const multisigFunctions = {
+    signMultisigTx,
+    abortSignavault,
+    executeMultisigTx,
+  };
   return (
     <List disablePadding>
       {data.data.map((proposal: Proposal, index: number) => {
@@ -27,6 +56,8 @@ const VotingList = ({ data, isConsortiumMember, refresh }: VotingListProps) => {
                 data={proposal}
                 isConsortiumMember={isConsortiumMember}
                 refresh={refresh}
+                onVoteSuccess={onVoteTxSuccess}
+                multisigFunctions={multisigFunctions}
               />
             );
             break;
@@ -36,6 +67,9 @@ const VotingList = ({ data, isConsortiumMember, refresh }: VotingListProps) => {
                 <NewMemberVoting
                   data={proposal}
                   isConsortiumMember={isConsortiumMember}
+                  refresh={refresh}
+                  onVoteSuccess={onVoteTxSuccess}
+                  multisigFunctions={multisigFunctions}
                 />
                 <ListItemStatus
                   startTimestamp={proposal.startTimestamp}
@@ -51,6 +85,9 @@ const VotingList = ({ data, isConsortiumMember, refresh }: VotingListProps) => {
                 <ExcludeMemberVoting
                   data={proposal}
                   isConsortiumMember={isConsortiumMember}
+                  refresh={refresh}
+                  onVoteSuccess={onVoteTxSuccess}
+                  multisigFunctions={multisigFunctions}
                 />
                 <ListItemStatus
                   startTimestamp={proposal.startTimestamp}

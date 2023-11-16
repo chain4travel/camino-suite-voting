@@ -4,6 +4,7 @@ import { useLoaderData, useNavigate, useParams } from 'react-router-dom';
 import { find, countBy, reduce, filter, map } from 'lodash';
 import { DateTime } from 'luxon';
 import Big from 'big.js';
+import sanitizeHtml from 'sanitize-html';
 
 import {
   Statistics,
@@ -30,12 +31,7 @@ const Detail = () => {
   const wallet = useWallet();
   const { type, id } = useParams();
   const navigate = useNavigate();
-  const {
-    proposal,
-    error: _error,
-    isLoading: _isLoading,
-    refetch,
-  } = useProposal(id!, wallet.signer);
+  const { proposal, refetch } = useProposal(id!, wallet.currentWalletAddress);
   const { baseFee } = useBaseFee();
   const { feeDistribution } = useFeeDistribution();
   const proposalWithEligibles = useEligibleCMembers(proposal as Proposal);
@@ -161,15 +157,20 @@ const Detail = () => {
         </Button>
       </Stack>
       <Container>
-        <Stack direction="row" spacing={4} alignItems="flex-start">
+        <Stack
+          direction="row"
+          spacing={4}
+          alignItems="flex-start"
+          justifyContent="space-between"
+        >
           <Stack spacing={2}>
             <Stack spacing={2}>
               <Header
                 variant="h3"
                 headline={
                   proposalType?.brief ??
-                  proposalType?.abbr ??
                   proposalType?.name ??
+                  proposalType?.abbr ??
                   ''
                 }
                 sx={{ margin: 0 }}
@@ -188,6 +189,7 @@ const Detail = () => {
                   ...result,
                   baseFee,
                   target: proposalWithEligibles?.target,
+                  status: proposalWithEligibles.status,
                 }}
                 proposalType={proposalType?.name}
               />
@@ -200,6 +202,12 @@ const Detail = () => {
                 options={proposalWithEligibles?.options?.map(
                   (opt: VotingOption) => ({
                     ...opt,
+                    label:
+                      opt.value === true
+                        ? 'Accept'
+                        : opt.value === false
+                        ? 'Decline'
+                        : opt.label,
                     percent: statistics?.summary[opt.option]?.percent ?? 0,
                   })
                 )}
@@ -210,9 +218,12 @@ const Detail = () => {
             </Stack>
             <Stack spacing={1.5} alignItems="flex-start">
               <Typography
+                component="p"
                 color="grey.400"
                 dangerouslySetInnerHTML={{
-                  __html: proposalWithEligibles?.description,
+                  __html: sanitizeHtml(
+                    proposalWithEligibles?.description ?? ''
+                  ),
                 }}
               />
               {proposalWithEligibles?.forumLink && (

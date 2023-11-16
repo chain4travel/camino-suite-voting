@@ -1,7 +1,7 @@
 import { get } from '@/helpers/http';
 
-export const fetchActiveVotings = async (proposalType: number) =>
-  get(`/proposals?proposalType=${proposalType}&proposalStatus=0`);
+export const fetchActiveVotings = async (page: number) =>
+  get(`/proposals?proposalStatus=0`);
 
 export const fetchCompletedVotes = async (
   proposalType: number,

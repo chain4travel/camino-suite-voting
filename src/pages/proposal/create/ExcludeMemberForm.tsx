@@ -2,6 +2,7 @@ import React from 'react';
 import { FormHelperText, Stack, TextField, Typography } from '@mui/material';
 import { Controller, useFormContext } from 'react-hook-form';
 import { z } from 'zod';
+import { PlatformVMAPI } from '@c4tplatform/caminojs/dist/apis/platformvm';
 import Header from '@/components/Header';
 import Paragraph from '@/components/Paragraph';
 import TextEditor from '@/components/TextEditor';
@@ -9,15 +10,34 @@ import FormSection from './FormSection';
 import Information from './Information';
 import { InfoRounded } from '@mui/icons-material';
 
-export const excludeMemberFormSchema = {
-  pAddress: z
-    .string()
-    .refine(addr => addr.startsWith('P-camino'), 'invalid P-address'),
-  description: z
-    .string()
-    .nonempty()
-    .refine(d => d?.replaceAll(/(<p>|<\/p>|<br>)/g, '') !== '', 'requied'),
-};
+export const excludeMemberFormSchema = (platformVMAPI?: PlatformVMAPI) => ({
+  schema: {
+    targetAddress: z.string().refine(addr => {
+      let isValid = false;
+      try {
+        isValid = platformVMAPI?.parseAddress(addr) !== undefined;
+      } catch {
+        // do nothing
+      }
+      return isValid;
+    }, 'invalid P-address'),
+    description: z
+      .string()
+      .nonempty()
+      .refine(d => d?.replaceAll(/(<p>|<\/p>|<br>)/g, '') !== '', 'requied'),
+  },
+  refine: (fields: { [x: string]: any }) => {
+    const diffDays = fields.endDate
+      .endOf('day')
+      .diff(fields.startDate.startOf('day'), ['days']).days;
+    return diffDays >= 7 && diffDays <= 30;
+  },
+  error: {
+    path: ['endDate'],
+    message: 'end date should be 60 days after start date',
+  },
+  endDateRestriction: { minDays: 7, maxDays: 30 },
+});
 const ExcludeMemberForm = () => {
   const { control } = useFormContext();
   return (
@@ -25,11 +45,11 @@ const ExcludeMemberForm = () => {
       <FormSection spacing="md" divider>
         <Header headline="Wallet address" variant="h6" />
         <Typography variant="body2" color="text.secondary">
-          Please enter the wallet address you want to apply to become a member
-          of the consortium
+          Please enter the wallet address of the member you want to exclude from
+          the consortium
         </Typography>
         <Controller
-          name="pAddress"
+          name="targetAddress"
           control={control}
           defaultValue={''}
           render={({ field, fieldState: { error } }) => (

@@ -19,15 +19,17 @@ import FormSection from './FormSection';
 
 const MAX_OPTIONS = 3;
 export const generalFormSchema = {
-  title: z.string(),
-  description: z.string(),
-  votingOptions: z.array(
-    z
-      .custom<VotingOption>()
-      .refine(d => d.label && d.value, { message: 'required field' })
-  ),
+  schema: {
+    title: z.string(),
+    description: z.string(),
+    votingOptions: z.array(
+      z
+        .custom<VotingOption>()
+        .refine(d => d.label && d.value, { message: 'required field' })
+    ),
+  },
 };
-const schema = z.object(generalFormSchema);
+const schema = z.object(generalFormSchema.schema);
 type GeneralFormSchema = z.infer<typeof schema>;
 
 const GeneralProposalForm = () => {

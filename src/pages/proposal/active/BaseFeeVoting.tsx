@@ -2,52 +2,41 @@ import React from 'react';
 import { Stack, Typography } from '@mui/material';
 import Big from 'big.js';
 import { findIndex } from 'lodash';
+import { ModelMultisigTx } from '@c4tplatform/signavaultjs';
 import type { Proposal, VotingOption } from '@/types';
 import { useBaseFee } from '@/hooks/useRpc';
 import useVote from '@/hooks/useVote';
-import useToast from '@/hooks/useToast';
-import Button from '@/components/Button';
-import { getTxExplorerUrl } from '@/helpers/string';
-import useNetwork from '@/hooks/useNetwork';
 import VotingOptionCard from './VotingOptionCard';
-import { useMultisig } from '@/hooks/useMultisig';
 
 interface BaseFeeVotingProps {
   data: Proposal;
   isConsortiumMember?: boolean;
   refresh?: () => void;
+  onVoteSuccess?: (data?: string) => void;
+  multisigFunctions: {
+    signMultisigTx?: (tx: ModelMultisigTx) => Promise<void>;
+    abortSignavault?: (tx: ModelMultisigTx) => Promise<void>;
+    executeMultisigTx?: (
+      onSuccess?: (txID?: string) => void
+    ) => (tx: ModelMultisigTx) => Promise<void> | undefined;
+  };
 }
 const BaseFeeVoting = ({
   data,
   isConsortiumMember,
   refresh,
+  onVoteSuccess,
+  multisigFunctions,
 }: BaseFeeVotingProps) => {
-  const toast = useToast();
-  const { activeNetwork } = useNetwork();
-  const onVoteTxSuccess = (data?: string) => {
-    toast.success(
-      'Successfully voted',
-      data,
-      data ? (
-        <Button
-          href={getTxExplorerUrl(activeNetwork?.name, 'p', data)}
-          target="_blank"
-          variant="outlined"
-          color="inherit"
-        >
-          View on explorer
-        </Button>
-      ) : undefined
-    );
-  };
   const {
     selectedOption,
     setSelectedOption,
     confirmedOption,
     setConfirmedOption,
     submitVote,
-  } = useVote(onVoteTxSuccess, refresh);
-  const { signMultisigTx, abortSignavault, executeMultisigTx } = useMultisig();
+  } = useVote(onVoteSuccess, refresh);
+  const { signMultisigTx, abortSignavault, executeMultisigTx } =
+    multisigFunctions;
   const { baseFee } = useBaseFee();
 
   const handleSelectChange = (option: VotingOption | null) => {
@@ -99,7 +88,7 @@ const BaseFeeVoting = ({
             signMultisigTx={signMultisigTx}
             abortSignavault={abortSignavault}
             executeMultisigTx={executeMultisigTx?.(txId => {
-              onVoteTxSuccess(txId);
+              onVoteSuccess?.(txId);
               setTimeout(() => refresh?.(), 500);
             })}
             renderContent={(option: VotingOption) => {

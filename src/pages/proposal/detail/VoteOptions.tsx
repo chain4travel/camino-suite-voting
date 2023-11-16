@@ -1,13 +1,25 @@
 import React from 'react';
-import { filter } from 'lodash';
+import { filter, find } from 'lodash';
 import { Stack, Typography } from '@mui/material';
 import { Cancel, CheckCircle } from '@mui/icons-material';
 import Big from 'big.js';
-import { Percentage, Proposal, ProposalTypes, VotingOption } from '@/types';
-import DistributionBar from '@/components/DistributionBar';
-import Tag from '@/components/Tag';
 import GrantProgramVotingOptions from '../active/GrantProgram/GrantProgramVotingOptions';
 import BaseFeeVoting from '../active/BaseFeeVoting';
+import DefaultVotingOptions from '../active/DefaultVotingOptions';
+import {
+  Percentage,
+  Proposal,
+  ProposalStatuses,
+  ProposalTypes,
+  VotingOption,
+} from '@/types';
+import DistributionBar from '@/components/DistributionBar';
+import Tag from '@/components/Tag';
+import { useMultisig, usePendingMultisigAddVoteTxs } from '@/hooks/useMultisig';
+import useToast from '@/hooks/useToast';
+import Button from '@/components/Button';
+import { getTxExplorerUrl } from '@/helpers/string';
+import useNetwork from '@/hooks/useNetwork';
 
 type VotedOption = VotingOption & Percentage;
 
@@ -15,6 +27,7 @@ interface VoteOptionsProps {
   proposal: Proposal;
   options: VotedOption[];
   result?: VotingOption;
+  status?: number;
   baseFee?: string | number;
   isConsortiumMember?: boolean;
   refresh?: () => void;
@@ -28,16 +41,52 @@ const VoteOptions = ({
   refresh,
 }: VoteOptionsProps) => {
   if (!options) return null;
+  const { activeNetwork } = useNetwork();
+  const { signMultisigTx, abortSignavault, executeMultisigTx } = useMultisig();
+  const toast = useToast();
+  const onVoteTxSuccess = (data?: string) => {
+    toast.success(
+      'Successfully voted',
+      data,
+      data ? (
+        <Button
+          href={getTxExplorerUrl(activeNetwork?.name, 'p', data)}
+          target="_blank"
+          variant="outlined"
+          color="inherit"
+        >
+          View on explorer
+        </Button>
+      ) : undefined
+    );
+  };
+  const { pendingMultisigBaseFeeTxs } = usePendingMultisigAddVoteTxs();
+  const pendingMultisigTx = find(
+    pendingMultisigBaseFeeTxs,
+    msigTx => msigTx.proposalId === proposal.id
+  );
+  const multisigFunctions = {
+    signMultisigTx,
+    abortSignavault,
+    executeMultisigTx,
+  };
+  const isCompleted =
+    (Object.values(ProposalStatuses).indexOf(ProposalStatuses.Completed) &
+      (proposal.status ?? 0)) >
+    0;
 
-  if (!result) {
+  console.log('proposal.type: ', proposal.type, ProposalTypes.ExcludeMember);
+  if (!result && !isCompleted) {
     let item;
     switch (proposal.type) {
       case ProposalTypes.BaseFee:
         item = (
           <BaseFeeVoting
-            data={proposal}
+            data={{ ...proposal, pendingMultisigTx }}
             isConsortiumMember={isConsortiumMember}
             refresh={refresh}
+            multisigFunctions={multisigFunctions}
+            onVoteSuccess={onVoteTxSuccess}
           />
         );
         break;
@@ -46,6 +95,17 @@ const VoteOptions = ({
           <GrantProgramVotingOptions data={proposal} showFullText />
         );
         break;
+      case ProposalTypes.NewMember:
+      case ProposalTypes.ExcludeMember:
+        item = (
+          <DefaultVotingOptions
+            data={{ ...proposal, pendingMultisigTx }}
+            isConsortiumMember={isConsortiumMember}
+            multisigFunctions={multisigFunctions}
+            onVoteSuccess={onVoteTxSuccess}
+            onRefresh={refresh}
+          />
+        );
     }
     return (
       <Stack
@@ -121,7 +181,7 @@ const VoteOptions = ({
               extraInfo = (
                 <DistributionBar
                   data={values.map(percent => ({ percent }))}
-                  variant={opt.option === result.option ? 'vote' : 'default'}
+                  variant={opt.option === result?.option ? 'vote' : 'default'}
                 />
               );
             }
@@ -156,7 +216,7 @@ const VoteOptions = ({
             >
               {label}
               <Tag
-                color={opt.option === result.option ? 'success' : 'default'}
+                color={opt.option === result?.option ? 'success' : 'default'}
                 label={`VOTED ${opt.percent ?? 0}%`}
               />
             </Stack>

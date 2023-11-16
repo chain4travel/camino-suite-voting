@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 import { List, ListItem, Stack } from '@mui/material';
+import { Cancel, CheckCircle } from '@mui/icons-material';
+import { countBy } from 'lodash';
+import { ModelMultisigTx } from '@c4tplatform/signavaultjs';
+import NewMemberVoting from '../active/NewMemberVoting';
+import BaseFeeVoting from '../active/BaseFeeVoting';
+import ExcludeMemberVoting from '../active/ExcludeMemberVoting';
+import FeeDistributionVoting from '../active/FeeDistributionVoting';
+import GrantProgramVoting from '../active/GrantProgram';
 import {
   ProposalTypes,
   type Proposal,
   type PendingMultisigTx,
   Applicant,
 } from '@/types';
-import NewMemberVoting from '../active/NewMemberVoting';
-import BaseFeeVoting from '../active/BaseFeeVoting';
-import ExcludeMemberVoting from '../active/ExcludeMemberVoting';
-import FeeDistributionVoting from '../active/FeeDistributionVoting';
-import GrantProgramVoting from '../active/GrantProgram';
 import Button from '@/components/Button';
-import { ModelMultisigTx } from '@c4tplatform/signavaultjs';
-import { Cancel, CheckCircle } from '@mui/icons-material';
-import { countBy } from 'lodash';
 import ListItemStatus from '@/components/ListItemStatus';
 
 type MultisigProposal = Proposal & { msigTx: PendingMultisigTx };
@@ -25,17 +25,23 @@ interface PendingListProps {
     name: string;
     data: MultisigProposal[];
   };
-  signMultisigTx?: (tx: ModelMultisigTx) => void;
-  executeMultisigTx?: (tx: ModelMultisigTx) => void;
-  abortSignavault?: (tx: ModelMultisigTx) => void;
+  multisigFunctions: {
+    signMultisigTx?: (tx: ModelMultisigTx) => Promise<void>;
+    abortSignavault?: (tx: ModelMultisigTx) => Promise<void>;
+    executeMultisigTx?: (
+      onSuccess?: (txID?: string) => void
+    ) => (tx: ModelMultisigTx) => Promise<void> | undefined;
+  };
+  onTxSuccess: (txId?: string) => void;
 }
 const PendingList = ({
   data,
-  signMultisigTx,
-  executeMultisigTx,
-  abortSignavault,
+  multisigFunctions,
+  onTxSuccess,
 }: PendingListProps) => {
   const [isCancelTx, setIsCancelTx] = useState(false);
+  const { signMultisigTx, executeMultisigTx, abortSignavault } =
+    multisigFunctions;
 
   const confrimToAbortPendingMultisigTx = (
     pendingMultisigTx: PendingMultisigTx
@@ -63,7 +69,7 @@ const PendingList = ({
           sx={{ py: 1.25, px: 2 }}
           onClick={
             msigTx.canExecute
-              ? () => executeMultisigTx?.(msigTx)
+              ? () => executeMultisigTx?.(onTxSuccess)(msigTx)
               : () => signMultisigTx?.(msigTx)
           }
           // loading={isSubmitting}
@@ -122,7 +128,10 @@ const PendingList = ({
           case ProposalTypes.BaseFee:
             Vote = (
               <Stack width="100%">
-                <BaseFeeVoting data={proposal} />
+                <BaseFeeVoting
+                  data={proposal}
+                  multisigFunctions={multisigFunctions}
+                />
                 {pendingMultisigTxActions(proposal.msigTx)}
               </Stack>
             );
@@ -130,7 +139,10 @@ const PendingList = ({
           case ProposalTypes.NewMember:
             Vote = (
               <Stack width="100%">
-                <NewMemberVoting data={proposal} />
+                <NewMemberVoting
+                  data={proposal}
+                  multisigFunctions={multisigFunctions}
+                />
                 <ListItemStatus
                   startTimestamp={proposal.startTimestamp}
                   endTimestamp={proposal.endTimestamp}
@@ -143,7 +155,10 @@ const PendingList = ({
           case ProposalTypes.ExcludeMember:
             Vote = (
               <Stack width="100%">
-                <ExcludeMemberVoting data={proposal} />
+                <ExcludeMemberVoting
+                  data={proposal}
+                  multisigFunctions={multisigFunctions}
+                />
                 <ListItemStatus
                   startTimestamp={proposal.startTimestamp}
                   endTimestamp={proposal.endTimestamp}

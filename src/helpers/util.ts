@@ -1,4 +1,5 @@
 import { reduce } from 'lodash';
+import { VotingOption } from '@/types';
 
 export const countMultipleOptionsBy = (items: any, byField: string) => {
   return reduce(
@@ -11,4 +12,14 @@ export const countMultipleOptionsBy = (items: any, byField: string) => {
     },
     {}
   );
+};
+
+export const getOptionLabel = (option: VotingOption) => {
+  let label = option.label;
+  if (option.value === true) {
+    label = 'Accept';
+  } else if (option.value === false) {
+    label = 'Decline';
+  }
+  return label;
 };

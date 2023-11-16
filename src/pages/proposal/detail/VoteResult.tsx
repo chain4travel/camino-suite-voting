@@ -2,7 +2,12 @@ import React, { useMemo } from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 import { Circle } from '@mui/icons-material';
 import Big from 'big.js';
-import { Applicant, ProposalTypes, VotingOption } from '@/types';
+import {
+  Applicant,
+  ProposalStatuses,
+  ProposalTypes,
+  VotingOption,
+} from '@/types';
 import Paragraph from '@/components/Paragraph';
 import DistributionBar, {
   VOTE_DISTRIBUTION_COLORS,
@@ -13,10 +18,14 @@ interface VoteResultProps {
   result: VotingOption & {
     baseFee?: number | string;
     target?: string | Applicant;
+    status?: number;
   };
   proposalType?: string;
 }
 const VoteResult = ({ result, proposalType }: VoteResultProps) => {
+  const isSuccess =
+    result?.status ===
+    Object.values(ProposalStatuses).indexOf(ProposalStatuses.Success);
   const { content, noBox } = useMemo(() => {
     let content,
       noBox = false;
@@ -279,7 +288,7 @@ const VoteResult = ({ result, proposalType }: VoteResultProps) => {
               <Typography fontWeight={600}>{String(result.target)}</Typography>
               <Tag
                 color={result.value ? 'success' : 'error'}
-                label={result.value ? 'ACCEPTED' : 'Declined'}
+                label={result.value ? 'ACCEPTED' : 'DECLINED'}
               />
             </Stack>
           );
@@ -290,7 +299,7 @@ const VoteResult = ({ result, proposalType }: VoteResultProps) => {
               <Typography fontWeight={600}>{String(result.target)}</Typography>
               <Tag
                 color={result.value ? 'success' : 'error'}
-                label={result.value ? 'Admitted' : 'Declined'}
+                label={result.value ? 'ADMITTED' : 'DECLINED'}
               />
             </Stack>
           );
@@ -301,7 +310,7 @@ const VoteResult = ({ result, proposalType }: VoteResultProps) => {
               <Typography fontWeight={600}>{String(result.target)}</Typography>
               <Tag
                 color={result.value ? 'success' : 'error'}
-                label={result.value ? 'Excluded' : 'Declined'}
+                label={result.value ? 'EXCLUDED' : 'DECLINED'}
               />
             </Stack>
           );
@@ -359,7 +368,7 @@ const VoteResult = ({ result, proposalType }: VoteResultProps) => {
     <Box
       padding={noBox ? 0 : 2.5}
       border={noBox ? 0 : '2px solid'}
-      borderColor="success.main"
+      borderColor={isSuccess ? 'success.main' : 'divider'}
       borderRadius={1}
     >
       {content}

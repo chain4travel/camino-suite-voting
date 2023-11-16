@@ -2,19 +2,39 @@ import { FormHelperText, Stack, TextField, Typography } from '@mui/material';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { z } from 'zod';
+import { PlatformVMAPI } from '@c4tplatform/caminojs/dist/apis/platformvm';
 import Header from '@/components/Header';
 import TextEditor from '@/components/TextEditor';
 import FormSection from './FormSection';
 
-export const newMemberFormSchema = {
-  pAddress: z
-    .string()
-    .refine(addr => addr.startsWith('P-camino'), 'invalid P-address'),
-  description: z
-    .string()
-    .nonempty()
-    .refine(d => d?.replaceAll(/(<p>|<\/p>|<br>)/g, '') !== '', 'requied'),
-};
+export const newMemberFormSchema = (platformVMAPI?: PlatformVMAPI) => ({
+  schema: {
+    targetAddress: z.string().refine(addr => {
+      let isValid = false;
+      try {
+        isValid = platformVMAPI?.parseAddress(addr) !== undefined;
+      } catch {
+        // do nothing
+      }
+      return isValid;
+    }, 'invalid P-address'),
+    description: z
+      .string()
+      .nonempty()
+      .refine(d => d?.replaceAll(/(<p>|<\/p>|<br>)/g, '') !== '', 'requied'),
+  },
+  refine: (fields: { [x: string]: any }) => {
+    const diffDays = fields.endDate
+      .startOf('day')
+      .diff(fields.startDate.startOf('day'), ['days']).days;
+    return diffDays === 60;
+  },
+  error: {
+    path: ['endDate'],
+    message: 'end date should be 60 days after start date',
+  },
+  endDateRestriction: { minDays: 60, maxDays: 60 },
+});
 const NewMemberForm = () => {
   const { control } = useFormContext();
   return (
@@ -26,7 +46,7 @@ const NewMemberForm = () => {
           of the consortium
         </Typography>
         <Controller
-          name="pAddress"
+          name="targetAddress"
           control={control}
           defaultValue={''}
           render={({ field, fieldState: { error } }) => (

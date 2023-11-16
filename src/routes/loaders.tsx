@@ -1,5 +1,5 @@
 import React from 'react';
-import { QueryClient } from 'react-query';
+import { QueryClient } from '@tanstack/react-query';
 import {
   PersonAddAlt1Outlined,
   MoveUpOutlined,
@@ -44,14 +44,14 @@ export const votingTypeLoader = (queryClient: QueryClient) => async () => {
       id: idx,
       name: ProposalTypes[key],
       abbr: key,
-      disabled: key !== 'BaseFee',
+      disabled: !['BaseFee', 'NewMember', 'ExcludeMember'].includes(key),
     })),
   };
   return {
     ...result,
     data: result?.data?.map((vtype: ProposalType) => ({
       ...vtype,
-      icon: iconSelector(vtype.abbr),
+      icon: iconSelector(vtype.name),
     })),
   };
 };

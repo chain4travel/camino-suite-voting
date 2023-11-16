@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { Box, Stack, Typography } from '@mui/material';
+import { Cancel, CheckCircle } from '@mui/icons-material';
 import { DateTime } from 'luxon';
 import { filter, map } from 'lodash';
 import Paragraph from '@/components/Paragraph';
@@ -8,13 +9,12 @@ import {
   Proposal,
   ProposalStatuses,
   ProposalTypes,
-  Vote,
   VotingOption,
 } from '@/types';
 import { toPastTense } from '@/helpers/string';
 import Tag from '@/components/Tag';
-import { Cancel, CheckCircle } from '@mui/icons-material';
 import Button from '@/components/Button';
+import { getOptionLabel } from '@/helpers/util';
 
 interface ExtraInfo {
   label: string;
@@ -30,8 +30,11 @@ const ProposalStatus = ({
   isLoggedIn,
   extraInfo,
 }: ProposalStatusProps) => {
-  const voted = proposal?.voted?.flatMap((v: Vote) =>
-    filter(proposal.options, (opt: VotingOption) => opt.option === v.option)
+  const voted = proposal?.voted?.flatMap((v: VotingOption) =>
+    filter(
+      proposal.options,
+      (opt: VotingOption) => opt.option === v.option
+    ).map(opt => ({ ...opt, label: getOptionLabel(opt) }))
   );
   const isSuccess =
     proposal?.status ===

@@ -46,7 +46,7 @@ interface VotingOptionProps {
   option: VotingOption;
   isConsortiumMember?: boolean;
   title?: string;
-  voted?: Vote[];
+  voted?: VotingOption[];
   inactive?: boolean;
   isSubmitting?: boolean;
   selected?: string | number | null;

@@ -38,7 +38,7 @@ const CompletedVotes = () => {
     endTime?: DateTime | null;
   }>({ startTime: null, endTime: null });
   const { proposals, error, isFetching, refetch } = useCompletedVotes(
-    Object.values(ProposalTypes).indexOf(votingType),
+    Object.values(ProposalTypes).indexOf(votingType as ProposalTypes),
     filter.startTime?.toUTC().toISO(),
     filter.endTime?.toUTC().toISO()
   );
@@ -132,6 +132,7 @@ const CompletedVotes = () => {
             onClick={() => submitFilter()}
             loading={isFetching}
             loadingPosition="start"
+            startIcon={null}
           >
             Apply
           </Button>
@@ -148,7 +149,7 @@ const CompletedVotes = () => {
               <FormControlLabel
                 key={pType.id}
                 label={pType.abbr ?? pType.name}
-                value={pType.id}
+                value={pType.name}
                 sx={{ marginLeft: 0 }}
                 control={
                   <RadioButton

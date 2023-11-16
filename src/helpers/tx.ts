@@ -35,6 +35,26 @@ export const parseUnsignedTx = (tx: string) => {
         );
         proposal.inactive = true;
         break;
+      case PlatformVMConstants.ADDMEMBERPORPOSAL_TYPE_ID:
+        proposal = proposalPayload.getProposal();
+        proposal.startTimestamp = proposal.getStart().readInt32BE(4);
+        proposal.endTimestamp = proposal.getEnd().readInt32BE(4);
+        proposal.type = ProposalTypes.NewMember;
+        proposal.typeId = Object.values(ProposalTypes).indexOf(
+          ProposalTypes.NewMember
+        );
+        proposal.inactive = true;
+        break;
+      case PlatformVMConstants.EXCLUDEMEMBERPORPOSAL_TYPE_ID:
+        proposal = proposalPayload.getProposal();
+        proposal.startTimestamp = proposal.getStart().readInt32BE(4);
+        proposal.endTimestamp = proposal.getEnd().readInt32BE(4);
+        proposal.type = ProposalTypes.ExcludeMember;
+        proposal.typeId = Object.values(ProposalTypes).indexOf(
+          ProposalTypes.ExcludeMember
+        );
+        proposal.inactive = true;
+        break;
       default:
         console.warn('Unsupported proposal type ', proposalType);
     }

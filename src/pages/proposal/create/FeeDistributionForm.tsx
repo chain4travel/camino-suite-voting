@@ -23,33 +23,35 @@ import DistributionBar, {
 
 const MAX_OPTIONS = 3;
 export const feeDistributionFormSchema = {
-  description: z.string(),
-  votingOptions: z
-    .array(
-      z
-        .custom<VotingOption>()
-        .refine(
-          d => {
-            const values = d.value as number[];
-            return isArray(values) && values.length > 0;
-          },
-          { message: 'invalid value numbers' }
-        )
-        .refine(
-          d => {
-            const values = d.value as number[];
-            const sum = sumBy(values, v => Number(v));
-            return sum === 100;
-          },
-          {
-            message:
-              'The numbers you have entered do not equal 100. Please make sure the numbers will add up to 100',
-          }
-        )
-    )
-    .min(1),
+  schema: {
+    description: z.string(),
+    votingOptions: z
+      .array(
+        z
+          .custom<VotingOption>()
+          .refine(
+            d => {
+              const values = d.value as number[];
+              return isArray(values) && values.length > 0;
+            },
+            { message: 'invalid value numbers' }
+          )
+          .refine(
+            d => {
+              const values = d.value as number[];
+              const sum = sumBy(values, v => Number(v));
+              return sum === 100;
+            },
+            {
+              message:
+                'The numbers you have entered do not equal 100. Please make sure the numbers will add up to 100',
+            }
+          )
+      )
+      .min(1),
+  },
 };
-const schema = z.object(feeDistributionFormSchema);
+const schema = z.object(feeDistributionFormSchema.schema);
 type FeeDistributionFormSchema = z.infer<typeof schema>;
 
 const FeeDistributionForm = () => {

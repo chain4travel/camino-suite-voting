@@ -43,32 +43,46 @@ export const essentialSchema = z.object({
 interface EssentialFormProps {
   proposalType: number | string;
   children?: ReactNode;
-  formSchema?: z.ZodRawShape;
+  formSchema?: {
+    schema: z.ZodRawShape;
+    refine?: (fields: { [x: string]: any }) => void;
+    error?: { path: string[]; message: string };
+    endDateRestriction?: { minDays: number; maxDays: number };
+  };
   onCancel?: () => void;
 }
 const EssentialForm = ({
   proposalType,
   children,
-  formSchema = {},
+  formSchema = { schema: {} },
   onCancel,
 }: EssentialFormProps) => {
-  const schema = essentialSchema.extend(formSchema).refine(
-    fields => {
-      const diffDays = fields.endDate
-        .endOf('day')
-        .diff(fields.startDate.startOf('day'), ['days']).days;
-      return diffDays > 1 && diffDays <= 30;
-    },
-    {
-      path: ['endDate'],
-      message: 'end date must after start date and maximum in 30 days',
-    }
-  );
+  const essentialRefinement = (fields: { [x: string]: any }) => {
+    const diffDays = fields.endDate
+      .endOf('day')
+      .diff(fields.startDate.startOf('day'), ['days']).days;
+    return diffDays > 1 && diffDays <= 30;
+  };
+  const essentialRefinementError = {
+    path: ['endDate'],
+    message: 'end date must after start date and maximum in 30 days',
+  };
+  const endDateRestriction = formSchema.endDateRestriction ?? {
+    minDays: 1,
+    maxDays: 30,
+  };
+  const schema = essentialSchema
+    .extend(formSchema.schema)
+    .refine(
+      formSchema.refine ?? essentialRefinement,
+      formSchema.error ?? essentialRefinementError
+    );
   type CreateProposalSchema = z.infer<typeof schema>;
   const methods = useForm<CreateProposalSchema>({
     resolver: zodResolver(schema),
   });
-  const { handleSubmit, control, getValues, reset, formState } = methods;
+  const { handleSubmit, control, getValues, reset, formState, watch } = methods;
+  const watchStartDate = watch('startDate', DateTime.now());
   const navigate = useNavigate();
   const toast = useToast();
   const { activeNetwork } = useNetwork();
@@ -80,7 +94,7 @@ const EssentialForm = ({
         data,
         data && (
           <Button
-            href={getTxExplorerUrl(activeNetwork.name, 'p', data)}
+            href={getTxExplorerUrl(activeNetwork?.name, 'p', data)}
             target="_blank"
             variant="outlined"
             color="inherit"
@@ -95,6 +109,7 @@ const EssentialForm = ({
 
   const onFormSubmit: SubmitHandler<CreateProposalSchema> = async data => {
     try {
+      console.log('=== data', data);
       addProposal(data);
     } catch (error) {
       if (error instanceof Error) {
@@ -147,7 +162,7 @@ const EssentialForm = ({
                         <DatePicker
                           {...field}
                           disablePast
-                          onChange={value => field.onChange(value!)}
+                          onChange={value => field.onChange(value)}
                           minDate={DateTime.now().startOf('day')}
                         />
                         {error && (
@@ -162,15 +177,21 @@ const EssentialForm = ({
                   <Controller
                     name="endDate"
                     control={control}
-                    defaultValue={DateTime.now().plus({ days: 1 })}
+                    defaultValue={DateTime.now().plus({
+                      days: endDateRestriction.minDays,
+                    })}
                     render={({ field, fieldState: { error } }) => (
                       <>
                         <DatePicker
                           {...field}
                           disablePast
-                          onChange={value => field.onChange(value!)}
-                          minDate={getValues('startDate')?.plus({ days: 1 })}
-                          maxDate={getValues('startDate')?.plus({ days: 30 })}
+                          onChange={value => field.onChange(value)}
+                          minDate={watchStartDate.plus({
+                            days: endDateRestriction.minDays,
+                          })}
+                          maxDate={watchStartDate.plus({
+                            days: endDateRestriction.maxDays,
+                          })}
                         />
                         {error && (
                           <FormHelperText error>{error.message}</FormHelperText>
