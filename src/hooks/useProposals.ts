@@ -1,9 +1,8 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { DateTime } from 'luxon';
 import { filter, find, orderBy } from 'lodash';
-import { BinTools, platformvm } from '@c4tplatform/caminojs/dist';
+import { BinTools, platformvm, Buffer } from '@c4tplatform/caminojs/dist';
 import { Serialization } from '@c4tplatform/caminojs/dist/utils/serialization';
-import { KeyPair } from '@c4tplatform/caminojs/dist/apis/platformvm';
 import {
   fetchProposalDetail,
   fetchCompletedVotes,
@@ -34,6 +33,20 @@ const parseAPIProposal = (proposal?: APIProposal) => {
       outcome = JSON.parse(outcomeBuf.toString());
     }
     const proposalType = Object.values(ProposalTypes)[proposal.type];
+    let target;
+    if (proposal.data) {
+      const data = serialization.typeToBuffer(proposal.data, 'base64');
+      switch (proposalType) {
+        case ProposalTypes.NewMember:
+          target = JSON.parse(data.toString());
+          break;
+        case ProposalTypes.ExcludeMember:
+          target = JSON.parse(data.toString());
+          break;
+        default:
+          console.warn('Unknown data of proposal to process', data);
+      }
+    }
     const now = DateTime.now();
     const startTime = DateTime.fromISO(proposal.startTime);
     const endTime = DateTime.fromISO(proposal.endTime);
@@ -53,8 +66,10 @@ const parseAPIProposal = (proposal?: APIProposal) => {
       })),
       startTimestamp: startTime.toUnixInteger(),
       endTimestamp: endTime.toUnixInteger(),
+      target,
       inactive,
       isCompleted,
+      isAdminProposal: proposal.admin_proposal,
       description: serialization
         .typeToBuffer(proposal.memo, 'base64')
         .toString(),
@@ -63,14 +78,13 @@ const parseAPIProposal = (proposal?: APIProposal) => {
   return;
 };
 const parseAPIProposals = (
-  hrp: string,
   proposals?: APIPRoposalWrapper[],
   currentWalletAddress?: string
 ) => {
   if (!proposals) return [];
   return proposals.map(proposalWrapper => {
     const proposal = parseAPIProposal(proposalWrapper.dacProposal);
-    const votes = proposalWrapper.dacVotes.map(vote => parseAPIVote(vote, hrp));
+    const votes = proposalWrapper.dacVotes.map(vote => parseAPIVote(vote));
     let voted;
     if (currentWalletAddress) {
       voted = find(votes, { voterAddr: currentWalletAddress });
@@ -84,7 +98,7 @@ const parseAPIProposals = (
     };
   });
 };
-const parseAPIVote = (vote: APIVote, hrp: string) => {
+const parseAPIVote = (vote: APIVote) => {
   const votedOptionsBuf = serialization.typeToBuffer(
     vote.votedOptions,
     'base64'
@@ -99,7 +113,6 @@ const parseAPIVote = (vote: APIVote, hrp: string) => {
 };
 
 export const useActiveVotings = (currentWalletAddress?: string, page = 0) => {
-  const { activeNetwork } = useNetwork();
   const { data, isInitialLoading, isFetching, refetch, error } = useQuery(
     ['getActiveVotings', page],
     async () => fetchActiveVotings(page)
@@ -112,7 +125,6 @@ export const useActiveVotings = (currentWalletAddress?: string, page = 0) => {
     isFetching
   );
   const proposals = parseAPIProposals(
-    activeNetwork?.name ?? 'local',
     data?.data.dacProposals,
     currentWalletAddress
   );
@@ -146,7 +158,6 @@ export const useCompletedVotes = (
   endTime?: string,
   page = 0
 ) => {
-  const { activeNetwork } = useNetwork();
   const { data, isFetching, error, refetch } = useQuery(
     ['getCompletedVotes', type, startTime, endTime, page],
     async () => fetchCompletedVotes(type, startTime, endTime),
@@ -155,10 +166,7 @@ export const useCompletedVotes = (
       // notifyOnChangeProps: ['data', 'error'],
     }
   );
-  const proposals = parseAPIProposals(
-    activeNetwork?.name ?? 'local',
-    data?.data.dacProposals
-  );
+  const proposals = parseAPIProposals(data?.data.dacProposals);
   const sortedProposals = orderBy(proposals, ['startTimestamp'], ['desc']);
 
   return {
@@ -172,8 +180,7 @@ export const useCompletedVotes = (
   };
 };
 
-export const useProposal = (id: string, signer?: KeyPair) => {
-  const { activeNetwork } = useNetwork();
+export const useProposal = (id: string, currentWalletAddress?: string) => {
   const { data, isLoading, error, refetch } = useQuery(
     ['getProposalDetail', id],
     async () => fetchProposalDetail(id),
@@ -182,15 +189,13 @@ export const useProposal = (id: string, signer?: KeyPair) => {
     }
   );
 
-  const proposal = parseAPIProposal(data?.data.dacProposal);
-  const votes = data?.data.dacVotes.map((vote: APIVote) =>
-    parseAPIVote(vote, activeNetwork!.name)
-  );
+  const proposal = parseAPIProposal(data?.data?.dacProposal);
+  const votes = data?.data?.dacVotes.map((vote: APIVote) => parseAPIVote(vote));
 
   // Find voted by current wallet
   let voted;
-  if (signer) {
-    voted = find(votes, { voterAddr: signer.getAddressString() });
+  if (currentWalletAddress) {
+    voted = find(votes, { voterAddr: currentWalletAddress });
   }
 
   return {
@@ -218,23 +223,78 @@ export const useAddProposal = (
       endDate,
       votingOptions,
       description,
+      targetAddress,
     }: {
       startDate: DateTime;
       endDate: DateTime;
-      votingOptions: VotingOption[];
-      description: string;
+      votingOptions?: VotingOption[];
+      description?: string;
+      targetAddress?: string;
     }) => {
       let proposal: platformvm.Proposal;
       switch (proposalType) {
         case 0:
-        case 'BASE_FEE':
           proposal = new platformvm.BaseFeeProposal(
             startDate.startOf('day').toUnixInteger(),
             endDate.endOf('day').toUnixInteger()
           );
           votingOptions
-            .map((opt: VotingOption) => opt.value)
-            .forEach(opt => proposal.addBaseFeeOption(opt));
+            ?.map((opt: VotingOption) => opt.value)
+            .forEach(opt =>
+              (proposal as platformvm.BaseFeeProposal).addBaseFeeOption(
+                Number(opt)
+              )
+            );
+          break;
+        case 1:
+          startDate = startDate.startOf('day');
+          endDate = endDate.startOf('day');
+          proposal = new platformvm.AddMemberProposal(
+            startDate.toUnixInteger(),
+            endDate.toUnixInteger(),
+            targetAddress
+          );
+          break;
+        case 2:
+          startDate = startDate.startOf('day');
+          endDate = endDate.startOf('day');
+          proposal = new platformvm.ExcludeMemberProposal(
+            startDate.toUnixInteger(),
+            endDate.toUnixInteger(),
+            targetAddress
+          );
+          break;
+        case 3:
+          {
+            startDate = startDate.startOf('day');
+            endDate = startDate.plus({ days: 60 });
+            const optionIndex = Buffer.alloc(4);
+            optionIndex.writeInt32BE(0, 0);
+            proposal = new platformvm.AdminProposal(
+              optionIndex,
+              new platformvm.AddMemberProposal(
+                startDate.toUnixInteger(),
+                endDate.toUnixInteger(),
+                targetAddress
+              )
+            );
+          }
+          break;
+        case 4:
+          {
+            startDate = startDate.startOf('day');
+            endDate = startDate.plus({ days: 7 });
+            const optionIndex = Buffer.alloc(4);
+            optionIndex.writeInt32BE(0, 0);
+            proposal = new platformvm.AdminProposal(
+              optionIndex,
+              new platformvm.ExcludeMemberProposal(
+                startDate.toUnixInteger(),
+                endDate.toUnixInteger(),
+                targetAddress
+              )
+            );
+          }
           break;
         default:
           throw `Unsupported proposal type: ${proposalType}`;
@@ -277,9 +337,7 @@ export const useAddProposal = (
           proposal,
           multisigWallet.keyData.alias,
           0,
-          serialization.typeToBuffer(description, 'utf8'),
-          undefined,
-          multisigWallet.keyData.owner.threshold
+          serialization.typeToBuffer(description, 'utf8')
         );
         // - check signavault to get pending Txs
         tryToCreateMultisig && (await tryToCreateMultisig(unsignedTx));

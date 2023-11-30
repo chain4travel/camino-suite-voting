@@ -74,7 +74,11 @@ export const usePendingMultisigTx = () => {
             tx.owners,
             owner => walletAddress.includes(owner.address) && owner.signature
           );
-          const unsignedTx = parseUnsignedTx(tx.unsignedTx);
+          const unsignedTx = parseUnsignedTx(
+            tx.unsignedTx,
+            multisigWallet?.hrp,
+            multisigWallet?.pchainId
+          );
           return { ...tx, ...unsignedTx, isSigned };
         });
         setPendingMultisigTxs(pendingTxs);
@@ -98,29 +102,24 @@ export const usePendingMultisigAddProposalTxs = () => {
 
   let pendingMultisigAddProposalTxs: PendingMultisigTx[] = [];
   if (pendingMultisigTxs) {
-    pendingMultisigAddProposalTxs = map(
-      pendingMultisigTxs,
-      (msigTx: ModelMultisigTx & { isSigned: boolean }) => {
-        const unsignedTx = parseUnsignedTx(msigTx.unsignedTx);
-        const isCreaterAlias = msigTx.alias === alias;
+    pendingMultisigAddProposalTxs = map(pendingMultisigTxs, msigTx => {
+      const isCreaterAlias = msigTx.alias === alias;
 
-        let canExecute = false;
-        const threshold = msigTx.threshold;
-        if (threshold) {
-          let signers = 0;
-          msigTx.owners.forEach(owner => {
-            if (owner.signature) signers++;
-          });
-          canExecute = signers >= threshold;
-        }
-        return {
-          ...msigTx,
-          ...unsignedTx,
-          isCreaterAlias,
-          canExecute,
-        };
+      let canExecute = false;
+      const threshold = msigTx.threshold;
+      if (threshold) {
+        let signers = 0;
+        msigTx.owners.forEach(owner => {
+          if (owner.signature) signers++;
+        });
+        canExecute = signers >= threshold;
       }
-    ).filter(
+      return {
+        ...msigTx,
+        isCreaterAlias,
+        canExecute,
+      };
+    }).filter(
       unsignedTx => unsignedTx.typeId === PlatformVMConstants.ADDPROPOSALTX
     );
   }
@@ -138,8 +137,7 @@ export const usePendingMultisigAddVoteTxs = () => {
   const pendingMultisigBaseFeeTxs = useMemo(() => {
     const pendingMultisigBaseFeeTxs: PendingMultisigTx[] = map(
       pendingMultisigTxs,
-      (msigTx: ModelMultisigTx) => {
-        const unsignedTx = parseUnsignedTx(msigTx.unsignedTx);
+      msigTx => {
         let canExecute = false;
         const threshold = msigTx.threshold;
         if (threshold) {
@@ -149,7 +147,7 @@ export const usePendingMultisigAddVoteTxs = () => {
           });
           canExecute = signers >= threshold;
         }
-        return { ...msigTx, ...unsignedTx, canExecute };
+        return { ...msigTx, canExecute };
       }
     ).filter(unsignedTx => unsignedTx.typeId === PlatformVMConstants.ADDVOTETX);
 

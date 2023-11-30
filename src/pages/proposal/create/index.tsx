@@ -23,10 +23,20 @@ import FeeDistributionForm, {
 import GeneralProposalForm, { generalFormSchema } from './GeneralProposalForm';
 import GrantProgramForm, { grantProgramFormSchema } from './GrantProgramForm';
 import useWallet from '@/hooks/useWallet';
+import { filter, find } from 'lodash';
 
 const CreateNewVoting = () => {
-  const { signer, pchainAPI } = useWallet();
+  const {
+    signer,
+    pchainAPI,
+    isConsortiumMember,
+    currentWalletAddress,
+    isConsortiumAdminProposer,
+    isCaminoProposer,
+  } = useWallet();
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
+  const [availableProposalTypes, setAvailableProposalTypes] =
+    useState(proposalTypes);
   const [selectedProposalType, setSelectedProposalType] = useState<number>(-1);
 
   const { ProposalForm, formSchema } = useMemo(() => {
@@ -42,10 +52,12 @@ const CreateNewVoting = () => {
         formSchema = generalFormSchema;
         break;
       case ProposalTypes.NewMember:
+      case ProposalTypes.AdminNewMember:
         ProposalForm = <NewMemberForm />;
         formSchema = newMemberFormSchema(pchainAPI);
         break;
       case ProposalTypes.ExcludeMember:
+      case ProposalTypes.AdminExcludeMember:
         ProposalForm = <ExcludeMemberVoting />;
         formSchema = excludeMemberFormSchema(pchainAPI);
         break;
@@ -72,6 +84,41 @@ const CreateNewVoting = () => {
       location.pathname = '/login';
     }
   }, [signer]);
+
+  useEffect(() => {
+    let types = filter(proposalTypes, ptype => !ptype.restricted);
+    if (!isConsortiumMember) {
+      setAvailableProposalTypes(types);
+    } else {
+      pchainAPI?.getCurrentValidators().then(result => {
+        const hasValidator = find(result.validators, validator =>
+          validator.rewardOwner.addresses.includes(currentWalletAddress)
+        );
+        if (hasValidator) {
+          const consortiumMemberProposalTypes = filter(
+            proposalTypes,
+            ptype => ptype.consortiumMemberOnly
+          );
+          types = [...types, ...consortiumMemberProposalTypes];
+          if (isCaminoProposer) {
+            const caminoProposalTypes = filter(
+              proposalTypes,
+              ptype => ptype.caminoOnly
+            );
+            types = [...types, ...caminoProposalTypes];
+          }
+          if (isConsortiumAdminProposer) {
+            const adminProposalTypes = filter(
+              proposalTypes,
+              ptype => ptype.isAdminProposal
+            );
+            types = [...types, ...adminProposalTypes];
+          }
+        }
+        setAvailableProposalTypes(types);
+      });
+    }
+  }, [isConsortiumMember, currentWalletAddress]);
 
   const handleChange = (event: SelectChangeEvent<number>) => {
     const {
@@ -109,13 +156,11 @@ const CreateNewVoting = () => {
           hidden
           sx={{ padding: 0 }}
         ></MenuItem>
-        {proposalTypes
-          .filter(pType => !pType.disabled)
-          .map(pType => (
-            <MenuItem key={pType.id} value={pType.id}>
-              {pType.name}
-            </MenuItem>
-          ))}
+        {availableProposalTypes.map(pType => (
+          <MenuItem key={pType.id} value={pType.id}>
+            {pType.name}
+          </MenuItem>
+        ))}
       </Select>
       <Divider sx={{ marginY: 4 }} />
       {formSchema ? (

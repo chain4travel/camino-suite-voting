@@ -1,26 +1,43 @@
 import React from 'react';
 import { FormHelperText, Stack, TextField, Typography } from '@mui/material';
+import { InfoRounded } from '@mui/icons-material';
 import { Controller, useFormContext } from 'react-hook-form';
 import { z } from 'zod';
-import { PlatformVMAPI } from '@c4tplatform/caminojs/dist/apis/platformvm';
+import {
+  AddressState,
+  PlatformVMAPI,
+} from '@c4tplatform/caminojs/dist/apis/platformvm';
+import { BN } from '@c4tplatform/caminojs/dist';
 import Header from '@/components/Header';
 import Paragraph from '@/components/Paragraph';
 import TextEditor from '@/components/TextEditor';
 import FormSection from './FormSection';
 import Information from './Information';
-import { InfoRounded } from '@mui/icons-material';
 
 export const excludeMemberFormSchema = (platformVMAPI?: PlatformVMAPI) => ({
   schema: {
-    targetAddress: z.string().refine(addr => {
-      let isValid = false;
-      try {
-        isValid = platformVMAPI?.parseAddress(addr) !== undefined;
-      } catch {
-        // do nothing
-      }
-      return isValid;
-    }, 'invalid P-address'),
+    targetAddress: z
+      .string()
+      .refine(addr => {
+        let isValid = false;
+        try {
+          isValid = platformVMAPI?.parseAddress(addr) !== undefined;
+        } catch {
+          // do nothing
+        }
+        return isValid;
+      }, 'invalid P-address')
+      .refine(async addr => {
+        let isValid = false;
+        try {
+          const BN_ONE = new BN(1);
+          const states = await platformVMAPI?.getAddressStates(addr);
+          isValid = !states?.and(BN_ONE.shln(AddressState.CONSORTIUM)).isZero();
+        } catch (error) {
+          // do nothing
+        }
+        return isValid;
+      }, 'not a consortium member'),
     description: z
       .string()
       .nonempty()

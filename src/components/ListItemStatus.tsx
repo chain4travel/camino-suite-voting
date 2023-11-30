@@ -12,6 +12,7 @@ interface ListItemStatusProps extends ChipProps {
   stage?: string;
   industry?: string;
   status?: string;
+  isCompleted?: boolean;
 }
 const ListItemStatus = ({
   startTimestamp,
@@ -20,6 +21,7 @@ const ListItemStatus = ({
   stage,
   industry,
   status,
+  isCompleted,
   ...props
 }: ListItemStatusProps) => {
   let duration;
@@ -28,7 +30,7 @@ const ListItemStatus = ({
     const endDateTime = DateTime.fromSeconds(endTimestamp);
     const now = DateTime.now();
     const isNotStartYet = startDateTime > now;
-    const isEnded = now > endDateTime;
+    const isEnded = isCompleted || now > endDateTime;
     duration =
       isNotStartYet || isEnded
         ? startDateTime.toFormat('dd.MM.yyyy hh:mm:ss a')

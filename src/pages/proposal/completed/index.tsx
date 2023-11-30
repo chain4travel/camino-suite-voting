@@ -177,6 +177,7 @@ const CompletedVotes = () => {
                     <ListItemStatus
                       startTimestamp={proposal.startTimestamp}
                       endTimestamp={proposal.endTimestamp}
+                      isCompleted
                     />
                   </Stack>
                   <Stack></Stack>

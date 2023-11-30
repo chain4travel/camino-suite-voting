@@ -75,7 +75,6 @@ const VoteOptions = ({
       (proposal.status ?? 0)) >
     0;
 
-  console.log('proposal.type: ', proposal.type, ProposalTypes.ExcludeMember);
   if (!result && !isCompleted) {
     let item;
     switch (proposal.type) {
@@ -211,13 +210,19 @@ const VoteOptions = ({
             <Stack
               direction={labelDirection}
               justifyContent="space-between"
-              alignItems="center"
+              alignItems="flex-start"
               spacing={labelSpacing}
             >
               {label}
               <Tag
                 color={opt.option === result?.option ? 'success' : 'default'}
-                label={`VOTED ${opt.percent ?? 0}%`}
+                label={
+                  proposal.isAdminProposal
+                    ? opt.option === result?.option
+                      ? 'VOTED'
+                      : 'NOT VOTED'
+                    : `VOTED ${opt.percent ?? 0}%`
+                }
               />
             </Stack>
             {extraInfo}

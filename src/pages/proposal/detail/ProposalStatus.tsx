@@ -126,7 +126,7 @@ const ProposalStatus = ({
             <Tag
               color={isSuccess ? 'success' : isFailed ? 'error' : 'default'}
               label={
-                proposal?.inactive
+                proposal?.status === 0 && proposal?.inactive
                   ? 'INACTIVE'
                   : Object.values(ProposalStatuses)[
                       proposal?.status

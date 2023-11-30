@@ -3,7 +3,13 @@ import { BN, Avalanche as Camino, BinTools } from '@c4tplatform/caminojs/dist';
 import { Configuration, MultisigApi } from '@c4tplatform/signavaultjs';
 import { AddressState } from '@c4tplatform/caminojs/dist/apis/platformvm';
 import store from 'wallet/store';
-import { MultisigWallet, SingletonWallet, Network, WalletType } from '@/types';
+import {
+  MultisigWallet,
+  SingletonWallet,
+  Network,
+  WalletType,
+  WalletAddressState,
+} from '@/types';
 import { useWalletStore } from '@/store/wallet';
 import useNetwork from './useNetwork';
 
@@ -43,7 +49,13 @@ const useWallet = () => {
   const setPendingMultisigTxs = useWalletStore(
     state => state.setPendingMultisigTxs
   );
-  const [isConsortiumMember, setIsConsortiumMember] = useState<boolean>(false);
+  const [walletAddressState, setWalletAddressState] =
+    useState<WalletAddressState>({
+      isConsortiumMember: false,
+      isKycVerified: false,
+      isConsortiumAdminProposer: false,
+      isCaminoProposer: false,
+    });
 
   const signavaultApi = useMemo(
     () => getSignaVaultApi(activeNetwork),
@@ -54,9 +66,20 @@ const useWallet = () => {
       const getAddressState = async (address: string, caminoClient: Camino) => {
         const BN_ONE = new BN(1);
         const states = await caminoClient?.PChain().getAddressStates(address);
-        setIsConsortiumMember(
-          !states?.and(BN_ONE.shln(AddressState.CONSORTIUM)).isZero()
-        );
+        setWalletAddressState({
+          isConsortiumMember: !states
+            ?.and(BN_ONE.shln(AddressState.CONSORTIUM))
+            .isZero(),
+          isKycVerified: !states
+            ?.and(BN_ONE.shln(AddressState.KYC_VERIFIED))
+            .isZero(),
+          isConsortiumAdminProposer: !states
+            ?.and(BN_ONE.shln(AddressState.ROLE_CONSORTIUM_ADMIN_PROPOSER))
+            .isZero(),
+          isCaminoProposer: !states
+            ?.and(BN_ONE.shln(AddressState.CAMINO_ONLY_PROPOSER))
+            .isZero(),
+        });
       };
 
       if (activeWallet && caminoClient) {
@@ -92,7 +115,7 @@ const useWallet = () => {
 
   // Fake wallet
   return {
-    isConsortiumMember,
+    ...walletAddressState,
     pchainAPI,
     signer,
     currentWalletAddress,

@@ -2,22 +2,54 @@ import { FormHelperText, Stack, TextField, Typography } from '@mui/material';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { z } from 'zod';
-import { PlatformVMAPI } from '@c4tplatform/caminojs/dist/apis/platformvm';
+import {
+  AddressState,
+  PlatformVMAPI,
+} from '@c4tplatform/caminojs/dist/apis/platformvm';
+import { BN } from '@c4tplatform/caminojs/dist';
 import Header from '@/components/Header';
 import TextEditor from '@/components/TextEditor';
 import FormSection from './FormSection';
 
 export const newMemberFormSchema = (platformVMAPI?: PlatformVMAPI) => ({
   schema: {
-    targetAddress: z.string().refine(addr => {
-      let isValid = false;
-      try {
-        isValid = platformVMAPI?.parseAddress(addr) !== undefined;
-      } catch {
-        // do nothing
-      }
-      return isValid;
-    }, 'invalid P-address'),
+    targetAddress: z
+      .string()
+      .refine(addr => {
+        let isValid = false;
+        try {
+          isValid = platformVMAPI?.parseAddress(addr) !== undefined;
+        } catch {
+          // do nothing
+        }
+        return isValid;
+      }, 'invalid P-address')
+      .superRefine(async (addr, ctx) => {
+        try {
+          const BN_ONE = new BN(1);
+          const states = await platformVMAPI?.getAddressStates(addr);
+          const isKycVerified = !states
+            ?.and(BN_ONE.shln(AddressState.KYC_VERIFIED))
+            .isZero();
+          if (!isKycVerified) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: 'not KYC-verified',
+            });
+          }
+          const isNotConsortiumMember = states
+            ?.and(BN_ONE.shln(AddressState.CONSORTIUM))
+            .isZero();
+          if (!isNotConsortiumMember) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: 'already a consortium member',
+            });
+          }
+        } catch (error) {
+          // do nothing
+        }
+      }),
     description: z
       .string()
       .nonempty()

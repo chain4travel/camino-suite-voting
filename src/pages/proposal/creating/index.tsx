@@ -28,7 +28,7 @@ import RefreshButton from '@/components/RefreshButton';
 const CreatingProposals = () => {
   const navigate = useNavigate();
   const { activeNetwork } = useNetwork();
-  const { isConsortiumMember } = useWallet();
+  const { currentWalletAddress, isKycVerified } = useWallet();
   const { signMultisigTx, executeMultisigTx, abortSignavault } = useMultisig();
   const { pendingMultisigAddProposalTxs, refetch, isFetching } =
     usePendingMultisigAddProposalTxs();
@@ -98,9 +98,13 @@ const CreatingProposals = () => {
     <Paper sx={{ px: 2 }}>
       <Header headline="Creating Proposals" variant="h5">
         <Stack direction="row" alignItems="center" spacing={1}>
-          {isConsortiumMember && (
-            <NavLink to="/dac/create">
-              <Button variant="contained" color="primary">
+          {currentWalletAddress && (
+            <NavLink to={isKycVerified ? '/dac/create' : '#'}>
+              <Button
+                variant="contained"
+                color="primary"
+                disabled={!isKycVerified}
+              >
                 Create new
               </Button>
             </NavLink>

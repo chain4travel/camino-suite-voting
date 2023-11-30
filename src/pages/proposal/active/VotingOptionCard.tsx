@@ -33,7 +33,7 @@ const StyledCard = styled((props: StyledCardProps & CardProps) => (
     : theme.palette.divider,
 }));
 const StyledCardHeader = styled(MuiCardHeader)(({ theme }) => ({
-  padding: theme.spacing(1.5, 2.5),
+  padding: theme.spacing(1.5, 2),
   paddingBottom: 0,
   '.MuiCardHeader-title': {
     display: 'initial',

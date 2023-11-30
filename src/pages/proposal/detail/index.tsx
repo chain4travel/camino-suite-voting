@@ -37,95 +37,117 @@ const Detail = () => {
   const proposalWithEligibles = useEligibleCMembers(proposal as Proposal);
 
   const proposalType = proposalTypes.find(vtype => vtype.id === Number(type));
-  const { result, statistics, votes, isCompleted } = useMemo(() => {
-    if (proposalWithEligibles?.votes) {
-      const summary = countMultipleOptionsBy(
-        proposalWithEligibles.votes,
-        'votedOptions'
-      );
-      const eligibleVotes = Object.keys(
-        proposalWithEligibles.eligibleCMembers ?? {}
-      ).length;
-      const turnouts = countBy(
-        proposalWithEligibles.votes,
-        v => v.votedOptions.length > 0
-      );
-      if (proposalWithEligibles.votes.length < eligibleVotes) {
-        turnouts.false =
-          (turnouts.false ?? 0) +
-          eligibleVotes -
-          proposalWithEligibles.votes.length;
-      }
-      const totalVotes = filter(
-        proposalWithEligibles.votes,
-        v => v.votedOptions.length > 0
-      ).length;
-      const statistics: Statistics = {
-        eligibleVotes,
-        totalVotes,
-        summary: reduce(
-          summary,
-          (acc, count, option) => ({
-            ...acc,
-            [option]: {
-              count,
-              percent: new Big(count).div(totalVotes).times(100).toFixed(2),
-            },
-          }),
-          {}
-        ),
-        turnouts: reduce(
-          turnouts,
-          (acc, count, option) => ({
-            ...acc,
-            [option]: {
-              count,
-              percent: eligibleVotes
-                ? new Big(count).div(eligibleVotes).times(100).toFixed(2)
-                : 0,
-            },
-          }),
-          {}
-        ),
-      };
-      const votes = map(
-        proposalWithEligibles.eligibleCMembers,
-        (eligible: any, nodeId: string) => {
-          const participant = find(
-            proposalWithEligibles.votes,
-            (v: Vote) => v.voterAddr === eligible.consortiumMemberAddress
-          );
-          return {
-            id: nodeId,
-            address: eligible.consortiumMemberAddress,
-            votedDateTime: participant?.votedDateTime
-              ? DateTime.fromSeconds(participant.votedDateTime).toFormat(
-                  'dd.MM.yyyy - hh:mm:ss a'
-                )
-              : '-',
-            option: participant?.votedOptions
-              ? `Future Base Fee ${
-                  proposalWithEligibles.options.find((opt: VotingOption) =>
-                    participant.votedOptions.includes(opt.option)
-                  )?.value
-                } nCAM`
-              : 'Did not participate',
-            disabled: !participant?.votedOptions,
-          };
+  const { result, statistics, votes, isCompleted, isAdminProposal } =
+    useMemo(() => {
+      if (proposalWithEligibles?.votes) {
+        const summary = countMultipleOptionsBy(
+          proposalWithEligibles.votes,
+          'votedOptions'
+        );
+        const eligibleVotes = Object.keys(
+          proposalWithEligibles.eligibleCMembers ?? {}
+        ).length;
+        const turnouts = countBy(
+          proposalWithEligibles.votes,
+          v => v.votedOptions.length > 0
+        );
+        if (proposalWithEligibles.votes.length < eligibleVotes) {
+          turnouts.false =
+            (turnouts.false ?? 0) +
+            eligibleVotes -
+            proposalWithEligibles.votes.length;
         }
-      );
-      return {
-        result: find(
-          proposalWithEligibles.options,
-          opt => opt.option === proposalWithEligibles.outcome
-        ),
-        statistics,
-        votes,
-        isCompleted: proposalWithEligibles.isCompleted,
-      };
-    }
-    return {};
-  }, [proposalWithEligibles]);
+        const totalVotes = filter(
+          proposalWithEligibles.votes,
+          v => v.votedOptions.length > 0
+        ).length;
+        const statistics: Statistics = {
+          eligibleVotes,
+          totalVotes,
+          summary: reduce(
+            summary,
+            (acc, count, option) => ({
+              ...acc,
+              [option]: {
+                count,
+                percent: new Big(count).div(totalVotes).times(100).toFixed(2),
+              },
+            }),
+            {}
+          ),
+          turnouts: reduce(
+            turnouts,
+            (acc, count, option) => ({
+              ...acc,
+              [option]: {
+                count,
+                percent: eligibleVotes
+                  ? new Big(count).div(eligibleVotes).times(100).toFixed(2)
+                  : 0,
+              },
+            }),
+            {}
+          ),
+        };
+        const votes = map(
+          proposalWithEligibles.eligibleCMembers,
+          (eligible: any, nodeId: string) => {
+            const participant = find(
+              proposalWithEligibles.votes,
+              (v: Vote) => v.voterAddr === eligible.consortiumMemberAddress
+            );
+            let option = '';
+            switch (proposalWithEligibles.type) {
+              case ProposalTypes.BaseFee:
+                option = `Future Base Fee ${
+                  proposalWithEligibles.options.find((opt: VotingOption) =>
+                    participant?.votedOptions.includes(opt.option)
+                  )?.value
+                } nCAM`;
+                break;
+              case ProposalTypes.NewMember:
+              case ProposalTypes.ExcludeMember:
+                option = proposalWithEligibles.options.find(
+                  (opt: VotingOption) =>
+                    participant?.votedOptions.includes(opt.option)
+                )?.value
+                  ? 'Accept'
+                  : 'Decline';
+                break;
+              default:
+                console.warn(
+                  'Unsupported proposal type: ',
+                  proposalWithEligibles.type
+                );
+            }
+            return {
+              id: nodeId,
+              address: eligible.consortiumMemberAddress,
+              votedDateTime: participant?.votedDateTime
+                ? DateTime.fromSeconds(participant.votedDateTime).toFormat(
+                    'dd.MM.yyyy - hh:mm:ss a'
+                  )
+                : '-',
+              option: participant?.votedOptions
+                ? option
+                : 'Did not participate',
+              disabled: !participant?.votedOptions,
+            };
+          }
+        );
+        return {
+          result: find(
+            proposalWithEligibles.options,
+            opt => opt.option === proposalWithEligibles.outcome
+          ),
+          statistics,
+          votes,
+          isCompleted: proposalWithEligibles.isCompleted,
+          isAdminProposal: proposalWithEligibles.isAdminProposal,
+        };
+      }
+      return {};
+    }, [proposalWithEligibles]);
   const extraInfo = useMemo(() => {
     if (proposalType) {
       switch (proposalType.name) {
@@ -249,7 +271,7 @@ const Detail = () => {
       </Container>
       <Divider color="divider" variant="fullWidth" sx={{ my: 4 }} />
       <Container sx={{ paddingBottom: 5 }}>
-        {isCompleted ? (
+        {isAdminProposal ? null : isCompleted ? (
           <CompletedStatistics
             statistics={statistics}
             options={proposalWithEligibles.options}

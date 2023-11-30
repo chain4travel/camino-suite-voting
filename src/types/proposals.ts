@@ -4,7 +4,9 @@ import { PendingMultisigTx } from './wallet';
 export enum ProposalTypes {
   BaseFee = 'Base Fee',
   NewMember = 'Admittance of new consortium members',
-  ExcludeMember = 'Exlusion of consortium member',
+  ExcludeMember = 'Exclusion of consortium member',
+  AdminNewMember = 'Admin Proposal for Admittance of new consortium members',
+  AdminExcludeMember = 'Admin Proposal for Exclusion of consortium member',
   General = 'General Proposal',
   FeeDistribution = 'Transaction Fee Distribution',
   GrantProgram = 'TAKEOFF Camino Grant Program',
@@ -21,6 +23,9 @@ export type ProposalType = {
   abbr: string;
   icon?: ReactElement;
   disabled?: boolean;
+  isAdminProposal?: boolean;
+  consortiumMemberOnly?: boolean;
+  caminoOnly?: boolean;
 };
 export type VotingOption = {
   option: number | string;
@@ -75,12 +80,8 @@ export type APIProposal = {
   memo: string;
   status: number;
   blockHeight: number;
-  applicantAddr?: string;
   outcome?: number;
-  data?: {
-    applicantAddr?: string;
-    memberAddr?: string;
-  };
+  admin_proposal?: boolean;
 };
 export type Proposal = {
   id: string;
@@ -104,6 +105,7 @@ export type Proposal = {
   target?: string | Applicant;
   pendingMultisigTx?: PendingMultisigTx;
   seq?: number;
+  isAdminProposal?: boolean;
 };
 export type Group = {
   type: string;

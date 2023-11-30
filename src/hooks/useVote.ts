@@ -58,10 +58,7 @@ const useSubmitVote = (option?: {
           proposalId,
           optionIndex,
           multisigWallet.keyData.alias,
-          0,
-          undefined,
-          undefined,
-          multisigWallet?.keyData.owner.threshold
+          0
         );
         // - check signavault to get pending Txs
         tryToCreateMultisig && (await tryToCreateMultisig(unsignedTx));
@@ -89,7 +86,7 @@ const useVote = (onSuccess?: (d: any) => void, onSettled?: () => void) => {
   const { submitVote } = useSubmitVote({
     onSuccess,
     onSettled: () => {
-      setTimeout(() => onSettled && onSettled(), 500);
+      setTimeout(() => onSettled && onSettled(), 1000);
       setConfirmedOption(null);
       setSelectedOption(null);
     },

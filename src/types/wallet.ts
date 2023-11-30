@@ -93,3 +93,10 @@ export type WalletStore = {
   pendingMultisigTxs: PendingMultisigTx[];
   setPendingMultisigTxs: (pendingMultisigTxs: PendingMultisigTx[]) => void;
 };
+
+export type WalletAddressState = {
+  isConsortiumMember: boolean;
+  isKycVerified: boolean;
+  isConsortiumAdminProposer: boolean;
+  isCaminoProposer: boolean;
+};

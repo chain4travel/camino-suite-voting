@@ -81,8 +81,11 @@ const EssentialForm = ({
   const methods = useForm<CreateProposalSchema>({
     resolver: zodResolver(schema),
   });
-  const { handleSubmit, control, getValues, reset, formState, watch } = methods;
-  const watchStartDate = watch('startDate', DateTime.now());
+  const { handleSubmit, control, reset, formState, watch } = methods;
+  const watchStartDate = watch(
+    'startDate',
+    DateTime.now().plus({ day: 1 }).startOf('day')
+  );
   const navigate = useNavigate();
   const toast = useToast();
   const { activeNetwork } = useNetwork();
@@ -109,7 +112,6 @@ const EssentialForm = ({
 
   const onFormSubmit: SubmitHandler<CreateProposalSchema> = async data => {
     try {
-      console.log('=== data', data);
       addProposal(data);
     } catch (error) {
       if (error instanceof Error) {
@@ -156,14 +158,18 @@ const EssentialForm = ({
                   <Controller
                     name="startDate"
                     control={control}
-                    defaultValue={DateTime.now()}
+                    defaultValue={DateTime.now()
+                      .plus({ day: 1 })
+                      .startOf('day')}
                     render={({ field, fieldState: { error } }) => (
                       <>
                         <DatePicker
                           {...field}
                           disablePast
                           onChange={value => field.onChange(value)}
-                          minDate={DateTime.now().startOf('day')}
+                          minDate={DateTime.now()
+                            .plus({ day: 1 })
+                            .startOf('day')}
                         />
                         {error && (
                           <FormHelperText error>{error.message}</FormHelperText>
@@ -177,7 +183,7 @@ const EssentialForm = ({
                   <Controller
                     name="endDate"
                     control={control}
-                    defaultValue={DateTime.now().plus({
+                    defaultValue={watchStartDate.plus({
                       days: endDateRestriction.minDays,
                     })}
                     render={({ field, fieldState: { error } }) => (
@@ -244,6 +250,11 @@ const EssentialForm = ({
             Create
           </Button>
         </Stack>
+        {formState.isDirty && !formState.isValid && (
+          <FormHelperText error>
+            please resolve the issue of the fields above
+          </FormHelperText>
+        )}
       </form>
     </FormProvider>
   );
