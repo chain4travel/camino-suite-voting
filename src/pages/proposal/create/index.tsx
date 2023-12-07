@@ -14,9 +14,15 @@ import NoVotingType from './NoVotingType';
 import BaseFeeForm, { baseFeeFormSchema } from './BaseFeeForm';
 import EssentialForm from './EssentialForm';
 import NewMemberForm, { newMemberFormSchema } from './NewMemberForm';
+import AdminNewMemberForm, {
+  adminNewMemberFormSchema,
+} from './AdminNewMemberForm';
 import ExcludeMemberVoting, {
   excludeMemberFormSchema,
 } from './ExcludeMemberForm';
+import AdminExcludeMemberVoting, {
+  adminExcludeMemberFormSchema,
+} from './AdminExcludeMemberForm';
 import FeeDistributionForm, {
   feeDistributionFormSchema,
 } from './FeeDistributionForm';
@@ -52,14 +58,20 @@ const CreateNewVoting = () => {
         formSchema = generalFormSchema;
         break;
       case ProposalTypes.NewMember:
-      case ProposalTypes.AdminNewMember:
         ProposalForm = <NewMemberForm />;
         formSchema = newMemberFormSchema(pchainAPI);
         break;
+      case ProposalTypes.AdminNewMember:
+        ProposalForm = <AdminNewMemberForm />;
+        formSchema = adminNewMemberFormSchema(pchainAPI);
+        break;
       case ProposalTypes.ExcludeMember:
-      case ProposalTypes.AdminExcludeMember:
         ProposalForm = <ExcludeMemberVoting />;
         formSchema = excludeMemberFormSchema(pchainAPI);
+        break;
+      case ProposalTypes.AdminExcludeMember:
+        ProposalForm = <AdminExcludeMemberVoting />;
+        formSchema = adminExcludeMemberFormSchema(pchainAPI);
         break;
       case ProposalTypes.FeeDistribution:
         ProposalForm = <FeeDistributionForm />;
@@ -87,6 +99,13 @@ const CreateNewVoting = () => {
 
   useEffect(() => {
     let types = filter(proposalTypes, ptype => !ptype.restricted);
+    if (isConsortiumAdminProposer) {
+      const adminProposalTypes = filter(
+        proposalTypes,
+        ptype => ptype.isAdminProposal
+      );
+      types = [...types, ...adminProposalTypes];
+    }
     if (!isConsortiumMember) {
       setAvailableProposalTypes(types);
     } else {
@@ -107,18 +126,11 @@ const CreateNewVoting = () => {
             );
             types = [...types, ...caminoProposalTypes];
           }
-          if (isConsortiumAdminProposer) {
-            const adminProposalTypes = filter(
-              proposalTypes,
-              ptype => ptype.isAdminProposal
-            );
-            types = [...types, ...adminProposalTypes];
-          }
         }
         setAvailableProposalTypes(types);
       });
     }
-  }, [isConsortiumMember, currentWalletAddress]);
+  }, [isConsortiumMember, isConsortiumAdminProposer, currentWalletAddress]);
 
   const handleChange = (event: SelectChangeEvent<number>) => {
     const {

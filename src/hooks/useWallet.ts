@@ -13,7 +13,6 @@ import {
 import { useWalletStore } from '@/store/wallet';
 import useNetwork from './useNetwork';
 
-const KOP_SIGNAVAULT_URL = 'https://signavault.kopernikus.camino.network';
 const DEFAULT_SIGNAVAULT_CONFIG: Configuration = new Configuration({
   basePath: 'http://127.0.0.1:8081/v1',
 });
@@ -25,10 +24,6 @@ const getSignaVaultApi = (activeNetwork?: Network | null): MultisigApi => {
 
   let signavaultUrl = activeNetwork?.signavaultUrl;
   if (activeNetwork) {
-    // assign `signavaultUrl if no configuration for Kopernikus
-    if (!signavaultUrl && activeNetwork.name === 'Kopernikus') {
-      signavaultUrl = KOP_SIGNAVAULT_URL;
-    }
     // auto append default version if no version pattern found
     if (signavaultUrl && !versioRegex.test(signavaultUrl)) {
       signavaultUrl += DEFAULT_SIGNAVAULT_VERSION;

@@ -80,7 +80,7 @@ const BaseFeeVoting = ({
             isConsortiumMember={isConsortiumMember}
             voted={data.voted}
             selected={selectedOption?.option}
-            inactive={data.inactive || data.isCompleted}
+            inactive={data.inactive || data.isCompleted || !data.canVote}
             onSelect={handleSelectChange}
             onVote={() => handleConfirmToVote(opt)}
             isSubmitting={confirmedOption === opt.option}

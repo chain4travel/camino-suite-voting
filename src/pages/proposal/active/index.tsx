@@ -25,6 +25,7 @@ const ActiveVotings = () => {
   const wallet = useWallet();
   const [onlyTodo, setOnlyTodo] = useState(false);
   const { proposals, error, refetch, isFetching } = useActiveVotings(
+    wallet.pchainAPI,
     wallet.currentWalletAddress
   );
   const {

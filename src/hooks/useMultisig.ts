@@ -84,6 +84,7 @@ export const usePendingMultisigTx = () => {
         setPendingMultisigTxs(pendingTxs);
         return pendingTxs;
       }
+      return;
     },
   });
 

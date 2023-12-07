@@ -206,7 +206,7 @@ const DefaultVotingOptions = ({
           onClick={triggerVoting(opt)}
           color={opt.value ? 'primary' : 'inherit'}
           fullWidth
-          disabled={!isConsortiumMember || data.inactive}
+          disabled={!isConsortiumMember || data.inactive || !data.canVote}
         >
           {getOptionLabel(opt)}
         </Button>

@@ -88,12 +88,6 @@ const CreatingProposals = () => {
     navigate('/dac/upcoming');
   };
 
-  console.log(
-    '@CreatingProposals: groupedPendingProposals',
-    groupedPendingProposals,
-    isFetching
-  );
-
   return (
     <Paper sx={{ px: 2 }}>
       <Header headline="Creating Proposals" variant="h5">

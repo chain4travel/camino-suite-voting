@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect, useMemo } from 'react';
 import {
   useForm,
   SubmitHandler,
@@ -20,25 +20,25 @@ import { useAddProposal } from '@/hooks/useProposals';
 import useNetwork from '@/hooks/useNetwork';
 import { getTxExplorerUrl } from '@/helpers/string';
 import { useNavigate } from 'react-router-dom';
+import { ProposalTypes } from '@/types';
 
-export const essentialSchema = z.object({
-  startDate: z
-    .custom<DateTime>()
-    .refine(
-      (d: DateTime) => d.isValid && d.diffNow(['days', 'hours']).days >= 0,
-      'invalid start date'
-    ),
-  endDate: z
-    .custom<DateTime>()
-    .refine(
-      (d: DateTime) => d.isValid && d.diffNow(['days']).days > 0,
-      'invalid end date'
-    ),
-  forumLink: z.preprocess(url => {
-    if (!url || typeof url !== 'string') return undefined;
-    return url === '' ? undefined : url;
-  }, z.string().url().optional()),
-});
+export const essentialSchema = (isAdminProposal: boolean) =>
+  z.object({
+    startDate: z
+      .custom<DateTime>()
+      .refine(
+        (d: DateTime) => d.isValid && d.diffNow(['days', 'hours']).days >= 0,
+        'invalid start date'
+      ),
+    endDate: z.custom<DateTime>().refine((d: DateTime) => {
+      if (isAdminProposal) return true;
+      else return d.isValid && d.diffNow(['days']).days > 0;
+    }, 'invalid end date'),
+    forumLink: z.preprocess(url => {
+      if (!url || typeof url !== 'string') return undefined;
+      return url === '' ? undefined : url;
+    }, z.string().url().optional()),
+  });
 
 interface EssentialFormProps {
   proposalType: number | string;
@@ -57,7 +57,15 @@ const EssentialForm = ({
   formSchema = { schema: {} },
   onCancel,
 }: EssentialFormProps) => {
+  const isAdminProposal = useMemo(() => {
+    const proposalIds = Object.values(ProposalTypes);
+    return (
+      proposalIds.indexOf(ProposalTypes.AdminNewMember) === proposalType ||
+      proposalIds.indexOf(ProposalTypes.AdminExcludeMember) === proposalType
+    );
+  }, [proposalType]);
   const essentialRefinement = (fields: { [x: string]: any }) => {
+    if (isAdminProposal) return true;
     const diffDays = fields.endDate
       .endOf('day')
       .diff(fields.startDate.startOf('day'), ['days']).days;
@@ -71,7 +79,7 @@ const EssentialForm = ({
     minDays: 1,
     maxDays: 30,
   };
-  const schema = essentialSchema
+  const schema = essentialSchema(isAdminProposal)
     .extend(formSchema.schema)
     .refine(
       formSchema.refine ?? essentialRefinement,
@@ -86,6 +94,13 @@ const EssentialForm = ({
     'startDate',
     DateTime.now().plus({ day: 1 }).startOf('day')
   );
+  useEffect(() => {
+    reset({
+      startDate: isAdminProposal
+        ? DateTime.now()
+        : DateTime.now().plus({ day: 1 }).startOf('day'),
+    });
+  }, [isAdminProposal]);
   const navigate = useNavigate();
   const toast = useToast();
   const { activeNetwork } = useNetwork();
@@ -158,18 +173,22 @@ const EssentialForm = ({
                   <Controller
                     name="startDate"
                     control={control}
-                    defaultValue={DateTime.now()
-                      .plus({ day: 1 })
-                      .startOf('day')}
+                    defaultValue={
+                      isAdminProposal
+                        ? DateTime.now()
+                        : DateTime.now().plus({ day: 1 }).startOf('day')
+                    }
                     render={({ field, fieldState: { error } }) => (
                       <>
                         <DatePicker
                           {...field}
                           disablePast
                           onChange={value => field.onChange(value)}
-                          minDate={DateTime.now()
-                            .plus({ day: 1 })
-                            .startOf('day')}
+                          minDate={
+                            isAdminProposal
+                              ? DateTime.now()
+                              : DateTime.now().plus({ day: 1 }).startOf('day')
+                          }
                         />
                         {error && (
                           <FormHelperText error>{error.message}</FormHelperText>
@@ -178,34 +197,38 @@ const EssentialForm = ({
                     )}
                   />
                 </Stack>
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <InputLabel sx={{ color: 'text.secondary' }}>To</InputLabel>
-                  <Controller
-                    name="endDate"
-                    control={control}
-                    defaultValue={watchStartDate.plus({
-                      days: endDateRestriction.minDays,
-                    })}
-                    render={({ field, fieldState: { error } }) => (
-                      <>
-                        <DatePicker
-                          {...field}
-                          disablePast
-                          onChange={value => field.onChange(value)}
-                          minDate={watchStartDate.plus({
-                            days: endDateRestriction.minDays,
-                          })}
-                          maxDate={watchStartDate.plus({
-                            days: endDateRestriction.maxDays,
-                          })}
-                        />
-                        {error && (
-                          <FormHelperText error>{error.message}</FormHelperText>
-                        )}
-                      </>
-                    )}
-                  />
-                </Stack>
+                {!isAdminProposal && (
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <InputLabel sx={{ color: 'text.secondary' }}>To</InputLabel>
+                    <Controller
+                      name="endDate"
+                      control={control}
+                      defaultValue={watchStartDate.plus({
+                        days: endDateRestriction.minDays,
+                      })}
+                      render={({ field, fieldState: { error } }) => (
+                        <>
+                          <DatePicker
+                            {...field}
+                            disablePast
+                            onChange={value => field.onChange(value)}
+                            minDate={watchStartDate.plus({
+                              days: endDateRestriction.minDays,
+                            })}
+                            maxDate={watchStartDate.plus({
+                              days: endDateRestriction.maxDays,
+                            })}
+                          />
+                          {error && (
+                            <FormHelperText error>
+                              {error.message}
+                            </FormHelperText>
+                          )}
+                        </>
+                      )}
+                    />
+                  </Stack>
+                )}
               </Stack>
             </FormSection>
             {/* <FormSection spacing="md" divider sx={{ paddingX: 3 }}>

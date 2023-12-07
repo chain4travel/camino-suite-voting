@@ -23,6 +23,7 @@ export type ProposalType = {
   abbr: string;
   icon?: ReactElement;
   disabled?: boolean;
+  restricted?: boolean;
   isAdminProposal?: boolean;
   consortiumMemberOnly?: boolean;
   caminoOnly?: boolean;
@@ -95,9 +96,9 @@ export type Proposal = {
   status: number;
   blockHeight: number;
   outcome?: number;
-  result?: Vote[];
-  voted?: VotingOption[];
+  voted?: VotingOption[]; // voted option for current connected wallet
   votes?: Vote[];
+  canVote?: boolean; // flag for current connected wallet has running validator at time when this proposal created
   inactive?: boolean;
   isCompleted?: boolean;
   description?: string;

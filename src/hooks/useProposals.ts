@@ -112,10 +112,39 @@ const parseAPIVote = (vote: APIVote) => {
   };
 };
 
-export const useActiveVotings = (currentWalletAddress?: string, page = 0) => {
+export const useActiveVotings = (
+  pchainAPI?: platformvm.PlatformVMAPI,
+  currentWalletAddress?: string,
+  page = 0
+) => {
   const { data, isInitialLoading, isFetching, refetch, error } = useQuery(
     ['getActiveVotings', page],
-    async () => fetchActiveVotings(page)
+    async () => {
+      const result = await fetchActiveVotings(page);
+      let proposals = parseAPIProposals(
+        result?.data.dacProposals,
+        currentWalletAddress
+      );
+      if (pchainAPI && currentWalletAddress) {
+        proposals = await Promise.all(
+          proposals.map(async proposal => {
+            const response = await pchainAPI?.getValidatorsAt(
+              proposal.blockHeight
+            );
+            const canVote = !!find(
+              response?.validators,
+              validator =>
+                validator.consortiumMemberAddress === currentWalletAddress
+            );
+            return {
+              ...proposal,
+              canVote: canVote && !proposal.voted,
+            };
+          })
+        );
+      }
+      return proposals;
+    }
     // { notifyOnChangeProps: ['data', 'error'] }
   );
 
@@ -124,17 +153,13 @@ export const useActiveVotings = (currentWalletAddress?: string, page = 0) => {
     isInitialLoading,
     isFetching
   );
-  const proposals = parseAPIProposals(
-    data?.data.dacProposals,
-    currentWalletAddress
-  );
 
   return {
     isFetching,
     isInitialLoading,
     error,
     refetch,
-    proposals: proposals ?? [],
+    proposals: data ?? [],
   };
 };
 
@@ -266,7 +291,7 @@ export const useAddProposal = (
           break;
         case 3:
           {
-            startDate = startDate.startOf('day');
+            startDate = startDate.plus({ hours: 2 });
             endDate = startDate.plus({ days: 60 });
             const optionIndex = Buffer.alloc(4);
             optionIndex.writeInt32BE(0, 0);
@@ -282,7 +307,7 @@ export const useAddProposal = (
           break;
         case 4:
           {
-            startDate = startDate.startOf('day');
+            startDate = startDate.plus({ hours: 2 });
             endDate = startDate.plus({ days: 7 });
             const optionIndex = Buffer.alloc(4);
             optionIndex.writeInt32BE(0, 0);
