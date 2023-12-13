@@ -50,7 +50,8 @@ const NavItem = ({ to, text, notification }: NavItemProps) => {
 };
 
 const ProposalNavbar = () => {
-  const { currentWalletAddress, isKycVerified } = useWallet();
+  const { currentWalletAddress, isKycVerified, isConsortiumAdminProposer } =
+    useWallet();
   const pendingMultisigTxs = useWalletStore(state => state.pendingMultisigTxs);
   const { pendingAddProposals, pendingAddVotes } = useMemo(() => {
     const pendingForCurrentAlias = filter(pendingMultisigTxs, {
@@ -73,6 +74,8 @@ const ProposalNavbar = () => {
         pendingAddVoteCount > 0 ? `${pendingAddVoteCount} pending` : undefined,
     };
   }, [pendingMultisigTxs]);
+  const isCreateProposalAllowed = isKycVerified || isConsortiumAdminProposer;
+  const enableCreateButton = currentWalletAddress && isCreateProposalAllowed;
   return (
     <Stack
       direction="row"
@@ -91,7 +94,7 @@ const ProposalNavbar = () => {
         <NavItem to="upcoming" text="Upcoming Proposals" />
         <NavItem to="completed" text="Completed Proposals" />
       </Stack>
-      {currentWalletAddress && isKycVerified && (
+      {enableCreateButton && (
         <NavItem
           to="creating"
           text="Create Proposal"

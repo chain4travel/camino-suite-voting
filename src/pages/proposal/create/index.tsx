@@ -39,6 +39,7 @@ const CreateNewVoting = () => {
     currentWalletAddress,
     isConsortiumAdminProposer,
     isCaminoProposer,
+    isKycVerified,
   } = useWallet();
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
   const [availableProposalTypes, setAvailableProposalTypes] =
@@ -98,31 +99,45 @@ const CreateNewVoting = () => {
   }, [signer]);
 
   useEffect(() => {
-    let types = filter(proposalTypes, ptype => !ptype.restricted);
+    let types: ProposalType[] = [];
+    // Check address state of admin proposer
     if (isConsortiumAdminProposer) {
       const adminProposalTypes = filter(
         proposalTypes,
-        ptype => ptype.isAdminProposal
+        ptype => !!ptype.isAdminProposal
       );
       types = [...types, ...adminProposalTypes];
     }
+    // Check address state of KYC-verified
+    if (isKycVerified) {
+      const kycVerifiedTypes = filter(
+        proposalTypes,
+        ptype => !ptype.restricted
+      );
+      types = [...types, ...kycVerifiedTypes];
+    }
+    // Check address state of C-member
     if (!isConsortiumMember) {
       setAvailableProposalTypes(types);
     } else {
+      // Check running validator
       pchainAPI?.getCurrentValidators().then(result => {
-        const hasValidator = find(result.validators, validator =>
-          validator.rewardOwner.addresses.includes(currentWalletAddress)
+        const hasValidator = find(
+          (result as { validators: any[] }).validators,
+          validator =>
+            validator.rewardOwner.addresses.includes(currentWalletAddress)
         );
         if (hasValidator) {
           const consortiumMemberProposalTypes = filter(
             proposalTypes,
-            ptype => ptype.consortiumMemberOnly
+            ptype => !!ptype.consortiumMemberOnly
           );
           types = [...types, ...consortiumMemberProposalTypes];
+          // Check address state of camino-only proposer
           if (isCaminoProposer) {
             const caminoProposalTypes = filter(
               proposalTypes,
-              ptype => ptype.caminoOnly
+              ptype => !!ptype.caminoOnly
             );
             types = [...types, ...caminoProposalTypes];
           }
