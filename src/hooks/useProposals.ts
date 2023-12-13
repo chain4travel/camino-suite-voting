@@ -205,30 +205,49 @@ export const useCompletedVotes = (
   };
 };
 
-export const useProposal = (id: string, currentWalletAddress?: string) => {
+export const useProposal = (
+  id: string,
+  currentWalletAddress?: string,
+  pchainAPI?: platformvm.PlatformVMAPI
+) => {
   const { data, isLoading, error, refetch } = useQuery(
     ['getProposalDetail', id],
-    async () => fetchProposalDetail(id),
+    async () => {
+      const result = await fetchProposalDetail(id);
+      const proposal = parseAPIProposal(result?.data?.dacProposal);
+      if (pchainAPI && currentWalletAddress && proposal) {
+        const response = await pchainAPI?.getValidatorsAt(proposal.blockHeight);
+        const canVote = !!find(
+          response?.validators,
+          validator =>
+            validator.consortiumMemberAddress === currentWalletAddress
+        );
+        const votes = result?.data?.dacVotes.map((vote: APIVote) =>
+          parseAPIVote(vote)
+        );
+
+        // Find voted by current wallet
+        let voted;
+        if (currentWalletAddress) {
+          voted = find(votes, { voterAddr: currentWalletAddress });
+        }
+        return {
+          ...proposal,
+          canVote: canVote && !proposal.voted,
+          voted: voted?.votedOptions.map((v: number) => ({ option: v })),
+          votes,
+        };
+      }
+
+      return proposal ?? {};
+    },
     {
       notifyOnChangeProps: ['data', 'error'],
     }
   );
 
-  const proposal = parseAPIProposal(data?.data?.dacProposal);
-  const votes = data?.data?.dacVotes.map((vote: APIVote) => parseAPIVote(vote));
-
-  // Find voted by current wallet
-  let voted;
-  if (currentWalletAddress) {
-    voted = find(votes, { voterAddr: currentWalletAddress });
-  }
-
   return {
-    proposal: {
-      ...(proposal ?? {}),
-      voted: voted?.votedOptions.map((v: number) => ({ option: v })),
-      votes,
-    },
+    proposal: data ?? {},
     error,
     isLoading,
     refetch,

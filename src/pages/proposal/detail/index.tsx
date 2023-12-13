@@ -31,7 +31,11 @@ const Detail = () => {
   const wallet = useWallet();
   const { type, id } = useParams();
   const navigate = useNavigate();
-  const { proposal, refetch } = useProposal(id!, wallet.currentWalletAddress);
+  const { proposal, refetch } = useProposal(
+    id!,
+    wallet.currentWalletAddress,
+    wallet.pchainAPI
+  );
   const { baseFee } = useBaseFee();
   const { feeDistribution } = useFeeDistribution();
   const proposalWithEligibles = useEligibleCMembers(proposal as Proposal);
