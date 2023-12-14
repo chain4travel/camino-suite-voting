@@ -17,9 +17,9 @@ import {
   ProposalTypes,
   VotingOption,
 } from '@/types';
+import { useNetworkStore } from '@/store/network';
 import useWallet from './useWallet';
 import useToast from './useToast';
-import useNetwork from './useNetwork';
 import { useMultisig } from './useMultisig';
 
 const serialization = Serialization.getInstance();
@@ -118,7 +118,7 @@ export const useActiveVotings = (
   page = 0
 ) => {
   const { data, isInitialLoading, isFetching, refetch, error } = useQuery(
-    ['getActiveVotings', page],
+    ['getActiveVotings', currentWalletAddress, page],
     async () => {
       const result = await fetchActiveVotings(page);
       let proposals = parseAPIProposals(
@@ -145,13 +145,6 @@ export const useActiveVotings = (
       }
       return proposals;
     }
-    // { notifyOnChangeProps: ['data', 'error'] }
-  );
-
-  console.debug(
-    'useActiveVotings isInitialLoading: ',
-    isInitialLoading,
-    isFetching
   );
 
   return {
@@ -211,7 +204,7 @@ export const useProposal = (
   pchainAPI?: platformvm.PlatformVMAPI
 ) => {
   const { data, isLoading, error, refetch } = useQuery(
-    ['getProposalDetail', id],
+    ['getProposalDetail', currentWalletAddress, id],
     async () => {
       const result = await fetchProposalDetail(id);
       const proposal = parseAPIProposal(result?.data?.dacProposal);
@@ -400,7 +393,7 @@ export const useAddProposal = (
 };
 
 export const useEligibleCMembers = (proposal: Proposal) => {
-  const { caminoClient } = useNetwork();
+  const caminoClient = useNetworkStore(state => state.caminoClient);
   const { data, error } = useQuery({
     queryKey: ['getEligibleCMembers', proposal.id],
     queryFn: async () =>

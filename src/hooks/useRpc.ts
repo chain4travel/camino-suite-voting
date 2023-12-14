@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { getFeeDistribution } from '@/helpers/rpc';
-import useNetwork from './useNetwork';
+import { useNetworkStore } from '@/store/network';
 
 // TODO: base RPC call
 
 export const useBaseFee = () => {
-  const { caminoClient } = useNetwork();
-  const { data, isLoading, error, isSuccess } = useQuery({
+  const caminoClient = useNetworkStore(state => state.caminoClient);
+  const { data, isLoading, error } = useQuery({
     queryKey: ['getBaseFee'],
     queryFn: async () => await caminoClient?.Info().getTxFee(),
     refetchOnWindowFocus: false,

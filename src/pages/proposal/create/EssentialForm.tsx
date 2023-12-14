@@ -17,7 +17,7 @@ import useToast from '@/hooks/useToast';
 import FormContainer from './FormContainer';
 import FormSection from './FormSection';
 import { useAddProposal } from '@/hooks/useProposals';
-import useNetwork from '@/hooks/useNetwork';
+import { useNetworkStore } from '@/store/network';
 import { getTxExplorerUrl } from '@/helpers/string';
 import { useNavigate } from 'react-router-dom';
 import { ProposalTypes } from '@/types';
@@ -103,7 +103,7 @@ const EssentialForm = ({
   }, [isAdminProposal]);
   const navigate = useNavigate();
   const toast = useToast();
-  const { activeNetwork } = useNetwork();
+  const activeNetwork = useNetworkStore(state => state.activeNetwork);
   const addProposal = useAddProposal(proposalType, {
     onSuccess: data => {
       reset({});

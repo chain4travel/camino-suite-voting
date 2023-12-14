@@ -9,7 +9,7 @@ import ExcludeMemberVoting from './ExcludeMemberVoting';
 import FeeDistributionVoting from './FeeDistributionVoting';
 import GrantProgramVoting from './GrantProgram';
 import useToast from '@/hooks/useToast';
-import useNetwork from '@/hooks/useNetwork';
+import { useNetworkStore } from '@/store/network';
 import Button from '@/components/Button';
 import { getTxExplorerUrl } from '@/helpers/string';
 import { useMultisig } from '@/hooks/useMultisig';
@@ -22,7 +22,7 @@ interface VotingListProps {
 const VotingList = ({ data, isConsortiumMember, refresh }: VotingListProps) => {
   const navigate = useNavigate();
   const toast = useToast();
-  const { activeNetwork } = useNetwork();
+  const activeNetwork = useNetworkStore(state => state.activeNetwork);
   const { signMultisigTx, abortSignavault, executeMultisigTx } = useMultisig();
   const onVoteTxSuccess = (data?: string) => {
     toast.success(

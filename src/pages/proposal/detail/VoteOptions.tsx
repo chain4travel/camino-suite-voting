@@ -19,7 +19,7 @@ import { useMultisig, usePendingMultisigAddVoteTxs } from '@/hooks/useMultisig';
 import useToast from '@/hooks/useToast';
 import Button from '@/components/Button';
 import { getTxExplorerUrl } from '@/helpers/string';
-import useNetwork from '@/hooks/useNetwork';
+import { useNetworkStore } from '@/store/network';
 
 type VotedOption = VotingOption & Percentage;
 
@@ -41,7 +41,7 @@ const VoteOptions = ({
   refresh,
 }: VoteOptionsProps) => {
   if (!options) return null;
-  const { activeNetwork } = useNetwork();
+  const activeNetwork = useNetworkStore(state => state.activeNetwork);
   const { signMultisigTx, abortSignavault, executeMultisigTx } = useMultisig();
   const toast = useToast();
   const onVoteTxSuccess = (data?: string) => {

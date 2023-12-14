@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
@@ -11,7 +11,8 @@ import { getRoutes } from './routes';
 import './locales/i18n';
 import CaminoTheme from './theme';
 import type { Network } from './types';
-import useNetwork from './hooks/useNetwork';
+import { useNetworkStore } from './store/network';
+import { updateBaseUrl } from './helpers/http';
 
 const queryClient = new QueryClient();
 
@@ -20,7 +21,13 @@ interface RootProps {
   theme?: Theme;
 }
 const Root = (props: RootProps) => {
-  useNetwork(props.network);
+  const setActiveNetwork = useNetworkStore(state => state.setActiveNetwork);
+  useEffect(() => {
+    if (props.network) {
+      setActiveNetwork(props.network);
+      updateBaseUrl(props.network.explorerUrl!);
+    }
+  }, [props.network]);
   const caminoTheme = CaminoTheme.getThemeOptions('dark');
   const theme = props.theme ?? createTheme(caminoTheme);
   return (

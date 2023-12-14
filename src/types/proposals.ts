@@ -83,6 +83,7 @@ export type APIProposal = {
   blockHeight: number;
   outcome?: number;
   admin_proposal?: boolean;
+  data?: string;
 };
 export type Proposal = {
   id: string;

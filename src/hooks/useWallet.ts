@@ -11,7 +11,7 @@ import {
   WalletAddressState,
 } from '@/types';
 import { useWalletStore } from '@/store/wallet';
-import useNetwork from './useNetwork';
+import { useNetworkStore } from '@/store/network';
 
 const DEFAULT_SIGNAVAULT_CONFIG: Configuration = new Configuration({
   basePath: 'http://127.0.0.1:8081/v1',
@@ -39,7 +39,10 @@ const getSignaVaultApi = (activeNetwork?: Network | null): MultisigApi => {
 const isMultiSigWallet = (wallet: { type: WalletType }) =>
   wallet.type === 'multisig';
 const useWallet = () => {
-  const { caminoClient, activeNetwork } = useNetwork();
+  const { caminoClient, activeNetwork } = useNetworkStore(state => ({
+    caminoClient: state.caminoClient,
+    activeNetwork: state.activeNetwork,
+  }));
   const activeWallet = store.state?.activeWallet;
   const setPendingMultisigTxs = useWalletStore(
     state => state.setPendingMultisigTxs

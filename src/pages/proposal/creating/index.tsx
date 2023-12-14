@@ -16,7 +16,6 @@ import useToast from '@/hooks/useToast';
 import Button from '@/components/Button';
 import { getTxExplorerUrl } from '@/helpers/string';
 import useWallet from '@/hooks/useWallet';
-import useNetwork from '@/hooks/useNetwork';
 import GroupHeader from './GroupHeader';
 import PendingList from './PendingList';
 import {
@@ -24,10 +23,11 @@ import {
   usePendingMultisigAddProposalTxs,
 } from '@/hooks/useMultisig';
 import RefreshButton from '@/components/RefreshButton';
+import { useNetworkStore } from '@/store/network';
 
 const CreatingProposals = () => {
   const navigate = useNavigate();
-  const { activeNetwork } = useNetwork();
+  const activeNetwork = useNetworkStore(state => state.activeNetwork);
   const { currentWalletAddress, isKycVerified } = useWallet();
   const { signMultisigTx, executeMultisigTx, abortSignavault } = useMultisig();
   const { pendingMultisigAddProposalTxs, refetch, isFetching } =
