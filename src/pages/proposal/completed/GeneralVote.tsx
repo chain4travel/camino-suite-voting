@@ -11,11 +11,8 @@ interface GeneralVoteProps {
 }
 const GeneralVote = ({ data, voteTypeName }: GeneralVoteProps) => {
   const votedList: VotingOption[] = useMemo(
-    () =>
-      data.options.filter(opt =>
-        data.result?.find(v => v.option === opt.option)
-      ),
-    [data.result]
+    () => data.options.filter(opt => data.outcome === opt.option),
+    [data.outcome]
   );
 
   return (

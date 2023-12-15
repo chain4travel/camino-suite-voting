@@ -3,20 +3,26 @@ import React from 'react';
 import { map } from 'lodash';
 import Big from 'big.js';
 import DistributionBar from '@/components/DistributionBar';
-import { Percentage, Statistics, VoteData, VotingOption } from '@/types';
+import {
+  Percentage,
+  ProposalTypes,
+  Statistics,
+  VoteData,
+  VotingOption,
+} from '@/types';
 import VoteResultTable from './VoteResultTable';
 
 interface CompletedStatisticsProps {
   statistics?: Statistics;
   options?: VotingOption[];
-  votingType?: string;
+  proposalType?: string;
   baseFee?: string | number;
   votes?: VoteData[];
 }
 const CompletedStatistics = ({
   statistics,
   options,
-  votingType,
+  proposalType,
   baseFee,
   votes,
 }: CompletedStatisticsProps) => {
@@ -40,16 +46,19 @@ const CompletedStatistics = ({
                 {option.label}
               </Typography>
             );
-            switch (votingType) {
-              case 'BASE_FEE':
+            switch (proposalType) {
+              case ProposalTypes.BaseFee:
                 {
                   const absoluteChange = new Big(option.value as number).minus(
                     baseFee!
                   );
-                  const percentageChange = new Big(absoluteChange)
-                    .times(100)
-                    .div(baseFee!)
-                    .toFixed(2);
+                  const percentageChange =
+                    Number(baseFee) > 0
+                      ? new Big(absoluteChange)
+                          .times(100)
+                          .div(baseFee!)
+                          .toFixed(2)
+                      : 0;
                   const sign = absoluteChange.s > 0 ? '+' : '';
                   extraInfo = (
                     <>
@@ -78,7 +87,7 @@ const CompletedStatistics = ({
                   );
                 }
                 break;
-              case 'FEE_DISTRIBUTION':
+              case ProposalTypes.FeeDistribution:
                 label = (
                   <Typography color="text.primary" variant="body2">
                     {`Distribution #${option.option}`}
@@ -90,8 +99,8 @@ const CompletedStatistics = ({
               <>
                 {label}
                 <Typography color="text.primary" fontWeight={700}>
-                  {statistics?.summary?.[option.option]?.count ?? 0} /{' '}
-                  {statistics?.summary?.[option.option]?.percent ?? 0}%
+                  {statistics?.summary?.[option.option]?.percent ?? 0}% /{' '}
+                  {statistics?.summary?.[option.option]?.count ?? 0}
                 </Typography>
                 {extraInfo}
               </>
@@ -127,7 +136,7 @@ const CompletedStatistics = ({
                   : 'Did not participate'}
               </Typography>
               <Typography color="grey.900" fontWeight={700}>
-                {turnout.count} / {turnout.percent}%
+                {turnout.percent}% / {turnout.count}
               </Typography>
             </>
           )}

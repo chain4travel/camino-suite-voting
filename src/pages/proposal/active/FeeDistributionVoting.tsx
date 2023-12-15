@@ -42,12 +42,13 @@ const FeeDistributionVoting = ({
     <Stack direction="row" sx={{ marginRight: 3 }} spacing={3} width="100%">
       {data.options.map(opt => (
         <VotingOptionCard
-          key={`${opt.option}`}
+          key={`fee-dist-${data.id}-${opt.option}`}
           option={opt}
           isConsortiumMember={isConsortiumMember}
           title={`Distribution #${opt.option}`}
           voted={data.voted}
           selected={selectedOption?.option}
+          inactive={data.inactive}
           onSelect={handleSelectChange}
           onVote={() => handleConfirmToVote(opt)}
           isSubmitting={confirmedOption === opt.option}
@@ -63,7 +64,12 @@ const FeeDistributionVoting = ({
                 <DistributionBar data={distributions} variant="vote" />
                 <Stack spacing={0.5}>
                   {map(distributions, (distribution, idx: number) => (
-                    <Stack direction="row" alignItems="center" spacing={1}>
+                    <Stack
+                      key={`fee-dist-${data.id}-${opt.option}-${idx}`}
+                      direction="row"
+                      alignItems="center"
+                      spacing={1}
+                    >
                       <Circle
                         sx={{
                           color: VOTE_DISTRIBUTION_COLORS[idx],

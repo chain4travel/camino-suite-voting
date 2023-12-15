@@ -24,5 +24,11 @@ const Tag = styled(Chip)(({ theme }) => ({
       backgroundColor: alpha(theme.palette.success.main, 0.2),
     },
   },
+  '&.MuiChip-filledError': {
+    '.MuiChip-label': {
+      color: theme.palette.error.main,
+      backgroundColor: alpha(theme.palette.error.main, 0.2),
+    },
+  },
 }));
 export default Tag;
