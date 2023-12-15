@@ -208,28 +208,28 @@ export const useProposal = (
     async () => {
       const result = await fetchProposalDetail(id);
       const proposal = parseAPIProposal(result?.data?.dacProposal);
+      let canVote = false;
       if (pchainAPI && currentWalletAddress && proposal) {
         const response = await pchainAPI?.getValidatorsAt(proposal.blockHeight);
-        const canVote = !!find(
+        canVote = !!find(
           response?.validators,
           validator =>
             validator.consortiumMemberAddress === currentWalletAddress
         );
-        const votes = result?.data?.dacVotes.map((vote: APIVote) =>
-          parseAPIVote(vote)
-        );
-
-        // Find voted by current wallet
-        const voted = find(votes, { voterAddr: currentWalletAddress });
-        return {
-          ...proposal,
-          canVote: canVote && !proposal.voted,
-          voted: voted?.votedOptions.map((v: number) => ({ option: v })),
-          votes,
-        };
       }
+      const votes = result?.data?.dacVotes.map((vote: APIVote) =>
+        parseAPIVote(vote)
+      );
 
-      return proposal ?? {};
+      // Find voted by current wallet
+      const voted = find(votes, { voterAddr: currentWalletAddress });
+
+      return {
+        ...proposal,
+        canVote: canVote && !proposal?.voted,
+        voted: voted?.votedOptions.map((v: number) => ({ option: v })),
+        votes,
+      };
     },
     {
       notifyOnChangeProps: ['data', 'error'],
