@@ -90,7 +90,11 @@ export type PendingMultisigTx = ModelMultisigTx & {
 };
 
 export type WalletStore = {
+  addressState: WalletAddressState;
   pendingMultisigTxs: PendingMultisigTx[];
+  currentWalletAddress?: string;
+  setAddressState: (addressState: WalletAddressState) => void;
+  setCurrentWalletAddress: (address: string) => void;
   setPendingMultisigTxs: (pendingMultisigTxs: PendingMultisigTx[]) => void;
 };
 

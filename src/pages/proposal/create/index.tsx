@@ -30,17 +30,20 @@ import GeneralProposalForm, { generalFormSchema } from './GeneralProposalForm';
 import GrantProgramForm, { grantProgramFormSchema } from './GrantProgramForm';
 import useWallet from '@/hooks/useWallet';
 import { filter, find } from 'lodash';
+import { useWalletStore } from '@/store';
 
 const CreateNewVoting = () => {
+  const { signer, pchainAPI } = useWallet();
+  const { currentWalletAddress, addressState } = useWalletStore(state => ({
+    currentWalletAddress: state.currentWalletAddress,
+    addressState: state.addressState,
+  }));
   const {
-    signer,
-    pchainAPI,
     isConsortiumMember,
-    currentWalletAddress,
     isConsortiumAdminProposer,
     isCaminoProposer,
     isKycVerified,
-  } = useWallet();
+  } = addressState;
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
   const [availableProposalTypes, setAvailableProposalTypes] =
     useState(proposalTypes);

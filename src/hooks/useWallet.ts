@@ -1,15 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { BN, Avalanche as Camino, BinTools } from '@c4tplatform/caminojs/dist';
 import { Configuration, MultisigApi } from '@c4tplatform/signavaultjs';
 import { AddressState } from '@c4tplatform/caminojs/dist/apis/platformvm';
 import store from 'wallet/store';
-import {
-  MultisigWallet,
-  SingletonWallet,
-  Network,
-  WalletType,
-  WalletAddressState,
-} from '@/types';
+import { MultisigWallet, SingletonWallet, Network, WalletType } from '@/types';
 import { useWalletStore } from '@/store/wallet';
 import { useNetworkStore } from '@/store/network';
 
@@ -44,79 +38,72 @@ const useWallet = () => {
     activeNetwork: state.activeNetwork,
   }));
   const activeWallet = store.state?.activeWallet;
-  const setPendingMultisigTxs = useWalletStore(
-    state => state.setPendingMultisigTxs
-  );
-  const [walletAddressState, setWalletAddressState] =
-    useState<WalletAddressState>({
-      isConsortiumMember: false,
-      isKycVerified: false,
-      isConsortiumAdminProposer: false,
-      isCaminoProposer: false,
-    });
+  const { setAddressState, setCurrentWalletAddress, setPendingMultisigTxs } =
+    useWalletStore(state => ({
+      setAddressState: state.setAddressState,
+      setCurrentWalletAddress: state.setCurrentWalletAddress,
+      setPendingMultisigTxs: state.setPendingMultisigTxs,
+    }));
 
   const signavaultApi = useMemo(
     () => getSignaVaultApi(activeNetwork),
     [activeNetwork]
   );
-  const { pchainAPI, signer, currentWalletAddress, multisigWallet } =
-    useMemo(() => {
-      const getAddressState = async (address: string, caminoClient: Camino) => {
-        const BN_ONE = new BN(1);
-        const states = await caminoClient?.PChain().getAddressStates(address);
-        setWalletAddressState({
-          isConsortiumMember: !states
-            ?.and(BN_ONE.shln(AddressState.CONSORTIUM))
-            .isZero(),
-          isKycVerified: !states
-            ?.and(BN_ONE.shln(AddressState.KYC_VERIFIED))
-            .isZero(),
-          isConsortiumAdminProposer: !states
-            ?.and(BN_ONE.shln(AddressState.ROLE_CONSORTIUM_ADMIN_PROPOSER))
-            .isZero(),
-          isCaminoProposer: !states
-            ?.and(BN_ONE.shln(AddressState.CAMINO_ONLY_PROPOSER))
-            .isZero(),
-        });
-      };
+  const { pchainAPI, signer, multisigWallet } = useMemo(() => {
+    const getAddressState = async (address: string, caminoClient: Camino) => {
+      const BN_ONE = new BN(1);
+      const states = await caminoClient?.PChain().getAddressStates(address);
+      setAddressState({
+        isConsortiumMember: !states
+          ?.and(BN_ONE.shln(AddressState.CONSORTIUM))
+          .isZero(),
+        isKycVerified: !states
+          ?.and(BN_ONE.shln(AddressState.KYC_VERIFIED))
+          .isZero(),
+        isConsortiumAdminProposer: !states
+          ?.and(BN_ONE.shln(AddressState.ROLE_CONSORTIUM_ADMIN_PROPOSER))
+          .isZero(),
+        isCaminoProposer: !states
+          ?.and(BN_ONE.shln(AddressState.CAMINO_ONLY_PROPOSER))
+          .isZero(),
+      });
+    };
 
-      if (activeWallet && caminoClient) {
-        const pchain = caminoClient.PChain();
-        const bintools = BinTools.getInstance();
-        let walletAddress, signer, multisigWallet;
-        if (isMultiSigWallet(activeWallet)) {
-          multisigWallet = activeWallet as MultisigWallet;
-          walletAddress = bintools.addressToString(
-            multisigWallet.hrp,
-            multisigWallet.pchainId,
-            multisigWallet.keyData.alias
-          );
-          signer = multisigWallet.wallets[0].keyPair; // pchain.keyChain().importKey();
-        } else {
-          const singletonWallet = activeWallet as SingletonWallet;
-          walletAddress =
-            singletonWallet.platformKeyChain?.getAddressStrings()[0];
-          signer = pchain.keyChain().importKey(singletonWallet.key);
-          setPendingMultisigTxs([]);
-        }
-        getAddressState(walletAddress, caminoClient);
-
-        return {
-          pchainAPI: pchain,
-          signer,
-          currentWalletAddress: walletAddress,
-          multisigWallet,
-        };
+    if (activeWallet && caminoClient) {
+      const pchain = caminoClient.PChain();
+      const bintools = BinTools.getInstance();
+      let walletAddress, signer, multisigWallet;
+      if (isMultiSigWallet(activeWallet)) {
+        multisigWallet = activeWallet as MultisigWallet;
+        walletAddress = bintools.addressToString(
+          multisigWallet.hrp,
+          multisigWallet.pchainId,
+          multisigWallet.keyData.alias
+        );
+        signer = multisigWallet.wallets[0].keyPair; // pchain.keyChain().importKey();
+      } else {
+        const singletonWallet = activeWallet as SingletonWallet;
+        walletAddress =
+          singletonWallet.platformKeyChain?.getAddressStrings()[0];
+        signer = pchain.keyChain().importKey(singletonWallet.key);
+        setPendingMultisigTxs([]);
       }
-      return {};
-    }, [activeWallet, caminoClient]);
+      getAddressState(walletAddress, caminoClient);
+      setCurrentWalletAddress(walletAddress);
+
+      return {
+        pchainAPI: pchain,
+        signer,
+        multisigWallet,
+      };
+    }
+    return {};
+  }, [activeWallet, caminoClient]);
 
   // Fake wallet
   return {
-    ...walletAddressState,
     pchainAPI,
     signer,
-    currentWalletAddress,
     multisigWallet,
     signavaultApi,
   };

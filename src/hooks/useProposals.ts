@@ -220,10 +220,7 @@ export const useProposal = (
         );
 
         // Find voted by current wallet
-        let voted;
-        if (currentWalletAddress) {
-          voted = find(votes, { voterAddr: currentWalletAddress });
-        }
+        const voted = find(votes, { voterAddr: currentWalletAddress });
         return {
           ...proposal,
           canVote: canVote && !proposal.voted,

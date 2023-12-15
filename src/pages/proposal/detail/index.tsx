@@ -25,15 +25,21 @@ import VoteResult from './VoteResult';
 import VoteOptions from './VoteOptions';
 import OngoingState from './OngoingState';
 import CompletedStatistics from './CompletedStatistics';
+import { useWalletStore } from '@/store';
 
 const Detail = () => {
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
   const wallet = useWallet();
+  const { currentWalletAddress, addressState } = useWalletStore(state => ({
+    currentWalletAddress: state.currentWalletAddress,
+    addressState: state.addressState,
+  }));
+  const { isConsortiumMember } = addressState;
   const { type, id } = useParams();
   const navigate = useNavigate();
   const { proposal, refetch } = useProposal(
     id!,
-    wallet.currentWalletAddress,
+    currentWalletAddress,
     wallet.pchainAPI
   );
   const { baseFee } = useBaseFee();
@@ -224,7 +230,7 @@ const Detail = () => {
               <Header variant="h6" headline="Voting options" />
               <VoteOptions
                 proposal={proposalWithEligibles}
-                isConsortiumMember={wallet.isConsortiumMember}
+                isConsortiumMember={isConsortiumMember}
                 options={proposalWithEligibles?.options?.map(
                   (opt: VotingOption) => ({
                     ...opt,

@@ -1,11 +1,10 @@
 import React, { useMemo } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Box, Stack, Typography } from '@mui/material';
-import useWallet from '@/hooks/useWallet';
 import { filter } from 'lodash';
-import Badge from './Badge';
-import { useWalletStore } from '@/store';
 import { PlatformVMConstants } from '@c4tplatform/caminojs/dist/apis/platformvm';
+import { useWalletStore } from '@/store';
+import Badge from './Badge';
 
 interface NavItemProps {
   to: string;
@@ -50,9 +49,13 @@ const NavItem = ({ to, text, notification }: NavItemProps) => {
 };
 
 const ProposalNavbar = () => {
-  const { currentWalletAddress, isKycVerified, isConsortiumAdminProposer } =
-    useWallet();
-  const pendingMultisigTxs = useWalletStore(state => state.pendingMultisigTxs);
+  const { addressState, currentWalletAddress, pendingMultisigTxs } =
+    useWalletStore(state => ({
+      addressState: state.addressState,
+      currentWalletAddress: state.currentWalletAddress,
+      pendingMultisigTxs: state.pendingMultisigTxs,
+    }));
+  const { isKycVerified, isConsortiumAdminProposer } = addressState;
   const { pendingAddProposals, pendingAddVotes } = useMemo(() => {
     const pendingForCurrentAlias = filter(pendingMultisigTxs, {
       alias: currentWalletAddress,

@@ -16,6 +16,7 @@ import Checkbox from '@/components/Checkbox';
 import Paper from '@/components/Paper';
 import RefreshButton from '@/components/RefreshButton';
 import { usePendingMultisigAddVoteTxs } from '@/hooks/useMultisig';
+import { useWalletStore } from '@/store';
 import VotingList from './VotingList';
 import GroupHeader from './GroupHeader';
 import NoProposals from './NoProposals';
@@ -23,10 +24,15 @@ import NoProposals from './NoProposals';
 const ActiveVotings = () => {
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
   const wallet = useWallet();
+  const { currentWalletAddress, addressState } = useWalletStore(state => ({
+    currentWalletAddress: state.currentWalletAddress,
+    addressState: state.addressState,
+  }));
+  const { isConsortiumMember } = addressState;
   const [onlyTodo, setOnlyTodo] = useState(false);
   const { proposals, error, refetch, isFetching } = useActiveVotings(
     wallet.pchainAPI,
-    wallet.currentWalletAddress
+    currentWalletAddress
   );
   const {
     pendingMultisigBaseFeeTxs,
@@ -75,7 +81,7 @@ const ActiveVotings = () => {
     <Paper sx={{ px: 2 }}>
       <Header headline="Ongoing Proposals" variant="h5">
         <Stack direction="row" alignItems="center" spacing={1}>
-          {wallet.isConsortiumMember && (
+          {isConsortiumMember && (
             <FormControlLabel
               control={<Checkbox />}
               onChange={(_event, checked) => setOnlyTodo(checked)}
@@ -111,7 +117,7 @@ const ActiveVotings = () => {
               <AccordionDetails style={{ padding: 0 }}>
                 <VotingList
                   data={group}
-                  isConsortiumMember={wallet.isConsortiumMember}
+                  isConsortiumMember={isConsortiumMember}
                   refresh={refetch}
                 />
               </AccordionDetails>
