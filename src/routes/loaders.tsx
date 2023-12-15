@@ -44,11 +44,11 @@ export const votingTypeLoader = (queryClient: QueryClient) => async () => {
       id: idx,
       name: ProposalTypes[key],
       abbr: key,
-      disabled: !['NewMember', 'ExcludeMember'].includes(key),
+      disabled: !['BaseFee', 'NewMember', 'ExcludeMember'].includes(key),
       restricted: !['NewMember'].includes(key),
       isAdminProposal: ['AdminNewMember', 'AdminExcludeMember'].includes(key),
       consortiumMemberOnly: ['ExcludeMember'].includes(key),
-      caminoOnly: false, // ['BaseFee'].includes(key),
+      caminoOnly: ['BaseFee'].includes(key),
     })),
   };
   return {
