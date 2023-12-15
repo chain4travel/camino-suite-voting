@@ -1,41 +1,110 @@
 import React from 'react';
-import { filter } from 'lodash';
+import { filter, find } from 'lodash';
 import { Stack, Typography } from '@mui/material';
-import Big from 'big.js';
-import { Percentage, Proposal, Vote, VotingOption } from '@/types';
-import DistributionBar from '@/components/DistributionBar';
-import Tag from '@/components/Tag';
 import { Cancel, CheckCircle } from '@mui/icons-material';
+import Big from 'big.js';
 import GrantProgramVotingOptions from '../active/GrantProgram/GrantProgramVotingOptions';
 import BaseFeeVoting from '../active/BaseFeeVoting';
+import DefaultVotingOptions from '../active/DefaultVotingOptions';
+import {
+  Percentage,
+  Proposal,
+  ProposalStatuses,
+  ProposalTypes,
+  VotingOption,
+} from '@/types';
+import DistributionBar from '@/components/DistributionBar';
+import Tag from '@/components/Tag';
+import { useMultisig, usePendingMultisigAddVoteTxs } from '@/hooks/useMultisig';
+import useToast from '@/hooks/useToast';
+import Button from '@/components/Button';
+import { getTxExplorerUrl } from '@/helpers/string';
+import { useNetworkStore } from '@/store/network';
 
 type VotedOption = VotingOption & Percentage;
 
 interface VoteOptionsProps {
   proposal: Proposal;
   options: VotedOption[];
-  result?: Vote;
-  votingType?: string;
-  baseFee?: number;
+  result?: VotingOption;
+  status?: number;
+  baseFee?: string | number;
+  isConsortiumMember?: boolean;
+  refresh?: () => void;
 }
 const VoteOptions = ({
   proposal,
   options,
-  votingType,
   result,
   baseFee,
+  isConsortiumMember,
+  refresh,
 }: VoteOptionsProps) => {
   if (!options) return null;
+  const activeNetwork = useNetworkStore(state => state.activeNetwork);
+  const { signMultisigTx, abortSignavault, executeMultisigTx } = useMultisig();
+  const toast = useToast();
+  const onVoteTxSuccess = (data?: string) => {
+    toast.success(
+      'Successfully voted',
+      data,
+      data ? (
+        <Button
+          href={getTxExplorerUrl(activeNetwork?.name, 'p', data)}
+          target="_blank"
+          variant="outlined"
+          color="inherit"
+        >
+          View on explorer
+        </Button>
+      ) : undefined
+    );
+  };
+  const { pendingMultisigAddVoteTxs } = usePendingMultisigAddVoteTxs();
+  const pendingMultisigTx = find(
+    pendingMultisigAddVoteTxs,
+    msigTx => msigTx.proposalId === proposal.id
+  );
+  const multisigFunctions = {
+    signMultisigTx,
+    abortSignavault,
+    executeMultisigTx,
+  };
+  const isCompleted =
+    (Object.values(ProposalStatuses).indexOf(ProposalStatuses.Completed) &
+      (proposal.status ?? 0)) >
+    0;
 
-  if (!result) {
+  if (!result && !isCompleted) {
     let item;
-    switch (votingType) {
-      case 'BASE_FEE':
-        item = <BaseFeeVoting data={proposal} />;
+    switch (proposal.type) {
+      case ProposalTypes.BaseFee:
+        item = (
+          <BaseFeeVoting
+            data={{ ...proposal, pendingMultisigTx }}
+            isConsortiumMember={isConsortiumMember}
+            refresh={refresh}
+            multisigFunctions={multisigFunctions}
+            onVoteSuccess={onVoteTxSuccess}
+          />
+        );
         break;
-      case 'GRANT':
-        item = <GrantProgramVotingOptions data={proposal} showFullText />;
+      case ProposalTypes.GrantProgram:
+        item = isConsortiumMember && (
+          <GrantProgramVotingOptions data={proposal} showFullText />
+        );
         break;
+      case ProposalTypes.NewMember:
+      case ProposalTypes.ExcludeMember:
+        item = (
+          <DefaultVotingOptions
+            data={{ ...proposal, pendingMultisigTx }}
+            isConsortiumMember={isConsortiumMember}
+            multisigFunctions={multisigFunctions}
+            onVoteSuccess={onVoteTxSuccess}
+            onRefresh={refresh}
+          />
+        );
     }
     return (
       <Stack
@@ -48,14 +117,14 @@ const VoteOptions = ({
   }
 
   return (
-    <Stack direction={options.length < 3 ? 'row' : 'column'} spacing={1.5}>
+    <Stack direction={options.length <= 3 ? 'row' : 'column'} spacing={1.5}>
       {filter(options, opt => opt.value !== baseFee).map(opt => {
         let label;
         let extraInfo = null;
         let labelDirection = 'column';
         let labelSpacing = 1;
-        switch (votingType) {
-          case 'BASE_FEE':
+        switch (proposal.type) {
+          case ProposalTypes.BaseFee:
             {
               if (baseFee) {
                 label = (
@@ -69,7 +138,10 @@ const VoteOptions = ({
                 const absoluteChange = new Big(opt.value as number).minus(
                   baseFee
                 );
-                const percentageChange = absoluteChange.times(100).div(baseFee);
+                const percentageChange =
+                  Number(baseFee) > 0
+                    ? absoluteChange.times(100).div(baseFee)
+                    : 0;
                 const sign = absoluteChange.s > 0 ? '+' : '';
                 extraInfo = (
                   <Stack spacing={0.5}>
@@ -96,7 +168,7 @@ const VoteOptions = ({
               }
             }
             break;
-          case 'FEE_DISTRIBUTION':
+          case ProposalTypes.FeeDistribution:
             {
               label = (
                 <Typography
@@ -108,7 +180,7 @@ const VoteOptions = ({
               extraInfo = (
                 <DistributionBar
                   data={values.map(percent => ({ percent }))}
-                  variant={opt.option === result.option ? 'vote' : 'default'}
+                  variant={opt.option === result?.option ? 'vote' : 'default'}
                 />
               );
             }
@@ -138,13 +210,19 @@ const VoteOptions = ({
             <Stack
               direction={labelDirection}
               justifyContent="space-between"
-              alignItems="center"
+              alignItems="flex-start"
               spacing={labelSpacing}
             >
               {label}
               <Tag
-                color={opt.option === result.option ? 'success' : 'default'}
-                label={`VOTED ${opt.percent ?? 0}%`}
+                color={opt.option === result?.option ? 'success' : 'default'}
+                label={
+                  proposal.isAdminProposal
+                    ? opt.option === result?.option
+                      ? 'VOTED'
+                      : 'NOT VOTED'
+                    : `VOTED ${opt.percent ?? 0}%`
+                }
               />
             </Stack>
             {extraInfo}

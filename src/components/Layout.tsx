@@ -1,17 +1,19 @@
 import React from 'react';
-import { Paper } from '@mui/material';
 import { Outlet } from 'react-router-dom';
 
 import Navbar from './Navbar';
+import Paper from './Paper';
+
+import './suite-override.css';
 
 const Layout = () => {
   return (
     <Paper
+      className="dac-container"
       style={{
+        width: '100%',
         height: '100%',
-        boxShadow: 'none',
         paddingBottom: '40px',
-        backgroundImage: 'none',
       }}
     >
       <Navbar />

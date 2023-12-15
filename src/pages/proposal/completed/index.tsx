@@ -1,7 +1,6 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useLoaderData, useNavigate } from 'react-router-dom';
 import {
-  Paper,
   FormControlLabel,
   List,
   ListItemButton,
@@ -10,7 +9,7 @@ import {
 } from '@mui/material';
 import Header from '@/components/Header';
 import Button from '@/components/Button';
-import { Proposal, VotingType } from '@/types';
+import { Proposal, ProposalType, ProposalTypes } from '@/types';
 import { useCompletedVotes } from '@/hooks/useProposals';
 import useToast from '@/hooks/useToast';
 import { DatePicker } from '@mui/x-date-pickers';
@@ -23,55 +22,65 @@ import GrantProgram from './GrantProgram';
 import TransactionFee from './BaseFee';
 import TransactionFeeDistribution from './FeeDistribution';
 import { useVotingTypeStore } from '@/store';
+import Paper from '@/components/Paper';
+import { DateTime } from 'luxon';
+import NoProposals from '../active/NoProposals';
+import RefreshButton from '@/components/RefreshButton';
 
 const CompletedVotes = () => {
+  const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
   const { selectVotingType: votingType, setSelectVotingType } =
     useVotingTypeStore();
-  const { data: votingTypes } = useLoaderData() as { data: VotingType[] };
-  const { votes, error, isLoading } = useCompletedVotes(votingType);
+  const startTime = useRef<DateTime | null>(null);
+  const endTime = useRef<DateTime | null>(null);
+  const [filter, setFilter] = useState<{
+    startTime?: DateTime | null;
+    endTime?: DateTime | null;
+  }>({ startTime: null, endTime: null });
+  const { proposals, error, isFetching, refetch } = useCompletedVotes(
+    Object.values(ProposalTypes).indexOf(votingType as ProposalTypes),
+    filter.startTime?.toUTC().toISO(),
+    filter.endTime?.toUTC().toISO()
+  );
   const toast = useToast();
   const navigate = useNavigate();
   useEffect(() => {
     if (error) {
-      toast.error('Failed to fetch votes');
+      toast.error('Failed to fetch proposals');
     }
   }, [error]);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectVotingType((event.target as HTMLInputElement).value);
-  };
-
   const { voteItem } = useMemo(() => {
-    const selectedVotingType = votingTypes.find(
-      vtype => vtype.id === votingType
+    const selectedVotingType = proposalTypes.find(
+      vtype => vtype.name === votingType
     );
     const voteTypeName = selectedVotingType?.abbr ?? selectedVotingType?.name;
     let voteItem = (_data: Proposal): JSX.Element | null => null;
     switch (votingType) {
-      case 'GENERAL':
+      case ProposalTypes.General:
         voteItem = (data: Proposal) => (
           <GeneralVote data={data} voteTypeName={voteTypeName} />
         );
         break;
-      case 'NEW_MEMBER':
+      case ProposalTypes.NewMember:
         voteItem = (data: Proposal) => (
           <NewMemberVote data={data} voteTypeName={voteTypeName} />
         );
         break;
-      case 'GRANT':
+      case ProposalTypes.GrantProgram:
         voteItem = (data: Proposal) => (
           <GrantProgram data={data} voteTypeName={voteTypeName} />
         );
         break;
-      case 'EXCLUDE_MEMBER':
+      case ProposalTypes.ExcludeMember:
         voteItem = (data: Proposal) => (
           <ExcludeMember data={data} voteTypeName={voteTypeName} />
         );
         break;
-      case 'BASE_FEE':
+      case ProposalTypes.BaseFee:
         voteItem = (data: Proposal) => <TransactionFee data={data} />;
         break;
-      case 'FEE_DISTRIBUTION':
+      case ProposalTypes.FeeDistribution:
         voteItem = (data: Proposal) => (
           <TransactionFeeDistribution data={data} />
         );
@@ -84,17 +93,46 @@ const CompletedVotes = () => {
     };
   }, [votingType]);
 
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectVotingType((event.target as HTMLInputElement).value);
+  };
+
+  const submitFilter = () => {
+    setFilter({
+      startTime: startTime.current?.startOf('day'),
+      endTime: endTime.current?.endOf('day'),
+    });
+  };
+
   return (
     <Paper sx={{ px: 2 }}>
-      <Header headline="Completed Proposals" variant="h5" />
+      <Header headline="Completed Proposals" variant="h5">
+        <RefreshButton loading={isFetching} onRefresh={refetch} />
+      </Header>
       <Stack spacing="16px">
         <Stack direction="row" spacing="12px">
-          <DatePicker sx={{ flex: 1 }} />
-          <DatePicker sx={{ flex: 1 }} />
+          <DatePicker
+            label="From"
+            sx={{ flex: 1 }}
+            onChange={(datetime: DateTime | null) =>
+              (startTime.current = datetime)
+            }
+          />
+          <DatePicker
+            label="To"
+            sx={{ flex: 1 }}
+            onChange={(datetime: DateTime | null) =>
+              (endTime.current = datetime)
+            }
+          />
           <Button
             variant="contained"
             color="primary"
             sx={{ minWidth: '100px' }}
+            onClick={() => submitFilter()}
+            loading={isFetching}
+            loadingPosition="start"
+            startIcon={null}
           >
             Apply
           </Button>
@@ -105,44 +143,51 @@ const CompletedVotes = () => {
           onChange={handleChange}
           row
         >
-          {votingTypes.map(vtype => (
-            <FormControlLabel
-              key={vtype.id}
-              label={vtype.abbr ?? vtype.name}
-              value={vtype.id}
-              sx={{ marginLeft: 0 }}
-              control={
-                <RadioButton
-                  label={vtype.abbr ?? vtype.name}
-                  checked={votingType === vtype.id}
-                />
-              }
-            />
-          ))}
+          {proposalTypes
+            .filter(pType => !pType.disabled)
+            .map(pType => (
+              <FormControlLabel
+                key={pType.id}
+                label={pType.abbr ?? pType.name}
+                value={pType.name}
+                sx={{ marginLeft: 0 }}
+                control={
+                  <RadioButton
+                    label={pType.abbr ?? pType.name}
+                    checked={votingType === pType.name}
+                  />
+                }
+              />
+            ))}
         </RadioGroup>
       </Stack>
       <List>
-        {votes.map((vote: Proposal, index: number) => {
-          return (
-            <ListItemButton
-              key={vote.id}
-              onClick={() => navigate(`${vote.type}/${vote.id}`)}
-              divider={votes.length !== index + 1 && true}
-              sx={{ px: 0 }}
-            >
-              <Stack width="100%">
-                <Stack>
-                  {voteItem(vote)}
-                  <ListItemStatus
-                    startTimestamp={vote.startDateTime}
-                    endTimestamp={vote.endDateTime}
-                  />
+        {proposals.length > 0 ? (
+          proposals.map((proposal, index: number) => {
+            return (
+              <ListItemButton
+                key={proposal.id}
+                onClick={() => navigate(`${proposal.typeId}/${proposal.id}`)}
+                divider={proposals.length !== index + 1 && true}
+                sx={{ px: 0, py: 2 }}
+              >
+                <Stack width="100%">
+                  <Stack>
+                    {voteItem(proposal as Proposal)}
+                    <ListItemStatus
+                      startTimestamp={proposal.startTimestamp}
+                      endTimestamp={proposal.endTimestamp}
+                      isCompleted
+                    />
+                  </Stack>
+                  <Stack></Stack>
                 </Stack>
-                <Stack></Stack>
-              </Stack>
-            </ListItemButton>
-          );
-        })}
+              </ListItemButton>
+            );
+          })
+        ) : (
+          <NoProposals type="completed" />
+        )}
       </List>
     </Paper>
   );

@@ -1,10 +1,32 @@
 import { ReactElement } from 'react';
+import { PendingMultisigTx } from './wallet';
 
-export type VotingType = {
-  id: string;
+export enum ProposalTypes {
+  BaseFee = 'Base Fee',
+  NewMember = 'Admittance of new consortium members',
+  ExcludeMember = 'Exclusion of consortium member',
+  AdminNewMember = 'Admin Proposal for Admittance of new consortium members',
+  AdminExcludeMember = 'Admin Proposal for Exclusion of consortium member',
+  General = 'General Proposal',
+  FeeDistribution = 'Transaction Fee Distribution',
+  GrantProgram = 'TAKEOFF Camino Grant Program',
+}
+export enum ProposalStatuses {
+  InProgress = 'In Progress',
+  Success = 'Success',
+  Failed = 'Failed',
+  Completed = 'Completed',
+}
+export type ProposalType = {
+  id: number;
   name: string;
-  abbr?: string;
+  abbr: string;
   icon?: ReactElement;
+  disabled?: boolean;
+  restricted?: boolean;
+  isAdminProposal?: boolean;
+  consortiumMemberOnly?: boolean;
+  caminoOnly?: boolean;
 };
 export type VotingOption = {
   option: number | string;
@@ -12,9 +34,15 @@ export type VotingOption = {
   label?: string | string[];
 };
 export type Vote = {
-  option: number;
-  address?: string;
+  votedOptions: number[];
+  voterAddr?: string;
   votedDateTime?: number;
+};
+export type APIVote = {
+  voteTxID: string;
+  votedAt: string;
+  votedOptions: string;
+  voterAddr: string;
 };
 export interface VoteData extends Omit<Vote, 'votedDateTime'> {
   id: number;
@@ -39,20 +67,47 @@ export type Applicant = {
   pitchDeck: string;
   additionalInfo?: string;
 };
+export type APIPRoposalWrapper = {
+  dacProposal: APIProposal;
+  dacVotes: APIVote[];
+};
+export type APIProposal = {
+  id: string;
+  proposerAddr: string;
+  startTime: string;
+  endTime: string;
+  type: number;
+  options: string;
+  memo: string;
+  status: number;
+  blockHeight: number;
+  outcome?: number;
+  admin_proposal?: boolean;
+  data?: string;
+};
 export type Proposal = {
-  id: number | string;
+  id: string;
   type: string;
-  description: string;
-  startDateTime: number;
-  endDateTime: number;
+  typeId: number;
+  startTime: string;
+  endTime: string;
+  startTimestamp: number;
+  endTimestamp: number;
   options: VotingOption[];
-  result?: Vote[];
-  voted?: Vote[];
+  status: number;
+  blockHeight: number;
+  outcome?: number;
+  voted?: VotingOption[]; // voted option for current connected wallet
   votes?: Vote[];
-  status: string;
+  canVote?: boolean; // flag for current connected wallet has running validator at time when this proposal created
+  inactive?: boolean;
+  isCompleted?: boolean;
+  description?: string;
   forumLink?: string;
   target?: string | Applicant;
-  multisig?: MultisigVote;
+  pendingMultisigTx?: PendingMultisigTx;
+  seq?: number;
+  isAdminProposal?: boolean;
 };
 export type Group = {
   type: string;

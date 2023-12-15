@@ -13,13 +13,3 @@ export const getFeeDistribution = async () => {
     { label: 'Burn', value: 30 },
   ];
 };
-
-export const vote = async (
-  proposalId: string | number,
-  votingType: string,
-  votes: VotingOption[]
-) => {
-  // TODO: call RPC
-  const promise = new Promise(resolve => setTimeout(() => resolve(true), 2000));
-  return promise;
-};

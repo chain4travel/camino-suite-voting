@@ -1,8 +1,11 @@
+import { ReactElement } from 'react';
+
 export interface ToastConfig {
   isShown?: boolean;
   severity?: Severity;
   message?: string;
   title?: string;
+  action?: ReactElement;
 }
 export enum Severity {
   Success = 'success',

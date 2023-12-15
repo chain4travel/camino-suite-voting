@@ -12,6 +12,7 @@ import { AddCircle, DeleteForever } from '@mui/icons-material';
 import { Controller, useFormContext, useFieldArray } from 'react-hook-form';
 import { z } from 'zod';
 import Big from 'big.js';
+import { uniqBy } from 'lodash';
 import { useBaseFee } from '@/hooks/useRpc';
 import useToast from '@/hooks/useToast';
 import TextEditor from '@/components/TextEditor';
@@ -22,20 +23,31 @@ import FormSection from './FormSection';
 
 const MAX_OPTIONS = 3;
 export const baseFeeFormSchema = {
-  description: z.string(),
-  votingOptions: z
-    .array(
-      z.custom<VotingOption>().refine(
-        d => {
-          const value = Number(d.value);
-          return typeof value === 'number' && value > 0;
-        },
-        { message: 'invalid base fee' }
+  schema: {
+    description: z.string().optional(),
+    votingOptions: z
+      .array(
+        z.custom<VotingOption>().refine(
+          d => {
+            const value = Number(d.value);
+            return typeof value === 'number' && value > 0;
+          },
+          { message: 'invalid base fee' }
+        )
       )
-    )
-    .min(1),
+      .min(1, 'you must add at least one option')
+      .refine(
+        options => {
+          const uniques = uniqBy(options, 'value');
+          return uniques.length === options.length;
+        },
+        {
+          message: 'each option should be different value',
+        }
+      ),
+  },
 };
-const schema = z.object(baseFeeFormSchema);
+const schema = z.object(baseFeeFormSchema.schema);
 type BaseFeeFormSchema = z.infer<typeof schema>;
 
 const BaseFeeForm = () => {
@@ -80,10 +92,10 @@ const BaseFeeForm = () => {
               const absoluteChange = new Big(Number(field.value) || 0).minus(
                 baseFee
               );
-              const percentageChange = absoluteChange
-                .times(100)
-                .div(baseFee)
-                .toFixed(2);
+              const percentageChange =
+                Number(baseFee) > 0
+                  ? absoluteChange.times(100).div(baseFee).toFixed(2)
+                  : 0;
               return (
                 <Paragraph key={item.id} spacing="sm">
                   <Stack
@@ -101,7 +113,7 @@ const BaseFeeForm = () => {
                     <TextField
                       {...field}
                       type="number"
-                      variant="filled"
+                      variant="outlined"
                       inputProps={{ min: 0 }}
                       error={!!errors.votingOptions?.[index]}
                       helperText={
@@ -131,20 +143,26 @@ const BaseFeeForm = () => {
             }}
           />
         ))}
-        <Button
-          variant="text"
-          startIcon={<AddCircle />}
-          onClick={handleAppendOption}
-          fullWidth
-          sx={{ justifyContent: 'flex-start' }}
-        >
-          Add Option
-        </Button>
+        {fields.length < 3 && (
+          <Button
+            variant="text"
+            startIcon={<AddCircle />}
+            onClick={handleAppendOption}
+            fullWidth
+            sx={{ justifyContent: 'flex-start' }}
+          >
+            Add Option
+          </Button>
+        )}
+        {errors.votingOptions?.message && (
+          <FormHelperText error>{errors.votingOptions?.message}</FormHelperText>
+        )}
       </FormSection>
       <FormSection>
         <Controller
           name="description"
           control={control}
+          defaultValue=""
           render={({ field, fieldState: { error } }) => (
             <>
               <TextEditor

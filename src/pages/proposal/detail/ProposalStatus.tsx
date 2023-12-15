@@ -1,13 +1,20 @@
 import React, { useMemo } from 'react';
 import { Box, Stack, Typography } from '@mui/material';
+import { Cancel, CheckCircle } from '@mui/icons-material';
 import { DateTime } from 'luxon';
 import { filter, map } from 'lodash';
 import Paragraph from '@/components/Paragraph';
 import StateButton from '@/components/StateButton';
-import { Proposal, Vote, VotingOption } from '@/types';
+import {
+  Proposal,
+  ProposalStatuses,
+  ProposalTypes,
+  VotingOption,
+} from '@/types';
 import { toPastTense } from '@/helpers/string';
 import Tag from '@/components/Tag';
-import { Cancel, CheckCircle } from '@mui/icons-material';
+import Button from '@/components/Button';
+import { getOptionLabel } from '@/helpers/util';
 
 interface ExtraInfo {
   label: string;
@@ -15,19 +22,33 @@ interface ExtraInfo {
 }
 interface ProposalStatusProps {
   proposal: Proposal;
+  isLoggedIn?: boolean;
   extraInfo?: ExtraInfo | ExtraInfo[];
 }
-const ProposalStatus = ({ proposal, extraInfo }: ProposalStatusProps) => {
-  const voted = proposal?.voted?.flatMap((v: Vote) =>
-    filter(proposal.options, (opt: VotingOption) => opt.option === v.option)
+const ProposalStatus = ({
+  proposal,
+  isLoggedIn,
+  extraInfo,
+}: ProposalStatusProps) => {
+  const voted = proposal?.voted?.flatMap((v: VotingOption) =>
+    filter(
+      proposal.options,
+      (opt: VotingOption) => opt.option === v.option
+    ).map(opt => ({ ...opt, label: getOptionLabel(opt) }))
   );
-  const isCompleted = proposal?.status === 'PASSED';
+  const isSuccess =
+    proposal?.status ===
+    Object.values(ProposalStatuses).indexOf(ProposalStatuses.Success);
+  const isFailed =
+    proposal?.status ===
+    Object.values(ProposalStatuses).indexOf(ProposalStatuses.Failed);
+  const isCompleted = isSuccess || isFailed;
   const { getVotedState, extraInfoComponent } = useMemo(() => {
     let extraInfoComponent = null;
     let getVotedState = (option: VotingOption) =>
       toPastTense(String(option.label));
     switch (proposal?.type) {
-      case 'BASE_FEE':
+      case ProposalTypes.BaseFee:
         {
           const info = extraInfo as ExtraInfo;
           extraInfoComponent = (
@@ -47,7 +68,7 @@ const ProposalStatus = ({ proposal, extraInfo }: ProposalStatusProps) => {
             `New Base Fee ${option.value} nCAM`;
         }
         break;
-      case 'FEE_DISTRIBUTION':
+      case ProposalTypes.FeeDistribution:
         {
           const info = extraInfo as ExtraInfo[];
           extraInfoComponent = (
@@ -90,7 +111,7 @@ const ProposalStatus = ({ proposal, extraInfo }: ProposalStatusProps) => {
   return (
     <Box
       padding={2.5}
-      minWidth={339}
+      minWidth={280}
       borderRadius={1.5}
       sx={{ backgroundColor: 'grey.900' }}
     >
@@ -103,8 +124,14 @@ const ProposalStatus = ({ proposal, extraInfo }: ProposalStatusProps) => {
           >
             <Typography variant="h5">Status</Typography>
             <Tag
-              color={isCompleted ? 'success' : 'default'}
-              label={proposal?.status}
+              color={isSuccess ? 'success' : isFailed ? 'error' : 'default'}
+              label={
+                proposal?.status === 0 && proposal?.inactive
+                  ? 'INACTIVE'
+                  : Object.values(ProposalStatuses)[
+                      proposal?.status
+                    ]?.toUpperCase()
+              }
             />
           </Stack>
         </Paragraph>
@@ -120,13 +147,13 @@ const ProposalStatus = ({ proposal, extraInfo }: ProposalStatusProps) => {
           <Paragraph spacing={1.5}>
             <Typography variant="body2" color="text.secondary">
               Start:{' '}
-              {DateTime.fromSeconds(proposal?.startDateTime ?? 0).toFormat(
+              {DateTime.fromSeconds(proposal?.startTimestamp ?? 0).toFormat(
                 'dd.MM.yyyy - hh:mm:ss a'
               )}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               End:{' '}
-              {DateTime.fromSeconds(proposal?.endDateTime ?? 0).toFormat(
+              {DateTime.fromSeconds(proposal?.endTimestamp ?? 0).toFormat(
                 'dd.MM.yyyy - hh:mm:ss a'
               )}
             </Typography>
@@ -154,15 +181,27 @@ const ProposalStatus = ({ proposal, extraInfo }: ProposalStatusProps) => {
                   variant="contained"
                   color={v.value ? 'success' : 'error'}
                   startIcon={v.value ? <CheckCircle /> : <Cancel />}
-                  sx={{ textTransform: 'none' }}
+                  sx={{ textTransform: 'none', textAlign: 'left' }}
                 >
                   {getVotedState(v)}
                 </StateButton>
               ))
-            ) : (
+            ) : isCompleted ? (
+              <Typography variant="body2" color="text.secondary">
+                Did not participate
+              </Typography>
+            ) : isLoggedIn ? (
               <Typography variant="body2" color="text.secondary">
                 You have not voted yet
               </Typography>
+            ) : (
+              <Button
+                variant="outlined"
+                color="inherit"
+                onClick={() => (location.pathname = '/login')}
+              >
+                Please login to vote
+              </Button>
             )}
           </Paragraph>
         </Paragraph>

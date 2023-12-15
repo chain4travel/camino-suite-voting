@@ -1,11 +1,14 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 
 const DEFAULT_ERR_MESSAGE = 'something wrong';
+const DEFAULT_API_VERSION = 'v2';
 
 const axiosInstance = axios.create({
-  baseURL: '/mock_data/',
+  baseURL: process.env.MAGELLAN_API_HOST ?? '/mock_data/',
 });
 
+export const updateBaseUrl = (url: string) =>
+  (axiosInstance.defaults.baseURL = `${url}/${DEFAULT_API_VERSION}`);
 export const post = (url: string, data: any, config?: AxiosRequestConfig) => {
   return axiosInstance.post(url, data, config);
 };
@@ -15,8 +18,6 @@ export const get = async (url: string, config?: AxiosRequestConfig) => {
 };
 
 const onSuccess = (response: AxiosResponse) => {
-  console.debug('successful response', response);
-
   return response;
 };
 

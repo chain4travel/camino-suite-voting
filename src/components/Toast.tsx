@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useEffect, useState } from 'react';
 import {
   Snackbar,
   Alert as MuiAlert,
@@ -6,10 +6,12 @@ import {
   Stack,
   AlertTitle,
   styled,
+  LinearProgress,
 } from '@mui/material';
 
 import useToast from '@/hooks/useToast';
 
+const DEFAULT_DURATION = 5000;
 const StyledSnackbar = styled(Snackbar)({
   '.MuiAlert-root': {
     boxShadow: 'none',
@@ -24,17 +26,50 @@ const Alert = styled(
   '&.MuiAlert-filled': {
     color: theme.palette.text.primary,
   },
+  '.MuiLinearProgress-root': {
+    position: 'absolute',
+    width: '100%',
+    left: 0,
+    bottom: 0,
+    borderBottomLeftRadius: theme.shape.borderRadius,
+    borderBottomRightRadius: theme.shape.borderRadius,
+  },
+  '.MuiButtonBase-root.MuiButton-root.MuiLoadingButton-root.MuiButton-outlined':
+    {
+      borderColor: theme.palette.text.primary,
+    },
 }));
 
+const useCountdown = (duration: number, started = false) => {
+  const COUNT_DOWN_STEP_DURATION = 100;
+  const COUNT_DOWN_STEP = (100 / duration) * 100;
+  const [progress, setProgress] = useState(100 - COUNT_DOWN_STEP);
+
+  useEffect(() => {
+    if (!started) return;
+
+    const interval = setInterval(
+      () => setProgress(prevProgress => prevProgress - COUNT_DOWN_STEP),
+      COUNT_DOWN_STEP_DURATION
+    );
+    return () => {
+      clearInterval(interval);
+      setProgress(100 - COUNT_DOWN_STEP);
+    };
+  }, [COUNT_DOWN_STEP, started]);
+
+  return progress;
+};
 const Toast = () => {
-  const { isShown, onClose, severity, message, title } = useToast();
+  const { isShown, onClose, severity, message, title, action } = useToast();
+  const progress = useCountdown(DEFAULT_DURATION, isShown);
 
   return (
     <Stack spacing={2} sx={{ width: '100%' }}>
       <StyledSnackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         open={isShown}
-        autoHideDuration={5000}
+        autoHideDuration={DEFAULT_DURATION}
         onClose={onClose}
       >
         <Alert
@@ -42,9 +77,15 @@ const Toast = () => {
           severity={severity}
           variant="filled"
           sx={{ width: '100%' }}
+          action={action}
         >
           {title && <AlertTitle>{title}</AlertTitle>}
           {message}
+          <LinearProgress
+            variant="determinate"
+            color={severity}
+            value={progress}
+          />
         </Alert>
       </StyledSnackbar>
     </Stack>

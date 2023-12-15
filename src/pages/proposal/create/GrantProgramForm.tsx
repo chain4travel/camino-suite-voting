@@ -1,12 +1,9 @@
 import {
   FormHelperText,
-  Input,
   InputLabel,
   MenuItem,
-  OutlinedInput,
   Select,
   Stack,
-  TextField,
   Typography,
 } from '@mui/material';
 import React from 'react';
@@ -24,31 +21,33 @@ const COMPANY_STAGES = [
   { label: 'Paying Customers', value: 3 },
 ];
 export const grantProgramFormSchema = {
-  companyName: z.string().nonempty('company name is required'),
-  companyWebsite: z
-    .string({ required_error: 'company website is required' })
-    .url(),
-  applicantName: z.string().nonempty('applicant name is required'),
-  applicantEmail: z.string().email(),
-  applicantPchainAddress: z
-    .string({ required_error: 'applicant p-chain address is required' })
-    .refine(addr => addr.startsWith('P-camino'), 'invalid P-address'),
-  companyIndustry: z.string().nonempty('company industry is required'),
-  companyDescription: z.string().nonempty('company description is required'),
-  companyStage: z.number().nonnegative(),
-  milestones: z.string().nonempty('milestones is required'),
-  numberOfFunds: z
-    .preprocess(val => Number(val), z.number())
-    .refine(n => n > 0, 'must be positive number'),
-  useOfFunds: z.string().nonempty('use of funds is required'),
-  pitchDeck: z
-    .string({ required_error: 'pitch deck is required' })
-    .url()
-    .nonempty(),
-  description: z
-    .string()
-    .optional()
-    .refine(d => d?.replaceAll(/(<p>|<\/p>|<br>)/g, '') !== '', 'requied'),
+  schema: {
+    companyName: z.string().nonempty('company name is required'),
+    companyWebsite: z
+      .string({ required_error: 'company website is required' })
+      .url(),
+    applicantName: z.string().nonempty('applicant name is required'),
+    applicantEmail: z.string().email(),
+    applicantPchainAddress: z
+      .string({ required_error: 'applicant p-chain address is required' })
+      .refine(addr => addr.startsWith('P-camino'), 'invalid P-address'),
+    companyIndustry: z.string().nonempty('company industry is required'),
+    companyDescription: z.string().nonempty('company description is required'),
+    companyStage: z.number().nonnegative(),
+    milestones: z.string().nonempty('milestones is required'),
+    numberOfFunds: z
+      .preprocess(val => Number(val), z.number())
+      .refine(n => n > 0, 'must be positive number'),
+    useOfFunds: z.string().nonempty('use of funds is required'),
+    pitchDeck: z
+      .string({ required_error: 'pitch deck is required' })
+      .url()
+      .nonempty(),
+    description: z
+      .string()
+      .optional()
+      .refine(d => d?.replaceAll(/(<p>|<\/p>|<br>)/g, '') !== '', 'requied'),
+  },
 };
 const GrantProgramForm = () => {
   const { control } = useFormContext();

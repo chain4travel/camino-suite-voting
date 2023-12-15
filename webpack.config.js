@@ -1,14 +1,16 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const path = require('path');
 const deps = require('./package.json').dependencies;
 module.exports = {
-  output: {
-    publicPath: '/',
-  },
-
   resolve: {
+    fallback: {
+      net: false,
+      tls: false,
+      fs: false,
+    },
     extensions: ['.vue', '.tsx', '.ts', '.jsx', '.js', '.json'],
     alias: {
       '@': path.resolve(__dirname, 'src'),
@@ -48,12 +50,15 @@ module.exports = {
   },
 
   plugins: [
+    new NodePolyfillPlugin(),
     new ModuleFederationPlugin({
-      name: 'proposal',
+      name: 'dac',
       filename: 'remoteEntry.js',
-      remotes: {},
+      remotes: {
+        wallet: 'wallet@http://localhost:5003/remoteEntry.js',
+      },
       exposes: {
-        './proposal': './src/root.tsx',
+        './dac': './src/root.tsx',
       },
       shared: {
         ...deps,

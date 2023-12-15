@@ -4,105 +4,169 @@ import { useLoaderData, useNavigate, useParams } from 'react-router-dom';
 import { find, countBy, reduce, filter, map } from 'lodash';
 import { DateTime } from 'luxon';
 import Big from 'big.js';
+import sanitizeHtml from 'sanitize-html';
 
-import { Statistics, Vote, VotingOption, VotingType } from '@/types';
+import {
+  Statistics,
+  Vote,
+  VotingOption,
+  ProposalType,
+  ProposalTypes,
+  Proposal,
+} from '@/types';
 import Header from '@/components/Header';
 import Button from '@/components/Button';
-import { useProposal } from '@/hooks/useProposals';
+import { useEligibleCMembers, useProposal } from '@/hooks/useProposals';
 import { useBaseFee, useFeeDistribution } from '@/hooks/useRpc';
+import useWallet from '@/hooks/useWallet';
+import { countMultipleOptionsBy } from '@/helpers/util';
 import ProposalStatus from './ProposalStatus';
 import VoteResult from './VoteResult';
 import VoteOptions from './VoteOptions';
 import OngoingState from './OngoingState';
 import CompletedStatistics from './CompletedStatistics';
+import { useWalletStore } from '@/store';
 
 const Detail = () => {
-  const { data: votingTypes } = useLoaderData() as { data: VotingType[] };
+  const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
+  const wallet = useWallet();
+  const { currentWalletAddress, addressState } = useWalletStore(state => ({
+    currentWalletAddress: state.currentWalletAddress,
+    addressState: state.addressState,
+  }));
+  const { isConsortiumMember } = addressState;
   const { type, id } = useParams();
   const navigate = useNavigate();
-  const {
-    proposal,
-    error: _error,
-    isLoading: _isLoading,
-  } = useProposal(type!, id!);
+  const { proposal, refetch } = useProposal(
+    id!,
+    currentWalletAddress,
+    wallet.pchainAPI
+  );
   const { baseFee } = useBaseFee();
   const { feeDistribution } = useFeeDistribution();
+  const proposalWithEligibles = useEligibleCMembers(proposal as Proposal);
 
-  const votingType = votingTypes.find(vtype => vtype.id === type);
-  const { result, statistics, votes, isCompleted } = useMemo(() => {
-    if (proposal?.votes) {
-      const summary = countBy(proposal.votes, 'option');
-      const turnouts = countBy(proposal.votes, v => !!v.option);
-      const totalVotes = filter(proposal.votes, v => !!v.option).length;
-      const statistics: Statistics = {
-        eligibleVotes: proposal.votes.length,
-        totalVotes,
-        summary: reduce(
-          summary,
-          (acc, count, option) => ({
-            ...acc,
-            [option]: {
-              count,
-              percent: new Big(count).div(totalVotes).times(100).toFixed(2),
-            },
-          }),
-          {}
-        ),
-        turnouts: reduce(
-          turnouts,
-          (acc, count, option) => ({
-            ...acc,
-            [option]: {
-              count,
-              percent: new Big(count)
-                .div(proposal.votes.length)
-                .times(100)
-                .toFixed(2),
-            },
-          }),
-          {}
-        ),
-      };
-      const votes = proposal.votes.map((v: Vote, idx: number) => {
-        return {
-          id: idx,
-          address: v.address,
-          votedDateTime: v.votedDateTime
-            ? DateTime.fromSeconds(v.votedDateTime).toFormat(
-                'dd.MM.yyyy - hh:mm:ss a'
-              )
-            : '-',
-          option: v.option
-            ? `Future Base Fee ${
-                proposal.options.find(
-                  (opt: VotingOption) => opt.option === v.option
-                )?.value
-              } nCAM`
-            : 'Did not participate',
-          disabled: !v.option,
+  const proposalType = proposalTypes.find(vtype => vtype.id === Number(type));
+  const { result, statistics, votes, isCompleted, isAdminProposal } =
+    useMemo(() => {
+      if (proposalWithEligibles?.votes) {
+        const summary = countMultipleOptionsBy(
+          proposalWithEligibles.votes,
+          'votedOptions'
+        );
+        const eligibleVotes = Object.keys(
+          proposalWithEligibles.eligibleCMembers ?? {}
+        ).length;
+        const turnouts = countBy(
+          proposalWithEligibles.votes,
+          v => v.votedOptions.length > 0
+        );
+        if (proposalWithEligibles.votes.length < eligibleVotes) {
+          turnouts.false =
+            (turnouts.false ?? 0) +
+            eligibleVotes -
+            proposalWithEligibles.votes.length;
+        }
+        const totalVotes = filter(
+          proposalWithEligibles.votes,
+          v => v.votedOptions.length > 0
+        ).length;
+        const statistics: Statistics = {
+          eligibleVotes,
+          totalVotes,
+          summary: reduce(
+            summary,
+            (acc, count, option) => ({
+              ...acc,
+              [option]: {
+                count,
+                percent: new Big(count).div(totalVotes).times(100).toFixed(2),
+              },
+            }),
+            {}
+          ),
+          turnouts: reduce(
+            turnouts,
+            (acc, count, option) => ({
+              ...acc,
+              [option]: {
+                count,
+                percent: eligibleVotes
+                  ? new Big(count).div(eligibleVotes).times(100).toFixed(2)
+                  : 0,
+              },
+            }),
+            {}
+          ),
         };
-      });
-      return {
-        result: find(
-          proposal.options,
-          opt => opt.option === proposal.result?.[0]?.option
-        ),
-        statistics,
-        votes,
-        isCompleted: proposal.status === 'PASSED',
-      };
-    }
-    return {};
-  }, [proposal]);
+        const votes = map(
+          proposalWithEligibles.eligibleCMembers,
+          (eligible: any, nodeId: string) => {
+            const participant = find(
+              proposalWithEligibles.votes,
+              (v: Vote) => v.voterAddr === eligible.consortiumMemberAddress
+            );
+            let option = '';
+            switch (proposalWithEligibles.type) {
+              case ProposalTypes.BaseFee:
+                option = `Future Base Fee ${
+                  proposalWithEligibles.options.find((opt: VotingOption) =>
+                    participant?.votedOptions.includes(opt.option)
+                  )?.value
+                } nCAM`;
+                break;
+              case ProposalTypes.NewMember:
+              case ProposalTypes.ExcludeMember:
+                option = proposalWithEligibles.options.find(
+                  (opt: VotingOption) =>
+                    participant?.votedOptions.includes(opt.option)
+                )?.value
+                  ? 'Accept'
+                  : 'Decline';
+                break;
+              default:
+                console.warn(
+                  'Unsupported proposal type: ',
+                  proposalWithEligibles.type
+                );
+            }
+            return {
+              id: nodeId,
+              address: eligible.consortiumMemberAddress,
+              votedDateTime: participant?.votedDateTime
+                ? DateTime.fromSeconds(participant.votedDateTime).toFormat(
+                    'dd.MM.yyyy - hh:mm:ss a'
+                  )
+                : '-',
+              option: participant?.votedOptions
+                ? option
+                : 'Did not participate',
+              disabled: !participant?.votedOptions,
+            };
+          }
+        );
+        return {
+          result: find(
+            proposalWithEligibles.options,
+            opt => opt.option === proposalWithEligibles.outcome
+          ),
+          statistics,
+          votes,
+          isCompleted: proposalWithEligibles.isCompleted,
+          isAdminProposal: proposalWithEligibles.isAdminProposal,
+        };
+      }
+      return {};
+    }, [proposalWithEligibles]);
   const extraInfo = useMemo(() => {
-    if (votingType) {
-      switch (votingType.id) {
-        case 'BASE_FEE':
+    if (proposalType) {
+      switch (proposalType.name) {
+        case ProposalTypes.BaseFee:
           return {
-            label: votingType?.abbr ?? votingType?.name,
+            label: proposalType?.abbr ?? proposalType?.name,
             value: baseFee,
           };
-        case 'FEE_DISTRIBUTION':
+        case ProposalTypes.FeeDistribution:
           return map(feeDistribution, distribution => ({
             label: distribution.label,
             value: distribution.value,
@@ -110,7 +174,7 @@ const Detail = () => {
         default:
       }
     }
-  }, [votingType, result, baseFee]);
+  }, [proposalType, result, baseFee]);
 
   return (
     <>
@@ -125,15 +189,20 @@ const Detail = () => {
         </Button>
       </Stack>
       <Container>
-        <Stack direction="row" spacing={4} alignItems="flex-start">
+        <Stack
+          direction="row"
+          spacing={4}
+          alignItems="flex-start"
+          justifyContent="space-between"
+        >
           <Stack spacing={2}>
             <Stack spacing={2}>
               <Header
                 variant="h3"
                 headline={
-                  votingType?.brief ??
-                  votingType?.abbr ??
-                  votingType?.name ??
+                  proposalType?.brief ??
+                  proposalType?.name ??
+                  proposalType?.abbr ??
                   ''
                 }
                 sx={{ margin: 0 }}
@@ -143,31 +212,53 @@ const Detail = () => {
                 color="info.light"
                 letterSpacing={2}
               >
-                {DateTime.fromSeconds(proposal?.endDateTime ?? 0).toFormat(
-                  'dd.MM.yyyy hh:mm:ss a'
-                )}
+                {DateTime.fromSeconds(
+                  proposalWithEligibles?.endTimestamp ?? 0
+                ).toFormat('dd.MM.yyyy hh:mm:ss a')}
               </Typography>
               <VoteResult
-                result={{ ...result, baseFee, target: proposal?.target }}
-                votingType={votingType?.id}
+                result={{
+                  ...result,
+                  baseFee,
+                  target: proposalWithEligibles?.target,
+                  status: proposalWithEligibles.status,
+                }}
+                proposalType={proposalType?.name}
               />
             </Stack>
             <Stack>
-              <Header variant="h6" headline="Vote options" />
+              <Header variant="h6" headline="Voting options" />
               <VoteOptions
-                proposal={proposal}
-                options={proposal?.options.map((opt: VotingOption) => ({
-                  ...opt,
-                  percent: statistics?.summary[opt.option]?.percent ?? 0,
-                }))}
-                votingType={votingType?.id}
+                proposal={proposalWithEligibles}
+                isConsortiumMember={isConsortiumMember}
+                options={proposalWithEligibles?.options?.map(
+                  (opt: VotingOption) => ({
+                    ...opt,
+                    label:
+                      opt.value === true
+                        ? 'Accept'
+                        : opt.value === false
+                        ? 'Decline'
+                        : opt.label,
+                    percent: statistics?.summary[opt.option]?.percent ?? 0,
+                  })
+                )}
                 result={result}
                 baseFee={baseFee}
+                refresh={refetch}
               />
             </Stack>
             <Stack spacing={1.5} alignItems="flex-start">
-              <Typography color="grey.400">{proposal?.description}</Typography>
-              {proposal?.forumLink && (
+              <Typography
+                component="p"
+                color="grey.400"
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHtml(
+                    proposalWithEligibles?.description ?? ''
+                  ),
+                }}
+              />
+              {proposalWithEligibles?.forumLink && (
                 <Button
                   sx={{
                     backgroundColor: '#242729',
@@ -181,16 +272,20 @@ const Detail = () => {
               )}
             </Stack>
           </Stack>
-          <ProposalStatus proposal={proposal} extraInfo={extraInfo} />
+          <ProposalStatus
+            proposal={proposalWithEligibles}
+            extraInfo={extraInfo}
+            isLoggedIn={!!wallet?.signer}
+          />
         </Stack>
       </Container>
       <Divider color="divider" variant="fullWidth" sx={{ my: 4 }} />
       <Container sx={{ paddingBottom: 5 }}>
-        {isCompleted ? (
+        {isAdminProposal ? null : isCompleted ? (
           <CompletedStatistics
             statistics={statistics}
-            options={proposal.options}
-            votingType={votingType?.id}
+            options={proposalWithEligibles.options}
+            proposalType={proposalType?.name}
             baseFee={baseFee}
             votes={votes}
           />

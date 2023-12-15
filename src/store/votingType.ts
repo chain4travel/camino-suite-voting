@@ -1,8 +1,8 @@
 import create from 'zustand';
 
-import type { CompletedVotingTypeState } from '@/types';
+import { ProposalTypes, type CompletedVotingTypeState } from '@/types';
 
 export const useVotingTypeStore = create<CompletedVotingTypeState>(set => ({
-  selectVotingType: 'GENERAL',
+  selectVotingType: ProposalTypes.NewMember,
   setSelectVotingType: (selectVotingType: string) => set({ selectVotingType }),
 }));

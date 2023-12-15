@@ -8,6 +8,7 @@ export const useToastStore = create<ToastState>(set => ({
     isShown: false,
     severity: Severity.Info,
     message: 'this is a info message',
+    action: undefined,
   },
   setOption: (option: ToastConfig | Partial<ToastConfig>) => set({ option }),
 }));

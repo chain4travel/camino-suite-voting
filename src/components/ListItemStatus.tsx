@@ -1,48 +1,61 @@
 import React from 'react';
 import { DateTime } from 'luxon';
 import { ChipProps, Stack } from '@mui/material';
-import { MultisigVote } from '@/types';
+import { PendingMultisigTx } from '@/types';
 import Tag from './Tag';
+import { countBy } from 'lodash';
 
 interface ListItemStatusProps extends ChipProps {
   startTimestamp?: number;
   endTimestamp?: number;
-  multisig?: MultisigVote;
+  pendingMultisigTx?: PendingMultisigTx;
   stage?: string;
   industry?: string;
+  status?: string;
+  isCompleted?: boolean;
 }
 const ListItemStatus = ({
   startTimestamp,
   endTimestamp,
-  multisig,
+  pendingMultisigTx,
   stage,
   industry,
+  status,
+  isCompleted,
   ...props
 }: ListItemStatusProps) => {
   let duration;
   if (startTimestamp && endTimestamp) {
     const startDateTime = DateTime.fromSeconds(startTimestamp);
     const endDateTime = DateTime.fromSeconds(endTimestamp);
-    const isNotStartYet =
-      startDateTime.startOf('day') > DateTime.now().startOf('day');
-    duration = isNotStartYet
-      ? startDateTime.toFormat('dd.MM.yyyy hh:mm:ss a')
-      : endDateTime
-          .diffNow(['days', 'hours', 'minutes'])
-          .toFormat("dd'd' hh'h' mm'm'");
+    const now = DateTime.now();
+    const isNotStartYet = startDateTime > now;
+    const isEnded = isCompleted || now > endDateTime;
+    duration =
+      isNotStartYet || isEnded
+        ? startDateTime.toFormat('dd.MM.yyyy hh:mm:ss a')
+        : endDateTime
+            .diffNow(['days', 'hours', 'minutes'])
+            .toFormat("dd'd' hh'h' mm'm'");
   }
 
+  let signedCount = 0;
+  if (pendingMultisigTx) {
+    signedCount =
+      countBy(pendingMultisigTx.owners, o => !!o.signature).true ?? 0;
+  }
   return (
     <Stack direction="row" alignItems="center" spacing={1}>
-      <Tag {...props} label={duration} />
-      {multisig && multisig.voted?.count && (
+      {duration && <Tag {...props} label={duration} />}
+      {pendingMultisigTx && (
         <Tag
           color="warning"
-          label={`${multisig.voted?.count} / ${multisig.threshold} PENDING`}
+          label={`${signedCount} / ${pendingMultisigTx.threshold} PENDING`}
         />
       )}
       {stage && <Tag color="success" label={stage.toUpperCase()} />}
       {industry && <Tag label={industry.toUpperCase()} />}
+      {status && <Tag label={status} />}
     </Stack>
   );
 };

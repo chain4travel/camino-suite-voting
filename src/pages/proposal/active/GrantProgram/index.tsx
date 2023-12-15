@@ -5,8 +5,12 @@ import GrantProgramVotingOptions from './GrantProgramVotingOptions';
 
 interface GrantProgramVotingProps {
   data: Proposal;
+  isConsortiumMember?: boolean;
 }
-const GrantProgramVoting = ({ data }: GrantProgramVotingProps) => {
+const GrantProgramVoting = ({
+  data,
+  isConsortiumMember,
+}: GrantProgramVotingProps) => {
   return (
     <Stack direction="row" alignItems="center" spacing={3}>
       <ListItemText
@@ -31,7 +35,7 @@ const GrantProgramVoting = ({ data }: GrantProgramVotingProps) => {
           sx: { fontWeight: 500, marginBottom: 1 },
         }}
       />
-      <GrantProgramVotingOptions data={data} />
+      {isConsortiumMember && <GrantProgramVotingOptions data={data} />}
     </Stack>
   );
 };

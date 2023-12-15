@@ -1,47 +1,59 @@
-import { Applicant, VotingOption } from '@/types';
-import { Box, Stack, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
+import { Box, Stack, Typography } from '@mui/material';
+import { Circle } from '@mui/icons-material';
 import Big from 'big.js';
+import {
+  Applicant,
+  ProposalStatuses,
+  ProposalTypes,
+  VotingOption,
+} from '@/types';
 import Paragraph from '@/components/Paragraph';
 import DistributionBar, {
   VOTE_DISTRIBUTION_COLORS,
 } from '@/components/DistributionBar';
-import { Circle } from '@mui/icons-material';
 import Tag from '@/components/Tag';
 
 interface VoteResultProps {
-  result: VotingOption & { baseFee?: number; target?: string | Applicant };
-  votingType?: string;
+  result: VotingOption & {
+    baseFee?: number | string;
+    target?: string | Applicant;
+    status?: number;
+  };
+  proposalType?: string;
 }
-const VoteResult = ({ result, votingType }: VoteResultProps) => {
+const VoteResult = ({ result, proposalType }: VoteResultProps) => {
+  const isSuccess =
+    result?.status ===
+    Object.values(ProposalStatuses).indexOf(ProposalStatuses.Success);
   const { content, noBox } = useMemo(() => {
     let content,
       noBox = false;
     // No matter result.value, default display
     if (result.target) {
-      switch (votingType) {
-        case 'GENERAL':
+      switch (proposalType) {
+        case ProposalTypes.General:
           content = (
             <Stack spacing={1} alignItems="flex-start">
               <Typography fontWeight={600}>{String(result.target)}</Typography>
             </Stack>
           );
           break;
-        case 'NEW_MEMBER':
+        case ProposalTypes.NewMember:
           content = (
             <Stack spacing={1} alignItems="flex-start">
               <Typography fontWeight={600}>{String(result.target)}</Typography>
             </Stack>
           );
           break;
-        case 'EXCLUDE_MEMBER':
+        case ProposalTypes.ExcludeMember:
           content = (
             <Stack spacing={1} alignItems="flex-start">
               <Typography fontWeight={600}>{String(result.target)}</Typography>
             </Stack>
           );
           break;
-        case 'GRANT':
+        case ProposalTypes.GrantProgram:
           {
             const applicant = result.target as Applicant;
             noBox = true;
@@ -203,19 +215,8 @@ const VoteResult = ({ result, votingType }: VoteResultProps) => {
     }
     // Has result value
     if (result.value) {
-      switch (votingType) {
-        case 'GENERAL':
-          content = (
-            <Stack spacing={1} alignItems="flex-start">
-              <Typography fontWeight={600}>{String(result.target)}</Typography>
-              <Tag
-                color={result.value ? 'success' : 'error'}
-                label={result.value ? 'ACCEPTED' : 'Declined'}
-              />
-            </Stack>
-          );
-          break;
-        case 'BASE_FEE':
+      switch (proposalType) {
+        case ProposalTypes.BaseFee:
           {
             if (!result.baseFee) {
               console.error('type BASE_FEE must provide current baseFee');
@@ -224,9 +225,10 @@ const VoteResult = ({ result, votingType }: VoteResultProps) => {
             const absoluteChange = new Big(result.value as number).minus(
               result.baseFee
             );
-            const percentageChange = absoluteChange
-              .times(100)
-              .div(result.baseFee);
+            const percentageChange =
+              Number(result.baseFee) > 0
+                ? absoluteChange.times(100).div(result.baseFee)
+                : 0;
             const sign = absoluteChange.s > 0 ? '+' : '';
             content = (
               <Paragraph spacing={1.5}>
@@ -280,29 +282,40 @@ const VoteResult = ({ result, votingType }: VoteResultProps) => {
             );
           }
           break;
-        case 'NEW_MEMBER':
+        case ProposalTypes.General:
           content = (
             <Stack spacing={1} alignItems="flex-start">
               <Typography fontWeight={600}>{String(result.target)}</Typography>
               <Tag
                 color={result.value ? 'success' : 'error'}
-                label={result.value ? 'Admitted' : 'Declined'}
+                label={result.value ? 'ACCEPTED' : 'DECLINED'}
               />
             </Stack>
           );
           break;
-        case 'EXCLUDE_MEMBER':
+        case ProposalTypes.NewMember:
           content = (
             <Stack spacing={1} alignItems="flex-start">
               <Typography fontWeight={600}>{String(result.target)}</Typography>
               <Tag
                 color={result.value ? 'success' : 'error'}
-                label={result.value ? 'Excluded' : 'Declined'}
+                label={result.value ? 'ADMITTED' : 'DECLINED'}
               />
             </Stack>
           );
           break;
-        case 'FEE_DISTRIBUTION': {
+        case ProposalTypes.ExcludeMember:
+          content = (
+            <Stack spacing={1} alignItems="flex-start">
+              <Typography fontWeight={600}>{String(result.target)}</Typography>
+              <Tag
+                color={result.value ? 'success' : 'error'}
+                label={result.value ? 'EXCLUDED' : 'DECLINED'}
+              />
+            </Stack>
+          );
+          break;
+        case ProposalTypes.FeeDistribution: {
           const values = result.value as number[];
           const labels = result.label as string[];
           content = (
@@ -349,13 +362,13 @@ const VoteResult = ({ result, votingType }: VoteResultProps) => {
       content,
       noBox,
     };
-  }, [result, votingType]);
+  }, [result, proposalType]);
 
   return content ? (
     <Box
       padding={noBox ? 0 : 2.5}
       border={noBox ? 0 : '2px solid'}
-      borderColor="success.main"
+      borderColor={isSuccess ? 'success.main' : 'divider'}
       borderRadius={1}
     >
       {content}

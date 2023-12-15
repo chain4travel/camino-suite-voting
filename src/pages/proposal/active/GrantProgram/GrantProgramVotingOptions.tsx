@@ -1,6 +1,6 @@
 import React, { MouseEventHandler, MouseEvent, useMemo } from 'react';
 import { CheckCircle, Cancel } from '@mui/icons-material';
-import { IconButton, Stack } from '@mui/material';
+import { Stack } from '@mui/material';
 import { filter, find } from 'lodash';
 import type { Proposal, VotingOption } from '@/types';
 import Button from '@/components/Button';
@@ -29,8 +29,6 @@ const GrantProgramVotingOptions = ({
     opt => !!find(data.voted, v => v.option === opt.option)
   );
 
-  console.log('data.options: ', data.options);
-  console.log('voted: ', voted);
   const triggerVoting =
     (option: VotingOption): MouseEventHandler<HTMLButtonElement> =>
     (event: MouseEvent<HTMLButtonElement>) => {
@@ -56,10 +54,10 @@ const GrantProgramVotingOptions = ({
     }
 
     // Multisig pending state
-    const isMultisigPending = !isVoted && data.multisig && data.multisig.voted;
+    const isMultisigPending = !isVoted && data.pendingMultisigTx;
     if (isMultisigPending) {
       const votedOption = find(data.options, {
-        option: data.multisig!.voted.option,
+        option: data.pendingMultisigTx?.voteOptionIndex,
       });
       if (votedOption) {
         const isAccepted = votedOption.value;
@@ -98,7 +96,7 @@ const GrantProgramVotingOptions = ({
         </Button>
       ))
       .reverse();
-  }, [voted, data.options, data.multisig]);
+  }, [voted, data.options, data.pendingMultisigTx]);
 
   const confirmVoting =
     (option: VotingOption): MouseEventHandler<HTMLButtonElement> =>

@@ -1,32 +1,26 @@
 import React, { useMemo } from 'react';
 import { Cancel, CheckCircle } from '@mui/icons-material';
 import { ListItemText, Stack, Typography } from '@mui/material';
+import sanitizeHtml from 'sanitize-html';
 import type { Proposal, VotingOption } from '@/types';
 import StateButton from '@/components/StateButton';
 import { toPastTense } from '@/helpers/string';
+import { getOptionLabel } from '@/helpers/util';
 
 interface NewMemberVoteProps {
   data: Proposal;
   voteTypeName?: string;
 }
 const NewMemberVote = ({ data, voteTypeName }: NewMemberVoteProps) => {
-  const votedList: VotingOption[] = useMemo(
-    () =>
-      data.options.filter(opt =>
-        data.result?.find(v => v.option === opt.option)
-      ),
-    [data.result]
+  const outcome: VotingOption[] = useMemo(
+    () => data.options.filter(opt => data.outcome === opt.option),
+    [data.outcome]
   );
 
   return (
-    <Stack
-      direction="row"
-      spacing="12px"
-      marginRight="24px"
-      alignItems="center"
-    >
+    <Stack direction="row" spacing={2.5} alignItems="flex-end">
       <ListItemText
-        primary={data.target ?? voteTypeName}
+        primary={(data.target as string) ?? voteTypeName}
         secondary={
           <Typography
             color="text.secondary"
@@ -38,22 +32,25 @@ const NewMemberVote = ({ data, voteTypeName }: NewMemberVoteProps) => {
               WebkitBoxOrient: 'vertical',
             }}
             variant="body2"
-          >
-            {data.description}
-          </Typography>
+            dangerouslySetInnerHTML={{
+              __html: sanitizeHtml(data.description ?? ''),
+            }}
+          />
         }
       />
-      {votedList.map(voted => (
+      {outcome.map(voted => (
         <StateButton
           variant="contained"
           key={voted.option}
           startIcon={voted.value ? <CheckCircle /> : <Cancel />}
           color={voted.value ? 'success' : 'error'}
         >
-          {toPastTense(voted.label)}
+          {toPastTense(String(getOptionLabel(voted)))}
         </StateButton>
       ))}
-      {votedList.length === 0 && <StateButton>Not participated</StateButton>}
+      {outcome.length === 0 && (
+        <StateButton variant="contained">Failed</StateButton>
+      )}
     </Stack>
   );
 };

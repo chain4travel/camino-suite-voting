@@ -8,15 +8,17 @@ import CompletedVotes from '@/pages/proposal/completed';
 import Layout from '@/components/Layout';
 import { votingTypeLoader } from './loaders';
 import Detail from '@/pages/proposal/detail';
+import UpcomingVotings from '@/pages/proposal/upcoming';
+import CreatingProposals from '@/pages/proposal/creating';
 
 export const getRoutes = (queryClient: QueryClient) => {
   const routes = [
     {
       path: '/',
-      loader: () => redirect('/proposal/active'),
+      loader: () => redirect('/dac'),
     },
     {
-      path: '/proposal',
+      path: '/dac',
       element: <Layout />,
       children: [
         {
@@ -32,6 +34,21 @@ export const getRoutes = (queryClient: QueryClient) => {
         },
         {
           path: 'active/:type/:id',
+          element: <Detail />,
+          loader: votingTypeLoader(queryClient),
+        },
+        {
+          path: 'creating',
+          element: <CreatingProposals />,
+          loader: votingTypeLoader(queryClient),
+        },
+        {
+          path: 'upcoming',
+          element: <UpcomingVotings />,
+          loader: votingTypeLoader(queryClient),
+        },
+        {
+          path: 'upcoming/:type/:id',
           element: <Detail />,
           loader: votingTypeLoader(queryClient),
         },
