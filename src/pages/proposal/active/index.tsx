@@ -49,7 +49,7 @@ const ActiveVotings = () => {
     }
     return filteredProposals.reduce((result: any, proposal: any) => {
       const proposalType = proposalTypes.find(
-        (vtype: ProposalType) => vtype.id === proposal.typeId
+        (vtype: ProposalType) => vtype.id === proposal.typeId && !vtype.disabled
       );
       if (proposalType) {
         const currentData = result[proposalType.id]
