@@ -60,9 +60,9 @@ const VoteOptions = ({
       ) : undefined
     );
   };
-  const { pendingMultisigBaseFeeTxs } = usePendingMultisigAddVoteTxs();
+  const { pendingMultisigAddVoteTxs } = usePendingMultisigAddVoteTxs();
   const pendingMultisigTx = find(
-    pendingMultisigBaseFeeTxs,
+    pendingMultisigAddVoteTxs,
     msigTx => msigTx.proposalId === proposal.id
   );
   const multisigFunctions = {

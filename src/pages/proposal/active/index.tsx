@@ -35,7 +35,7 @@ const ActiveVotings = () => {
     currentWalletAddress
   );
   const {
-    pendingMultisigBaseFeeTxs,
+    pendingMultisigAddVoteTxs,
     refetch: refetchPendingMultisigTxs,
     isFetching: isFetchingPendingMultisigTxs,
   } = usePendingMultisigAddVoteTxs();
@@ -56,7 +56,7 @@ const ActiveVotings = () => {
           ? result[proposalType.id].data
           : [];
         const pendingMultisigTx = find(
-          pendingMultisigBaseFeeTxs,
+          pendingMultisigAddVoteTxs,
           msigTx => msigTx.proposalId === proposal.id
         );
         return {
@@ -76,7 +76,7 @@ const ActiveVotings = () => {
       }
       return result;
     }, {});
-  }, [proposals, onlyTodo]);
+  }, [proposals, onlyTodo, pendingMultisigAddVoteTxs]);
   return (
     <Paper sx={{ px: 2 }}>
       <Header headline="Ongoing Proposals" variant="h5">

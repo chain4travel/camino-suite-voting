@@ -135,8 +135,8 @@ export const usePendingMultisigAddProposalTxs = () => {
 export const usePendingMultisigAddVoteTxs = () => {
   const { pendingMultisigTxs, refetch, isFetching } = usePendingMultisigTx();
 
-  const pendingMultisigBaseFeeTxs = useMemo(() => {
-    const pendingMultisigBaseFeeTxs: PendingMultisigTx[] = map(
+  const pendingMultisigAddVoteTxs = useMemo(() => {
+    const pendingMultisigAddVoteTxs: PendingMultisigTx[] = map(
       pendingMultisigTxs,
       msigTx => {
         let canExecute = false;
@@ -152,11 +152,11 @@ export const usePendingMultisigAddVoteTxs = () => {
       }
     ).filter(unsignedTx => unsignedTx.typeId === PlatformVMConstants.ADDVOTETX);
 
-    return pendingMultisigBaseFeeTxs;
+    return pendingMultisigAddVoteTxs;
   }, [pendingMultisigTxs]);
 
   return {
-    pendingMultisigBaseFeeTxs,
+    pendingMultisigAddVoteTxs,
     refetch,
     isFetching,
   };
