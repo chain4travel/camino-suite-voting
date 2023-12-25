@@ -6,7 +6,7 @@ DAC (Decentralized Autonomous Consortium) Voting System
 
 #### Prerequisites
 
-- camino-suite (refer to the PR [#180](https://github.com/chain4travel/camino-suite/pull/180))
+- camino-suite
   - depends on
     - camino-wallet
     - camino-block-explorer
@@ -14,7 +14,7 @@ DAC (Decentralized Autonomous Consortium) Voting System
 
 #### Run on local machine
 
-- Modify (refer to the PR ) and start the `camino-suite`, and start the apps it depends on, i.e.,
+- Modify (refer to the PR [#180](https://github.com/chain4travel/camino-suite/pull/180)) and start the `camino-suite`, and start the apps it depends on, i.e.,
   - Start the `camino-wallet`
   - Start the `camino-block-explorer`
 - Update the submodule from remote
