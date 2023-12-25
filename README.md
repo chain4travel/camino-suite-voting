@@ -6,7 +6,7 @@ DAC (Decentralized Autonomous Consortium) Voting System
 
 #### Prerequisites
 
-- camino-suite (refer to the PR #180)
+- camino-suite (refer to the PR [#180](https://github.com/chain4travel/camino-suite/pull/180))
   - depends on
     - camino-wallet
     - camino-block-explorer
