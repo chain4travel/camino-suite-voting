@@ -44,4 +44,4 @@ DAC (Decentralized Autonomous Consortium) Voting System
   - `src/apis/platformvm/constants.ts` to add the ID of the new proposal type
 - Most of UI components have a draft according to the previous design in Figma, like General Proposal and Fee Distribution, can check under the folders, `pages/proposal/active`, `pages/proposal/completed`, and `pages/proposal/create`
 - Add or modify the configuration to enable the proposal type in `routes/loaders.tsx` according to the value of `ProposalTypes` enum
-- Update the `useAddProposal` hook in the `src/hooks/useProposals.ts` to add the new proposal type ID (sync with backend guys) with the extra parameters according to the caminojs API
+- Update the `useAddProposal` hook in the `src/hooks/useProposals.ts` to add the new proposal type ID (sync with backend) with the extra parameters according to the caminojs API
