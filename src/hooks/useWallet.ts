@@ -1,11 +1,11 @@
-import { useMemo } from 'react';
-import { BN, Avalanche as Camino, BinTools } from '@c4tplatform/caminojs/dist';
-import { Configuration, MultisigApi } from '@c4tplatform/signavaultjs';
-import { AddressState } from '@c4tplatform/caminojs/dist/apis/platformvm';
-import store from 'wallet/store';
-import { MultisigWallet, SingletonWallet, Network, WalletType } from '@/types';
-import { useWalletStore } from '@/store/wallet';
 import { useNetworkStore } from '@/store/network';
+import { useWalletStore } from '@/store/wallet';
+import { MultisigWallet, Network, SingletonWallet, WalletType } from '@/types';
+import { BN, BinTools, Avalanche as Camino } from '@c4tplatform/caminojs/dist';
+import { AddressState } from '@c4tplatform/caminojs/dist/apis/platformvm';
+import { Configuration, MultisigApi } from '@c4tplatform/signavaultjs';
+import { useMemo } from 'react';
+import store from 'wallet/store';
 
 const DEFAULT_SIGNAVAULT_CONFIG: Configuration = new Configuration({
   basePath: 'http://127.0.0.1:8081/v1',

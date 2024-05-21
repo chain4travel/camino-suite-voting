@@ -1,5 +1,13 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useLoaderData, useNavigate } from 'react-router-dom';
+import Button from '@/components/Button';
+import Header from '@/components/Header';
+import ListItemStatus from '@/components/ListItemStatus';
+import Paper from '@/components/Paper';
+import RadioButton from '@/components/RadioButton';
+import RefreshButton from '@/components/RefreshButton';
+import { useCompletedVotes } from '@/hooks/useProposals';
+import useToast from '@/hooks/useToast';
+import { useVotingTypeStore } from '@/store';
+import { Proposal, ProposalType, ProposalTypes } from '@/types';
 import {
   FormControlLabel,
   List,
@@ -7,25 +15,17 @@ import {
   RadioGroup,
   Stack,
 } from '@mui/material';
-import Header from '@/components/Header';
-import Button from '@/components/Button';
-import { Proposal, ProposalType, ProposalTypes } from '@/types';
-import { useCompletedVotes } from '@/hooks/useProposals';
-import useToast from '@/hooks/useToast';
 import { DatePicker } from '@mui/x-date-pickers';
-import ListItemStatus from '@/components/ListItemStatus';
-import RadioButton from '@/components/RadioButton';
-import NewMemberVote from './NewMemberVote';
+import { DateTime } from 'luxon';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useLoaderData, useNavigate } from 'react-router-dom';
+import NoProposals from '../active/NoProposals';
+import TransactionFee from './BaseFee';
 import ExcludeMember from './ExcludeMember';
+import TransactionFeeDistribution from './FeeDistribution';
 import GeneralVote from './GeneralVote';
 import GrantProgram from './GrantProgram';
-import TransactionFee from './BaseFee';
-import TransactionFeeDistribution from './FeeDistribution';
-import { useVotingTypeStore } from '@/store';
-import Paper from '@/components/Paper';
-import { DateTime } from 'luxon';
-import NoProposals from '../active/NoProposals';
-import RefreshButton from '@/components/RefreshButton';
+import NewMemberVote from './NewMemberVote';
 
 const CompletedVotes = () => {
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
@@ -161,7 +161,7 @@ const CompletedVotes = () => {
             ))}
         </RadioGroup>
       </Stack>
-      <List>
+      <List sx={{ maxWidth: 'none' }}>
         {proposals.length > 0 ? (
           proposals.map((proposal, index: number) => {
             return (

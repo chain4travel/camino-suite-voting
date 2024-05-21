@@ -1,31 +1,31 @@
-import React, { useMemo } from 'react';
 import { Container, Divider, Stack, Typography } from '@mui/material';
-import { useLoaderData, useNavigate, useParams } from 'react-router-dom';
-import { find, countBy, reduce, filter, map } from 'lodash';
-import { DateTime } from 'luxon';
 import Big from 'big.js';
+import { countBy, filter, find, map, reduce } from 'lodash';
+import { DateTime } from 'luxon';
+import React, { useMemo } from 'react';
+import { useLoaderData, useNavigate, useParams } from 'react-router-dom';
 import sanitizeHtml from 'sanitize-html';
 
-import {
-  Statistics,
-  Vote,
-  VotingOption,
-  ProposalType,
-  ProposalTypes,
-  Proposal,
-} from '@/types';
-import Header from '@/components/Header';
 import Button from '@/components/Button';
+import Header from '@/components/Header';
+import { countMultipleOptionsBy } from '@/helpers/util';
 import { useEligibleCMembers, useProposal } from '@/hooks/useProposals';
 import { useBaseFee, useFeeDistribution } from '@/hooks/useRpc';
 import useWallet from '@/hooks/useWallet';
-import { countMultipleOptionsBy } from '@/helpers/util';
-import ProposalStatus from './ProposalStatus';
-import VoteResult from './VoteResult';
-import VoteOptions from './VoteOptions';
-import OngoingState from './OngoingState';
-import CompletedStatistics from './CompletedStatistics';
 import { useWalletStore } from '@/store';
+import {
+  Proposal,
+  ProposalType,
+  ProposalTypes,
+  Statistics,
+  Vote,
+  VotingOption,
+} from '@/types';
+import CompletedStatistics from './CompletedStatistics';
+import OngoingState from './OngoingState';
+import ProposalStatus from './ProposalStatus';
+import VoteOptions from './VoteOptions';
+import VoteResult from './VoteResult';
 
 const Detail = () => {
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
@@ -45,7 +45,6 @@ const Detail = () => {
   const { baseFee } = useBaseFee();
   const { feeDistribution } = useFeeDistribution();
   const proposalWithEligibles = useEligibleCMembers(proposal as Proposal);
-
   const proposalType = proposalTypes.find(vtype => vtype.id === Number(type));
   const { result, statistics, votes, isCompleted, isAdminProposal } =
     useMemo(() => {
@@ -296,4 +295,4 @@ const Detail = () => {
     </>
   );
 };
-export default Detail;
+export default React.memo(Detail);

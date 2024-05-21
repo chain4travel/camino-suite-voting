@@ -1,16 +1,16 @@
-import React from 'react';
-import { FormHelperText, Stack, TextField, Typography } from '@mui/material';
-import { InfoRounded } from '@mui/icons-material';
-import { Controller, useFormContext } from 'react-hook-form';
-import { z } from 'zod';
+import Header from '@/components/Header';
+import Paragraph from '@/components/Paragraph';
+import TextEditor from '@/components/TextEditor';
+import { BN } from '@c4tplatform/caminojs/dist';
 import {
   AddressState,
   PlatformVMAPI,
 } from '@c4tplatform/caminojs/dist/apis/platformvm';
-import { BN } from '@c4tplatform/caminojs/dist';
-import Header from '@/components/Header';
-import Paragraph from '@/components/Paragraph';
-import TextEditor from '@/components/TextEditor';
+import { InfoRounded } from '@mui/icons-material';
+import { FormHelperText, Stack, TextField, Typography } from '@mui/material';
+import React from 'react';
+import { Controller, useFormContext } from 'react-hook-form';
+import { z } from 'zod';
 import FormSection from './FormSection';
 import Information from './Information';
 
@@ -139,4 +139,4 @@ const ExcludeMemberForm = () => {
     </>
   );
 };
-export default ExcludeMemberForm;
+export default React.memo(ExcludeMemberForm);

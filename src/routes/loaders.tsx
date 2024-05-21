@@ -1,14 +1,14 @@
-import React from 'react';
-import { QueryClient } from '@tanstack/react-query';
+import { ProposalType, ProposalTypes } from '@/types';
 import {
-  PersonAddAlt1Outlined,
-  MoveUpOutlined,
   DatasetOutlined,
-  IsoOutlined,
-  HighlightOffOutlined,
   HelpCenterOutlined,
+  HighlightOffOutlined,
+  IsoOutlined,
+  MoveUpOutlined,
+  PersonAddAlt1Outlined,
 } from '@mui/icons-material';
-import { ProposalTypes, ProposalType } from '@/types';
+import { QueryClient } from '@tanstack/react-query';
+import React from "react"
 
 const iconSelector = (type: string) => {
   switch (type) {
@@ -44,11 +44,11 @@ export const votingTypeLoader = (queryClient: QueryClient) => async () => {
       id: idx,
       name: ProposalTypes[key],
       abbr: key,
-      disabled: !['NewMember', 'ExcludeMember'].includes(key),
+      disabled: !['BaseFee', 'NewMember', 'ExcludeMember'].includes(key),
       restricted: !['NewMember'].includes(key),
       isAdminProposal: ['AdminNewMember', 'AdminExcludeMember'].includes(key),
       consortiumMemberOnly: ['ExcludeMember'].includes(key),
-      caminoOnly: false, // ['BaseFee'].includes(key),
+      caminoOnly: ['BaseFee'].includes(key),
     })),
   };
   return {

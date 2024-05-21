@@ -1,7 +1,12 @@
-import { AxiosError } from 'axios';
-import createHash from 'create-hash';
-import { difference, find, map } from 'lodash';
-import { BinTools, Buffer, BN } from '@c4tplatform/caminojs/dist';
+import { parseUnsignedTx } from '@/helpers/tx';
+import { useWalletStore } from '@/store';
+import { PendingMultisigTx } from '@/types';
+import { BN, BinTools, Buffer } from '@c4tplatform/caminojs/dist';
+import {
+  KeyChain,
+  UnsignedTx as PlatformUnsignedTx,
+  PlatformVMConstants,
+} from '@c4tplatform/caminojs/dist/apis/platformvm';
 import {
   MultisigKeyChain,
   MultisigKeyPair,
@@ -9,19 +14,14 @@ import {
   SECP256k1KeyPair,
   SignatureError,
 } from '@c4tplatform/caminojs/dist/common';
-import {
-  KeyChain,
-  PlatformVMConstants,
-  UnsignedTx as PlatformUnsignedTx,
-} from '@c4tplatform/caminojs/dist/apis/platformvm';
-import useWallet from './useWallet';
-import useToast from './useToast';
 import { ModelMultisigTx } from '@c4tplatform/signavaultjs';
-import { useWalletStore } from '@/store';
-import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { parseUnsignedTx } from '@/helpers/tx';
-import { PendingMultisigTx } from '@/types';
+import { AxiosError } from 'axios';
+import createHash from 'create-hash';
+import { difference, find, map } from 'lodash';
+import { useMemo } from 'react';
+import useToast from './useToast';
+import useWallet from './useWallet';
 
 export const usePendingMultisigTx = () => {
   const { multisigWallet, signavaultApi, signer } = useWallet();
@@ -324,7 +324,7 @@ export const useMultisig = () => {
           )
           ?.toString('hex');
         try {
-          await signavaultApi.cancelMultisigTx(tx.id, {
+          await signavaultApi.cancelMultisigTx({
             timestamp: timestamp,
             signature: signatureAliasTimestamp,
             id: tx?.id,

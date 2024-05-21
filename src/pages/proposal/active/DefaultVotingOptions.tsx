@@ -1,14 +1,14 @@
-import React, { MouseEvent, MouseEventHandler, useMemo, useState } from 'react';
-import { countBy, filter, find, findIndex } from 'lodash';
-import { IconButton, Stack } from '@mui/material';
-import { Cancel, CheckCircle } from '@mui/icons-material';
-import { ModelMultisigTx } from '@c4tplatform/signavaultjs';
-import useVote from '@/hooks/useVote';
-import type { Proposal, VotingOption } from '@/types';
+import Button from '@/components/Button';
 import StateButton from '@/components/StateButton';
 import { toPastTense } from '@/helpers/string';
-import Button from '@/components/Button';
 import { getOptionLabel } from '@/helpers/util';
+import useVote from '@/hooks/useVote';
+import type { Proposal, VotingOption } from '@/types';
+import { ModelMultisigTx } from '@c4tplatform/signavaultjs';
+import { Cancel, CheckCircle } from '@mui/icons-material';
+import { IconButton, Stack } from '@mui/material';
+import { countBy, filter, find, findIndex } from 'lodash';
+import React, { MouseEvent, MouseEventHandler, useMemo, useState } from 'react';
 
 interface DefaultVotingOptionsProps {
   data: Proposal;
@@ -89,7 +89,6 @@ const DefaultVotingOptions = ({
         setTimeout(() => onRefresh?.(), 500);
       })(data.pendingMultisigTx);
   };
-
   const actionButtons = useMemo(() => {
     const isVoted = voted.length > 0;
     // Voted state

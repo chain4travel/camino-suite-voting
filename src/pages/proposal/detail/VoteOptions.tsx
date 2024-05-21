@@ -1,11 +1,10 @@
-import React from 'react';
-import { filter, find } from 'lodash';
-import { Stack, Typography } from '@mui/material';
-import { Cancel, CheckCircle } from '@mui/icons-material';
-import Big from 'big.js';
-import GrantProgramVotingOptions from '../active/GrantProgram/GrantProgramVotingOptions';
-import BaseFeeVoting from '../active/BaseFeeVoting';
-import DefaultVotingOptions from '../active/DefaultVotingOptions';
+import Button from '@/components/Button';
+import DistributionBar from '@/components/DistributionBar';
+import Tag from '@/components/Tag';
+import { getTxExplorerUrl } from '@/helpers/string';
+import { useMultisig, usePendingMultisigAddVoteTxs } from '@/hooks/useMultisig';
+import useToast from '@/hooks/useToast';
+import { useNetworkStore } from '@/store/network';
 import {
   Percentage,
   Proposal,
@@ -13,13 +12,14 @@ import {
   ProposalTypes,
   VotingOption,
 } from '@/types';
-import DistributionBar from '@/components/DistributionBar';
-import Tag from '@/components/Tag';
-import { useMultisig, usePendingMultisigAddVoteTxs } from '@/hooks/useMultisig';
-import useToast from '@/hooks/useToast';
-import Button from '@/components/Button';
-import { getTxExplorerUrl } from '@/helpers/string';
-import { useNetworkStore } from '@/store/network';
+import { Cancel, CheckCircle } from '@mui/icons-material';
+import { Stack, Typography } from '@mui/material';
+import Big from 'big.js';
+import { filter, find } from 'lodash';
+import React from 'react';
+import BaseFeeVoting from '../active/BaseFeeVoting';
+import DefaultVotingOptions from '../active/DefaultVotingOptions';
+import GrantProgramVotingOptions from '../active/GrantProgram/GrantProgramVotingOptions';
 
 type VotedOption = VotingOption & Percentage;
 
@@ -232,4 +232,4 @@ const VoteOptions = ({
     </Stack>
   );
 };
-export default VoteOptions;
+export default React.memo(VoteOptions);

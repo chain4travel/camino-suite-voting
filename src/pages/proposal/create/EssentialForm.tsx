@@ -1,26 +1,26 @@
-import React, { ReactNode, useEffect, useMemo } from 'react';
-import {
-  useForm,
-  SubmitHandler,
-  Controller,
-  FormProvider,
-} from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import Paragraph from '@/components/Paragraph';
+import Button from '@/components/Button';
 import Header from '@/components/Header';
+import Paragraph from '@/components/Paragraph';
+import { getTxExplorerUrl } from '@/helpers/string';
+import { useAddProposal } from '@/hooks/useProposals';
+import useToast from '@/hooks/useToast';
+import { useNetworkStore } from '@/store/network';
+import { ProposalTypes } from '@/types';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { FormHelperText, InputLabel, Stack, Typography } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { DateTime } from 'luxon';
-import Button from '@/components/Button';
-import useToast from '@/hooks/useToast';
+import React, { ReactNode, useEffect, useMemo } from 'react';
+import {
+  Controller,
+  FormProvider,
+  SubmitHandler,
+  useForm,
+} from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import { z } from 'zod';
 import FormContainer from './FormContainer';
 import FormSection from './FormSection';
-import { useAddProposal } from '@/hooks/useProposals';
-import { useNetworkStore } from '@/store/network';
-import { getTxExplorerUrl } from '@/helpers/string';
-import { useNavigate } from 'react-router-dom';
-import { ProposalTypes } from '@/types';
 
 export const essentialSchema = (isAdminProposal: boolean) =>
   z.object({
@@ -282,4 +282,4 @@ const EssentialForm = ({
     </FormProvider>
   );
 };
-export default EssentialForm;
+export default React.memo(EssentialForm);
