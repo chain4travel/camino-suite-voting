@@ -1,18 +1,18 @@
-import React, { useMemo } from 'react';
-import { Box, Stack, Typography } from '@mui/material';
-import { Circle } from '@mui/icons-material';
-import Big from 'big.js';
+import DistributionBar, {
+  VOTE_DISTRIBUTION_COLORS,
+} from '@/components/DistributionBar';
+import Paragraph from '@/components/Paragraph';
+import Tag from '@/components/Tag';
 import {
   Applicant,
   ProposalStatuses,
   ProposalTypes,
   VotingOption,
 } from '@/types';
-import Paragraph from '@/components/Paragraph';
-import DistributionBar, {
-  VOTE_DISTRIBUTION_COLORS,
-} from '@/components/DistributionBar';
-import Tag from '@/components/Tag';
+import { Circle } from '@mui/icons-material';
+import { Box, Stack, Typography } from '@mui/material';
+import Big from 'big.js';
+import React, { useMemo } from 'react';
 
 interface VoteResultProps {
   result: VotingOption & {
@@ -42,7 +42,17 @@ const VoteResult = ({ result, proposalType }: VoteResultProps) => {
         case ProposalTypes.NewMember:
           content = (
             <Stack spacing={1} alignItems="flex-start">
-              <Typography fontWeight={600}>{String(result.target)}</Typography>
+              <Typography
+                fontWeight={600}
+                sx={{
+                  whiteSpace: 'nowrap',
+
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {String(result.target)}
+              </Typography>
             </Stack>
           );
           break;
@@ -296,7 +306,20 @@ const VoteResult = ({ result, proposalType }: VoteResultProps) => {
         case ProposalTypes.NewMember:
           content = (
             <Stack spacing={1} alignItems="flex-start">
-              <Typography fontWeight={600}>{String(result.target)}</Typography>
+              <Typography
+                fontWeight={600}
+                sx={{
+                  whiteSpace: 'nowrap',
+                  width: {
+                    xs: '300px',
+                    sm: '500px',
+                  },
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {String(result.target)}
+              </Typography>
               <Tag
                 color={result.value ? 'success' : 'error'}
                 label={result.value ? 'ADMITTED' : 'DECLINED'}
@@ -375,4 +398,4 @@ const VoteResult = ({ result, proposalType }: VoteResultProps) => {
     </Box>
   ) : null;
 };
-export default VoteResult;
+export default React.memo(VoteResult);

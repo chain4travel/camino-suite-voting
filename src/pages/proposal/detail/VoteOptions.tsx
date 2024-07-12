@@ -13,7 +13,7 @@ import {
   VotingOption,
 } from '@/types';
 import { Cancel, CheckCircle } from '@mui/icons-material';
-import { Stack, Typography } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import Big from 'big.js';
 import { filter, find } from 'lodash';
 import React from 'react';
@@ -117,7 +117,7 @@ const VoteOptions = ({
   }
 
   return (
-    <Stack direction={options.length <= 3 ? 'row' : 'column'} spacing={1.5}>
+    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
       {filter(options, opt => opt.value !== baseFee).map(opt => {
         let label;
         let extraInfo = null;
@@ -229,7 +229,7 @@ const VoteOptions = ({
           </Stack>
         );
       })}
-    </Stack>
+    </Box>
   );
 };
 export default React.memo(VoteOptions);

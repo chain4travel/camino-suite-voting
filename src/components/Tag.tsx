@@ -1,5 +1,4 @@
 import { Chip, alpha, styled } from '@mui/material';
-import React from 'react';
 
 const Tag = styled(Chip)(({ theme }) => ({
   borderRadius: theme.shape.borderRadius / 2,

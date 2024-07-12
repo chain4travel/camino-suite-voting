@@ -22,7 +22,7 @@ import { useMultisig } from './useMultisig';
 import useToast from './useToast';
 import useWallet from './useWallet';
 
-const bintools: BinTools = BinTools.getInstance()
+const bintools: BinTools = BinTools.getInstance();
 
 const serialization = Serialization.getInstance();
 const parseAPIProposal = (proposal?: APIProposal) => {
@@ -351,7 +351,7 @@ export const useAddProposal = (
           serialization.typeToBuffer(description, 'utf8'),
           proposal,
           signer.getAddress(),
-          0,
+          0
         );
         const tx = unsignedTx.sign(pchainAPI.keyChain());
         const txid: string = await pchainAPI.issueTx(tx);
@@ -373,7 +373,7 @@ export const useAddProposal = (
           serialization.typeToBuffer(description, 'utf8'),
           proposal,
           multisigWallet.keyData.alias,
-          0,
+          0
         );
         // - check signavault to get pending Txs
         tryToCreateMultisig && (await tryToCreateMultisig(unsignedTx));

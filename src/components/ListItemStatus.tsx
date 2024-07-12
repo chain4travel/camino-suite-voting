@@ -1,9 +1,9 @@
-import React from 'react';
-import { DateTime } from 'luxon';
-import { ChipProps, Stack } from '@mui/material';
 import { PendingMultisigTx } from '@/types';
-import Tag from './Tag';
+import { Box, ChipProps } from '@mui/material';
 import { countBy } from 'lodash';
+import { DateTime } from 'luxon';
+import React from 'react';
+import Tag from './Tag';
 
 interface ListItemStatusProps extends ChipProps {
   startTimestamp?: number;
@@ -45,7 +45,7 @@ const ListItemStatus = ({
       countBy(pendingMultisigTx.owners, o => !!o.signature).true ?? 0;
   }
   return (
-    <Stack direction="row" alignItems="center" spacing={1}>
+    <Box sx={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
       {duration && <Tag {...props} label={duration} />}
       {pendingMultisigTx && (
         <Tag
@@ -56,7 +56,7 @@ const ListItemStatus = ({
       {stage && <Tag color="success" label={stage.toUpperCase()} />}
       {industry && <Tag label={industry.toUpperCase()} />}
       {status && <Tag label={status} />}
-    </Stack>
+    </Box>
   );
 };
-export default ListItemStatus;
+export default React.memo(ListItemStatus);

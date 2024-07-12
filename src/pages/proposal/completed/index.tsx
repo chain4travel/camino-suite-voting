@@ -1,6 +1,6 @@
 import Button from '@/components/Button';
+import CaminoDatePicker from '@/components/DatePicker';
 import Header from '@/components/Header';
-import ListItemStatus from '@/components/ListItemStatus';
 import Paper from '@/components/Paper';
 import RadioButton from '@/components/RadioButton';
 import RefreshButton from '@/components/RefreshButton';
@@ -9,13 +9,14 @@ import useToast from '@/hooks/useToast';
 import { useVotingTypeStore } from '@/store';
 import { Proposal, ProposalType, ProposalTypes } from '@/types';
 import {
+  Box,
   FormControlLabel,
   List,
   ListItemButton,
   RadioGroup,
   Stack,
+  useTheme,
 } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers';
 import { DateTime } from 'luxon';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useLoaderData, useNavigate } from 'react-router-dom';
@@ -49,7 +50,7 @@ const CompletedVotes = () => {
       toast.error('Failed to fetch proposals');
     }
   }, [error]);
-
+  const theme = useTheme();
   const { voteItem } = useMemo(() => {
     const selectedVotingType = proposalTypes.find(
       vtype => vtype.name === votingType
@@ -105,29 +106,32 @@ const CompletedVotes = () => {
   };
 
   return (
-    <Paper sx={{ px: 2 }}>
-      <Header headline="Completed Proposals" variant="h5">
+    <Paper sx={{ p: 2 }}>
+      <Header headline="Completed Proposals" variant="h6">
         <RefreshButton loading={isFetching} onRefresh={refetch} />
       </Header>
       <Stack spacing="16px">
-        <Stack direction="row" spacing="12px">
-          <DatePicker
-            label="From"
-            sx={{ flex: 1 }}
-            onChange={(datetime: DateTime | null) =>
-              (startTime.current = datetime)
-            }
+        <Box sx={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <CaminoDatePicker
+            label="Voting from"
+            sx={{
+              flex: 1,
+            }}
+            onChange={(datetime: DateTime | null) => {
+              startTime.current = datetime;
+            }}
           />
-          <DatePicker
-            label="To"
-            sx={{ flex: 1 }}
+          <CaminoDatePicker
+            label="Voting till"
+            sx={{
+              flex: 1,
+            }}
             onChange={(datetime: DateTime | null) =>
               (endTime.current = datetime)
             }
           />
           <Button
             variant="contained"
-            color="primary"
             sx={{ minWidth: '100px' }}
             onClick={() => submitFilter()}
             loading={isFetching}
@@ -136,32 +140,51 @@ const CompletedVotes = () => {
           >
             Apply
           </Button>
-        </Stack>
+        </Box>
         <RadioGroup
           name="votingType"
           value={votingType}
           onChange={handleChange}
           row
+          sx={{
+            display: 'flex',
+            gap: '16px',
+            marginLeft: '16px',
+          }}
         >
           {proposalTypes
             .filter(pType => !pType.disabled)
             .map(pType => (
               <FormControlLabel
                 key={pType.id}
-                label={pType.abbr ?? pType.name}
+                label={pType.name}
                 value={pType.name}
-                sx={{ marginLeft: 0 }}
+                sx={{
+                  margin: '0 !important',
+                  color:
+                    votingType === pType.name
+                      ? theme.palette.primary.contrastText
+                      : theme.palette.text.secondary,
+                  fontSize: '14px',
+                  fontFamily: 'Inter',
+                }}
                 control={
                   <RadioButton
-                    label={pType.abbr ?? pType.name}
+                    label={pType.name}
                     checked={votingType === pType.name}
+                    sx={{
+                      width: '20px',
+                      height: '20px',
+                      marginRight: '8px',
+                      background: 'none',
+                    }}
                   />
                 }
               />
             ))}
         </RadioGroup>
       </Stack>
-      <List sx={{ maxWidth: 'none' }}>
+      <List sx={{ maxWidth: 'none', marginTop: '16px' }}>
         {proposals.length > 0 ? (
           proposals.map((proposal, index: number) => {
             return (
@@ -169,19 +192,9 @@ const CompletedVotes = () => {
                 key={proposal.id}
                 onClick={() => navigate(`${proposal.typeId}/${proposal.id}`)}
                 divider={proposals.length !== index + 1 && true}
-                sx={{ px: 0, py: 2 }}
+                sx={{ px: 0, py: '16px', borderRadius: '12px' }}
               >
-                <Stack width="100%">
-                  <Stack>
-                    {voteItem(proposal as Proposal)}
-                    <ListItemStatus
-                      startTimestamp={proposal.startTimestamp}
-                      endTimestamp={proposal.endTimestamp}
-                      isCompleted
-                    />
-                  </Stack>
-                  <Stack></Stack>
-                </Stack>
+                {voteItem(proposal as Proposal)}
               </ListItemButton>
             );
           })

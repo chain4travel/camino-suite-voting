@@ -1,6 +1,6 @@
 import { useWalletStore } from '@/store';
 import { PlatformVMConstants } from '@c4tplatform/caminojs/dist/apis/platformvm';
-import { Box, Tab, Tabs } from '@mui/material';
+import { Box, Tab, Tabs, useTheme } from '@mui/material';
 import { filter } from 'lodash';
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -18,6 +18,7 @@ const ProposalNavbar = () => {
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
+  const theme = useTheme();
   const { addressState, currentWalletAddress, pendingMultisigTxs } =
     useWalletStore(state => ({
       addressState: state.addressState,
@@ -61,7 +62,13 @@ const ProposalNavbar = () => {
         value={value}
         onChange={handleChange}
         textColor="secondary"
-        sx={{ '& .MuiTabs-indicator': { display: 'none' }, height: '61px' }}
+        sx={{
+          '& .MuiTabs-indicator': { display: 'none' },
+          height: '61px',
+          '& .Mui-selected': {
+            color: `${theme.palette.text.primary} !important`,
+          },
+        }}
         scrollButtons="auto"
         variant="scrollable"
         allowScrollButtonsMobile

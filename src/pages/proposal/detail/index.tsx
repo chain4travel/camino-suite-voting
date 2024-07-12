@@ -1,4 +1,4 @@
-import { Container, Divider, Stack, Typography } from '@mui/material';
+import { Box, Container, Divider, Stack, Typography } from '@mui/material';
 import Big from 'big.js';
 import { countBy, filter, find, map, reduce } from 'lodash';
 import { DateTime } from 'luxon';
@@ -188,13 +188,16 @@ const Detail = () => {
         </Button>
       </Stack>
       <Container>
-        <Stack
-          direction="row"
-          spacing={4}
-          alignItems="flex-start"
-          justifyContent="space-between"
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'start',
+            justifyContent: 'space-between',
+            gap: '16px',
+            flexWrap: 'wrap',
+          }}
         >
-          <Stack spacing={2}>
+          <Stack spacing={2} sx={{ flex: '1' }}>
             <Stack spacing={2}>
               <Header
                 variant="h3"
@@ -276,7 +279,7 @@ const Detail = () => {
             extraInfo={extraInfo}
             isLoggedIn={!!wallet?.signer}
           />
-        </Stack>
+        </Box>
       </Container>
       <Divider color="divider" variant="fullWidth" sx={{ my: 4 }} />
       <Container sx={{ paddingBottom: 5 }}>

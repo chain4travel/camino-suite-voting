@@ -3,3 +3,12 @@
   padding-right: 0;
   min-height: auto;
 }
+
+.clamp-3-lines {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  max-height: 80px;
+}

@@ -96,6 +96,8 @@ const useWallet = () => {
         signer,
         multisigWallet,
       };
+    } else {
+      setCurrentWalletAddress('');
     }
     return {};
   }, [activeWallet, caminoClient]);

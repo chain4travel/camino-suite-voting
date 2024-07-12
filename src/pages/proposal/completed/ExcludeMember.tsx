@@ -1,11 +1,11 @@
-import React, { useMemo } from 'react';
-import { Cancel, CheckCircle } from '@mui/icons-material';
-import { ListItemText, Stack, Typography } from '@mui/material';
-import sanitizeHtml from 'sanitize-html';
-import type { Proposal, VotingOption } from '@/types';
 import StateButton from '@/components/StateButton';
 import { toPastTense } from '@/helpers/string';
 import { getOptionLabel } from '@/helpers/util';
+import type { Proposal, VotingOption } from '@/types';
+import { Cancel, CheckCircle } from '@mui/icons-material';
+import { ListItemText, Stack, Typography } from '@mui/material';
+import React, { useMemo } from 'react';
+import sanitizeHtml from 'sanitize-html';
 
 interface NewMemberVoteProps {
   data: Proposal;
@@ -55,4 +55,4 @@ const ExcludeMember = ({ data, voteTypeName }: NewMemberVoteProps) => {
   );
 };
 
-export default ExcludeMember;
+export default React.memo(ExcludeMember);
