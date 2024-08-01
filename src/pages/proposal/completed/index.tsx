@@ -192,7 +192,7 @@ const CompletedVotes = () => {
                 key={proposal.id}
                 onClick={() => navigate(`${proposal.typeId}/${proposal.id}`)}
                 divider={proposals.length !== index + 1 && true}
-                sx={{ px: 0, py: '16px', borderRadius: '12px' }}
+                sx={{ px: 0, py: '16px' }}
               >
                 {voteItem(proposal as Proposal)}
               </ListItemButton>

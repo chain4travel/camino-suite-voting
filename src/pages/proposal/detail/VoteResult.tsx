@@ -1,6 +1,7 @@
 import DistributionBar, {
   VOTE_DISTRIBUTION_COLORS,
 } from '@/components/DistributionBar';
+import LongString from '@/components/LongString';
 import Paragraph from '@/components/Paragraph';
 import Tag from '@/components/Tag';
 import {
@@ -306,19 +307,8 @@ const VoteResult = ({ result, proposalType }: VoteResultProps) => {
         case ProposalTypes.NewMember:
           content = (
             <Stack spacing={1} alignItems="flex-start">
-              <Typography
-                fontWeight={600}
-                sx={{
-                  whiteSpace: 'nowrap',
-                  width: {
-                    xs: '300px',
-                    sm: '500px',
-                  },
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
-              >
-                {String(result.target)}
+              <Typography fontWeight={600}>
+                <LongString value={String(result.target)} />
               </Typography>
               <Tag
                 color={result.value ? 'success' : 'error'}
