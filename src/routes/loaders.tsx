@@ -1,4 +1,5 @@
 import { ProposalType, ProposalTypes } from '@/types';
+import { isFeatureEnabled } from '@/utils/featureFlags/featureFlagUtils';
 import {
   DatasetOutlined,
   HelpCenterOutlined,
@@ -44,7 +45,7 @@ export const votingTypeLoader = (queryClient: QueryClient) => async () => {
       id: idx,
       name: ProposalTypes[key],
       abbr: key,
-      disabled: !['BaseFee', 'NewMember', 'ExcludeMember'].includes(key),
+      disabled: !isFeatureEnabled(key),
       restricted: !['NewMember'].includes(key),
       isAdminProposal: ['AdminNewMember', 'AdminExcludeMember'].includes(key),
       consortiumMemberOnly: ['ExcludeMember'].includes(key),
