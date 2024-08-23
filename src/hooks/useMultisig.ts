@@ -58,31 +58,34 @@ export const usePendingMultisigTx = () => {
           signatureAliasTimestamp,
           timestamp
         );
-        const pendingTxs = res.data.map(tx => {
-          const unlinkedAddresses = multisigWallet.unlinkedOwners.map(ulink =>
-            bintools.addressToString(
-              multisigWallet.hrp,
-              multisigWallet.pchainId,
-              ulink
-            )
-          );
-          const walletAddress = difference(
-            multisigWallet.keyData.owner.addresses,
-            unlinkedAddresses
-          );
-          const isSigned = !!find(
-            tx.owners,
-            owner => walletAddress.includes(owner.address) && owner.signature
-          );
-          const unsignedTx = parseUnsignedTx(
-            tx.unsignedTx,
-            multisigWallet?.hrp,
-            multisigWallet?.pchainId
-          );
-          return { ...tx, ...unsignedTx, isSigned };
-        });
-        setPendingMultisigTxs(pendingTxs);
-        return pendingTxs;
+        if (res && res.data) {
+          const pendingTxs = res.data.map(tx => {
+            const unlinkedAddresses = multisigWallet.unlinkedOwners.map(ulink =>
+              bintools.addressToString(
+                multisigWallet.hrp,
+                multisigWallet.pchainId,
+                ulink
+              )
+            );
+            const walletAddress = difference(
+              multisigWallet.keyData.owner.addresses,
+              unlinkedAddresses
+            );
+            const isSigned = !!find(
+              tx.owners,
+              owner => walletAddress.includes(owner.address) && owner.signature
+            );
+            const unsignedTx = parseUnsignedTx(
+              tx.unsignedTx,
+              multisigWallet?.hrp,
+              multisigWallet?.pchainId
+            );
+            return { ...tx, ...unsignedTx, isSigned };
+          });
+          setPendingMultisigTxs(pendingTxs);
+          return pendingTxs;
+        }
+        return;
       }
       return;
     },

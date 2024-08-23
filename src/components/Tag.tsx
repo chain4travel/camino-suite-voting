@@ -5,7 +5,7 @@ const Tag = styled(Chip)(({ theme }) => ({
   backgroundColor: theme.palette.grey[800],
   height: 20,
   '.MuiChip-label': {
-    ...theme.typography.caption,
+    ...theme.typography.overline,
     fontWeight: 600,
     color: theme.palette.grey[300],
     padding: theme.spacing(0, 1),

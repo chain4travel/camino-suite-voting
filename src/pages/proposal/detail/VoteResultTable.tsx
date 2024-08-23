@@ -11,6 +11,7 @@ import {
   TableRow,
   Typography,
   styled,
+  useTheme,
 } from '@mui/material';
 import { TableVirtuoso, TableComponents } from 'react-virtuoso';
 import { VoteData } from '@/types';
@@ -28,8 +29,8 @@ type ColumnField = {
 };
 const columns: ColumnField[] = [
   { dataKey: 'address', label: 'Address / Name', width: '100%' },
-  { dataKey: 'votedDateTime', label: 'Time of vote', width: 260 },
-  { dataKey: 'option', label: 'Voted for', width: 260 },
+  { dataKey: 'votedDateTime', label: 'Time of vote', width: 220 },
+  { dataKey: 'option', label: 'Voted for', width: 100 },
 ];
 
 const VirtuosoTableComponents: TableComponents<VoteData> = {
@@ -52,8 +53,10 @@ interface VoteResultTableProps {
   votes?: VoteData[];
 }
 const VoteResultTable = ({ votes }: VoteResultTableProps) => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   return (
-    <TablePaper sx={{ height: 400, width: '100%' }}>
+    <TablePaper sx={{ width: '100%', height: 400 }}>
       <TableVirtuoso
         data={votes}
         components={VirtuosoTableComponents}
@@ -66,13 +69,16 @@ const VoteResultTable = ({ votes }: VoteResultTableProps) => {
                 align="left"
                 style={{ width: column.width }}
                 sx={{
+                  background: isDark
+                    ? '#0F182A'
+                    : `${theme.palette.background.default} !important`,
                   backgroundColor: 'grey.900',
                   borderColor: 'divider',
                 }}
               >
                 <Stack direction="row" alignItems="center" spacing={2}>
                   {idx === 0 && <Box width={24} height={24} />}
-                  <Typography variant="subtitle2">{column.label}</Typography>
+                  <Typography variant="caption">{column.label}</Typography>
                 </Stack>
               </TableCell>
             ))}
@@ -94,7 +100,14 @@ const VoteResultTable = ({ votes }: VoteResultTableProps) => {
                     {idx === 0 && (
                       <AccountBalanceWalletOutlined color="primary" />
                     )}
-                    <Typography variant="body2">
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        overflow: 'hidden',
+                        whiteSpace: 'nowrap',
+                        textOverflow: 'ellipsis',
+                      }}
+                    >
                       {row[column.dataKey]}
                     </Typography>
                   </Stack>

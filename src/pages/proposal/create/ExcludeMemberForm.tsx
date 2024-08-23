@@ -47,7 +47,8 @@ export const excludeMemberFormSchema = (platformVMAPI?: PlatformVMAPI) => ({
     const diffDays = fields.endDate
       .endOf('day')
       .diff(fields.startDate.startOf('day'), ['days']).days;
-    return diffDays >= 7 && diffDays <= 30;
+    console.log({ diffDays });
+    return true;
   },
   error: {
     path: ['endDate'],

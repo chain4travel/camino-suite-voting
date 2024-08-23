@@ -137,7 +137,6 @@ const VotingList = ({ data, isConsortiumMember, refresh }: VotingListProps) => {
             disableRipple
           >
             {Vote}
-            {/* <ArrowForwardIos /> */}
           </ListItemButton>
         );
       })}

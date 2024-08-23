@@ -8,7 +8,7 @@ import {
   PersonAddAlt1Outlined,
 } from '@mui/icons-material';
 import { QueryClient } from '@tanstack/react-query';
-import React from "react"
+import React from 'react';
 
 const iconSelector = (type: string) => {
   switch (type) {
@@ -44,7 +44,7 @@ export const votingTypeLoader = (queryClient: QueryClient) => async () => {
       id: idx,
       name: ProposalTypes[key],
       abbr: key,
-      disabled: !['BaseFee', 'NewMember', 'ExcludeMember'].includes(key),
+      disabled: !['NewMember', 'ExcludeMember'].includes(key),
       restricted: !['NewMember'].includes(key),
       isAdminProposal: ['AdminNewMember', 'AdminExcludeMember'].includes(key),
       consortiumMemberOnly: ['ExcludeMember'].includes(key),

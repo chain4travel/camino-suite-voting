@@ -1,6 +1,7 @@
 import StateButton from '@/components/StateButton';
 import { toPastTense } from '@/helpers/string';
 import { getOptionLabel } from '@/helpers/util';
+import { useProposalDescription } from '@/hooks/useProposalDescription';
 import type { Proposal, VotingOption } from '@/types';
 import { Cancel, CheckCircle } from '@mui/icons-material';
 import { ListItemText, Stack, Typography } from '@mui/material';
@@ -17,6 +18,7 @@ const ExcludeMember = ({ data, voteTypeName }: NewMemberVoteProps) => {
     () => data.options.filter(opt => data.outcome === opt.option),
     [data.outcome]
   );
+  const description = useProposalDescription(data.id);
   return (
     <Stack direction="row" spacing={2.5} alignItems="flex-end">
       <ListItemText
@@ -33,7 +35,7 @@ const ExcludeMember = ({ data, voteTypeName }: NewMemberVoteProps) => {
             }}
             variant="body2"
             dangerouslySetInnerHTML={{
-              __html: sanitizeHtml(data.description ?? ''),
+              __html: sanitizeHtml(description ?? ''),
             }}
           />
         }

@@ -14,8 +14,11 @@ import { useLoaderData } from 'react-router-dom';
 import NoProposals from '../active/NoProposals';
 import VotingList from '../active/VotingList';
 import GroupHeader from './GroupHeader';
+import { useTheme } from '@mui/material';
 
 const UpcomingVotings = () => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
   const { proposals, error, refetch, isFetching } = useUpcomingVotings();
   const groupedProposals = useMemo(() => {
@@ -46,8 +49,8 @@ const UpcomingVotings = () => {
     }, {});
   }, [proposals]);
   return (
-    <Paper sx={{ px: 2 }}>
-      <Header headline="Upcoming Proposals" variant="h5">
+    <Paper sx={{ p: 2 }}>
+      <Header headline="Upcoming Proposals" variant="h6">
         <RefreshButton loading={isFetching} onRefresh={refetch} />
       </Header>
       {Object.entries(groupedProposals ?? {}).length > 0 ? (
@@ -57,13 +60,15 @@ const UpcomingVotings = () => {
               key={proposalType}
               defaultExpanded={group.data.length > 0}
               sx={{
-                borderRadius: '0',
+                borderRadius: '12px',
               }}
             >
               <AccordionSummary
                 expandIcon={<ExpandMore />}
                 sx={{
-                  backgroundColor: 'grey.800',
+                  background: isDark
+                    ? '#0F182A'
+                    : `${theme.palette.background.default} !important`,
                   border: 0,
                 }}
               >
