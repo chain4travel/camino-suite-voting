@@ -26,6 +26,7 @@ import OngoingState from './OngoingState';
 import ProposalStatus from './ProposalStatus';
 import VoteOptions from './VoteOptions';
 import VoteResult from './VoteResult';
+import { useProposalDescription } from '@/hooks/useProposalDescription';
 
 const Detail = () => {
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
@@ -174,7 +175,7 @@ const Detail = () => {
       }
     }
   }, [proposalType, result, baseFee]);
-
+  const description = useProposalDescription(id);
   return (
     <>
       <Stack padding={2} alignItems="flex-start">
@@ -252,12 +253,10 @@ const Detail = () => {
             </Stack>
             <Stack spacing={1.5} alignItems="flex-start">
               <Typography
-                component="p"
+                variant="caption"
                 color="grey.400"
                 dangerouslySetInnerHTML={{
-                  __html: sanitizeHtml(
-                    proposalWithEligibles?.description ?? ''
-                  ),
+                  __html: sanitizeHtml(description ?? ''),
                 }}
               />
               {proposalWithEligibles?.forumLink && (

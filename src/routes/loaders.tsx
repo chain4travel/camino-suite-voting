@@ -9,7 +9,7 @@ import {
   PersonAddAlt1Outlined,
 } from '@mui/icons-material';
 import { QueryClient } from '@tanstack/react-query';
-import React from "react"
+import React from 'react';
 
 const iconSelector = (type: string) => {
   switch (type) {

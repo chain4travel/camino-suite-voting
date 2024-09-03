@@ -43,17 +43,17 @@ const VoteResult = ({ result, proposalType }: VoteResultProps) => {
         case ProposalTypes.NewMember:
           content = (
             <Stack spacing={1} alignItems="flex-start">
-              <Typography
+              <LongString value={String(result.target)} />
+              {/* <Typography
                 fontWeight={600}
                 sx={{
                   whiteSpace: 'nowrap',
-
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                 }}
               >
                 {String(result.target)}
-              </Typography>
+              </Typography> */}
             </Stack>
           );
           break;

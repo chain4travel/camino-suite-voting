@@ -11,7 +11,7 @@ import {
   VotingOption,
 } from '@/types';
 import { Cancel, CheckCircle } from '@mui/icons-material';
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Stack, Typography, useTheme } from '@mui/material';
 import { filter, map } from 'lodash';
 import { DateTime } from 'luxon';
 import React, { useMemo } from 'react';
@@ -108,12 +108,19 @@ const ProposalStatus = ({
       extraInfoComponent,
     };
   }, [proposal?.type]);
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   return (
     <Box
       padding={2.5}
       minWidth={280}
       borderRadius={1.5}
-      sx={{ backgroundColor: 'grey.900', marginLeft: '0px' }}
+      sx={{
+        background: isDark
+          ? '#0F182A'
+          : `${theme.palette.background.default} !important`,
+        marginLeft: '0px',
+      }}
     >
       <Paragraph spacing="md">
         <Paragraph divider>

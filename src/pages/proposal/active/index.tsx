@@ -13,7 +13,7 @@ import useWallet from '@/hooks/useWallet';
 import { useWalletStore } from '@/store';
 import { ProposalType } from '@/types';
 import { ExpandMore } from '@mui/icons-material';
-import { FormControlLabel, Stack } from '@mui/material';
+import { FormControlLabel, Stack, useTheme } from '@mui/material';
 import { filter, find } from 'lodash';
 import React, { useMemo, useState } from 'react';
 import { useLoaderData } from 'react-router-dom';
@@ -28,6 +28,8 @@ const ActiveVotings = () => {
     currentWalletAddress: state.currentWalletAddress,
     addressState: state.addressState,
   }));
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   const { isConsortiumMember } = addressState;
   const [onlyTodo, setOnlyTodo] = useState(false);
   const { proposals, error, refetch, isFetching } = useActiveVotings(
@@ -78,8 +80,8 @@ const ActiveVotings = () => {
     }, {});
   }, [proposals, onlyTodo, pendingMultisigAddVoteTxs]);
   return (
-    <Paper sx={{ px: 2 }}>
-      <Header headline="Ongoing Proposals" variant="h5">
+    <Paper sx={{ p: 2 }}>
+      <Header headline="Ongoing Proposals" variant="h6">
         <Stack direction="row" alignItems="center" spacing={1}>
           {isConsortiumMember && (
             <FormControlLabel
@@ -104,13 +106,15 @@ const ActiveVotings = () => {
               key={proposalType}
               defaultExpanded={group.data.length > 0}
               sx={{
-                borderRadius: '0',
+                borderRadius: '12px',
               }}
             >
               <AccordionSummary
                 expandIcon={<ExpandMore />}
                 sx={{
-                  backgroundColor: 'grey.800',
+                  background: isDark
+                    ? '#0F182A'
+                    : `${theme.palette.background.default} !important`,
                   borderRadius: '0',
                 }}
               >

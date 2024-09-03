@@ -163,7 +163,7 @@ const CompletedVotes = () => {
                   margin: '0 !important',
                   color:
                     votingType === pType.name
-                      ? theme.palette.primary.contrastText
+                      ? theme.palette.text.primary
                       : theme.palette.text.secondary,
                   fontSize: '14px',
                   fontFamily: 'Inter',

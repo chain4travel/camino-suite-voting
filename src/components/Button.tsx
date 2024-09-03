@@ -6,6 +6,7 @@ const Button = styled(LoadingButton)(({}) => {
   return {
     '&, &.MuiButton-root': {
       boxShadow: 'none',
+      width: 'fit-content',
     },
     '&.MuiButton-outlined': {
       borderColor: theme.palette.divider,
@@ -28,7 +29,7 @@ const Button = styled(LoadingButton)(({}) => {
       color: theme.palette.grey[900],
     },
     '&.Mui-disabled': {
-      opacity: 0.5,
+      opacity: 0.8,
     },
   };
 });

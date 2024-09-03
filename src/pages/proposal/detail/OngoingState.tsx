@@ -8,7 +8,7 @@ const OngoingState = () => {
       alignItems="center"
       justifyContent="center"
       spacing={3}
-      width={458}
+      maxWidth={458}
       textAlign="center"
       sx={{ my: 8, mx: 'auto' }}
     >
