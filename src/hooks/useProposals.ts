@@ -1,13 +1,9 @@
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { DateTime } from 'luxon';
-import { filter, find, orderBy } from 'lodash';
-import { BinTools, platformvm, Buffer } from '@c4tplatform/caminojs/dist';
-import { Serialization } from '@c4tplatform/caminojs/dist/utils/serialization';
 import {
-  fetchProposalDetail,
-  fetchCompletedVotes,
   fetchActiveVotings,
+  fetchCompletedVotes,
+  fetchProposalDetail,
 } from '@/apis/proposals';
+import { useNetworkStore } from '@/store/network';
 import {
   APIPRoposalWrapper,
   APIProposal,
@@ -17,10 +13,16 @@ import {
   ProposalTypes,
   VotingOption,
 } from '@/types';
-import { useNetworkStore } from '@/store/network';
-import useWallet from './useWallet';
-import useToast from './useToast';
+import { BinTools, Buffer, platformvm } from '@c4tplatform/caminojs/dist';
+import { Serialization } from '@c4tplatform/caminojs/dist/utils/serialization';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { filter, find, orderBy } from 'lodash';
+import { DateTime } from 'luxon';
 import { useMultisig } from './useMultisig';
+import useToast from './useToast';
+import useWallet from './useWallet';
+
+const bintools: BinTools = BinTools.getInstance();
 
 const serialization = Serialization.getInstance();
 const parseAPIProposal = (proposal?: APIProposal) => {
@@ -346,10 +348,10 @@ export const useAddProposal = (
           txs.utxos,
           pchainAPI.keyChain().getAddressStrings(),
           pchainAPI.keyChain().getAddressStrings(),
+          serialization.typeToBuffer(description, 'utf8'),
           proposal,
           signer.getAddress(),
-          0,
-          serialization.typeToBuffer(description, 'utf8')
+          0
         );
         const tx = unsignedTx.sign(pchainAPI.keyChain());
         const txid: string = await pchainAPI.issueTx(tx);
@@ -368,10 +370,10 @@ export const useAddProposal = (
           txs.utxos,
           [multisigAlias, ...multisigWallet.keyData.owner.addresses],
           [multisigAlias],
+          serialization.typeToBuffer(description, 'utf8'),
           proposal,
           multisigWallet.keyData.alias,
-          0,
-          serialization.typeToBuffer(description, 'utf8')
+          0
         );
         // - check signavault to get pending Txs
         tryToCreateMultisig && (await tryToCreateMultisig(unsignedTx));

@@ -1,4 +1,11 @@
-import React from 'react';
+import DistributionBar, {
+  VOTE_DISTRIBUTION_COLORS,
+} from '@/components/DistributionBar';
+import Paragraph from '@/components/Paragraph';
+import TextEditor from '@/components/TextEditor';
+import useToast from '@/hooks/useToast';
+import { VotingOption } from '@/types';
+import { AddCircle, Circle, DeleteForever } from '@mui/icons-material';
 import {
   Button,
   FormHelperText,
@@ -8,18 +15,11 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { AddCircle, Circle, DeleteForever } from '@mui/icons-material';
-import { Controller, useFormContext, useFieldArray } from 'react-hook-form';
-import { z } from 'zod';
 import { isArray, sumBy } from 'lodash';
-import useToast from '@/hooks/useToast';
-import TextEditor from '@/components/TextEditor';
-import Paragraph from '@/components/Paragraph';
-import { VotingOption } from '@/types';
+import React from 'react';
+import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
+import { z } from 'zod';
 import FormSection from './FormSection';
-import DistributionBar, {
-  VOTE_DISTRIBUTION_COLORS,
-} from '@/components/DistributionBar';
 
 const MAX_OPTIONS = 3;
 export const feeDistributionFormSchema = {
@@ -196,4 +196,4 @@ const FeeDistributionForm = () => {
     </>
   );
 };
-export default FeeDistributionForm;
+export default React.memo(FeeDistributionForm);

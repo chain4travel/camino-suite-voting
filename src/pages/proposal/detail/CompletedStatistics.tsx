@@ -1,4 +1,4 @@
-import { Stack, Typography } from '@mui/material';
+import { Stack, Typography, useTheme } from '@mui/material';
 import React from 'react';
 import { map } from 'lodash';
 import Big from 'big.js';
@@ -26,6 +26,8 @@ const CompletedStatistics = ({
   baseFee,
   votes,
 }: CompletedStatisticsProps) => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   return (
     <Stack spacing={3}>
       <Stack spacing={1}>

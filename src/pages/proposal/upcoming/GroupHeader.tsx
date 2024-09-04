@@ -37,7 +37,9 @@ const GroupHeader = styled(
       >
         {/* {group.icon} */}
         <Stack direction="row" alignItems="center" spacing={2.5}>
-          <Typography variant="h6">{group.name}</Typography>
+          <Typography variant="body2" fontWeight={600}>
+            {group.name}
+          </Typography>
           {extraInfo}
         </Stack>
         <Stack direction="row" alignItems="center">

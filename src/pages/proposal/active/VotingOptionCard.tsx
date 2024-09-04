@@ -1,18 +1,18 @@
-import { Cancel, CheckCircle } from '@mui/icons-material';
-import {
-  Card as MuiCard,
-  CardProps,
-  styled,
-  CardHeader as MuiCardHeader,
-  CardContent,
-  Stack,
-} from '@mui/material';
-import React, { ReactNode, useState } from 'react';
-import { countBy, find } from 'lodash';
-import { ModelMultisigTx } from '@c4tplatform/signavaultjs';
 import Button from '@/components/Button';
 import StateButton from '@/components/StateButton';
-import type { PendingMultisigTx, Vote, VotingOption } from '@/types';
+import type { PendingMultisigTx, VotingOption } from '@/types';
+import { ModelMultisigTx } from '@c4tplatform/signavaultjs';
+import { Cancel, CheckCircle } from '@mui/icons-material';
+import {
+  CardContent,
+  CardProps,
+  Card as MuiCard,
+  CardHeader as MuiCardHeader,
+  Stack,
+  styled,
+} from '@mui/material';
+import { countBy, find } from 'lodash';
+import React, { ReactNode, useState } from 'react';
 
 interface StyledCardProps {
   active?: boolean;

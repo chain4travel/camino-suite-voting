@@ -180,12 +180,6 @@ const CreateNewVoting = () => {
         onChange={handleChange}
         sx={{ marginTop: '16px', borderRadius: '12px' }}
       >
-        <MenuItem
-          key="placeholder"
-          value="0"
-          hidden
-          sx={{ padding: 0 }}
-        ></MenuItem>
         {availableProposalTypes.map(pType => (
           <MenuItem key={pType.id} value={pType.id}>
             {pType.name}

@@ -1,14 +1,14 @@
-import React, { MouseEvent, MouseEventHandler, useMemo, useState } from 'react';
-import { countBy, filter, find, findIndex } from 'lodash';
-import { IconButton, Stack } from '@mui/material';
-import { Cancel, CheckCircle } from '@mui/icons-material';
-import { ModelMultisigTx } from '@c4tplatform/signavaultjs';
-import useVote from '@/hooks/useVote';
-import type { Proposal, VotingOption } from '@/types';
+import Button from '@/components/Button';
 import StateButton from '@/components/StateButton';
 import { toPastTense } from '@/helpers/string';
-import Button from '@/components/Button';
 import { getOptionLabel } from '@/helpers/util';
+import useVote from '@/hooks/useVote';
+import type { Proposal, VotingOption } from '@/types';
+import { ModelMultisigTx } from '@c4tplatform/signavaultjs';
+import { Cancel, CheckCircle } from '@mui/icons-material';
+import { Box, IconButton, Stack } from '@mui/material';
+import { countBy, filter, find, findIndex } from 'lodash';
+import React, { MouseEvent, MouseEventHandler, useMemo, useState } from 'react';
 
 interface DefaultVotingOptionsProps {
   data: Proposal;
@@ -89,7 +89,6 @@ const DefaultVotingOptions = ({
         setTimeout(() => onRefresh?.(), 500);
       })(data.pendingMultisigTx);
   };
-
   const actionButtons = useMemo(() => {
     const isVoted = voted.length > 0;
     // Voted state
@@ -118,7 +117,7 @@ const DefaultVotingOptions = ({
           o => !!o.signature
         );
         return (
-          <Stack spacing={1.5} direction={'row'} alignItems={'center'} flex={1}>
+          <Stack spacing={1.5} direction={'row'} alignItems={'center'}>
             <Button
               variant="contained"
               color={data.pendingMultisigTx.canExecute ? 'success' : 'primary'}
@@ -178,21 +177,6 @@ const DefaultVotingOptions = ({
             )}
           </Stack>
         );
-        // return (
-        //   <Button
-        //     key={`multisig-voted-${votedOption?.option}`}
-        //     variant={isAccepted ? 'contained' : 'outlined'}
-        //     startIcon={isAccepted ? <CheckCircle /> : <Cancel />}
-        //     onClick={triggerVoting(votedOption)}
-        //     loading={confirmedOption === votedOption.option}
-        //     loadingPosition="start"
-        //     color={isAccepted ? 'primary' : 'inherit'}
-        //     fullWidth
-        //     disabled={!isConsortiumMember}
-        //   >
-        //     {getOptionLabel(votedOption)}
-        //   </Button>
-        // );
       }
     }
 
@@ -230,7 +214,13 @@ const DefaultVotingOptions = ({
     };
 
   return (
-    <Stack direction="row" sx={{ minWidth: 240, flex: 1 }} spacing={1.5}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '8px',
+      }}
+    >
       {selectedOption
         ? [
             <IconButton
@@ -265,7 +255,7 @@ const DefaultVotingOptions = ({
             </Button>,
           ]
         : actionButtons}
-    </Stack>
+    </Box>
   );
 };
 export default DefaultVotingOptions;

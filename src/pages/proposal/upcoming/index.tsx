@@ -1,21 +1,24 @@
-import React, { useMemo } from 'react';
-import { useLoaderData } from 'react-router-dom';
-import { ExpandMore } from '@mui/icons-material';
-import { useUpcomingVotings } from '@/hooks/useProposals';
-import Header from '@/components/Header';
 import {
   Accordion,
-  AccordionSummary,
   AccordionDetails,
+  AccordionSummary,
 } from '@/components/Accordion';
-import { ProposalType } from '@/types';
+import Header from '@/components/Header';
 import Paper from '@/components/Paper';
 import RefreshButton from '@/components/RefreshButton';
+import { useUpcomingVotings } from '@/hooks/useProposals';
+import { ProposalType } from '@/types';
+import { ExpandMore } from '@mui/icons-material';
+import React, { useMemo } from 'react';
+import { useLoaderData } from 'react-router-dom';
+import NoProposals from '../active/NoProposals';
 import VotingList from '../active/VotingList';
 import GroupHeader from './GroupHeader';
-import NoProposals from '../active/NoProposals';
+import { useTheme } from '@mui/material';
 
 const UpcomingVotings = () => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
   const { proposals, error, refetch, isFetching } = useUpcomingVotings();
   const groupedProposals = useMemo(() => {
@@ -46,8 +49,8 @@ const UpcomingVotings = () => {
     }, {});
   }, [proposals]);
   return (
-    <Paper sx={{ px: 2 }}>
-      <Header headline="Upcoming Proposals" variant="h5">
+    <Paper sx={{ p: 2 }}>
+      <Header headline="Upcoming Proposals" variant="h6">
         <RefreshButton loading={isFetching} onRefresh={refetch} />
       </Header>
       {Object.entries(groupedProposals ?? {}).length > 0 ? (
@@ -56,18 +59,31 @@ const UpcomingVotings = () => {
             <Accordion
               key={proposalType}
               defaultExpanded={group.data.length > 0}
+              sx={{
+                borderRadius: '12px',
+              }}
             >
               <AccordionSummary
                 expandIcon={<ExpandMore />}
                 sx={{
-                  backgroundColor: 'grey.800',
-                  border: 1,
-                  borderColor: 'grey.700',
+                  background: isDark
+                    ? '#0F182A'
+                    : `${theme.palette.background.default} !important`,
+                  border: 0,
                 }}
               >
                 <GroupHeader group={group} />
               </AccordionSummary>
-              <AccordionDetails style={{ padding: 0 }}>
+              <AccordionDetails
+                sx={{
+                  p: 0,
+                  borderRadius: 0,
+                  '& .MuiList-root': {
+                    borderRadius: 0,
+                    maxWidth: 'none',
+                  },
+                }}
+              >
                 <VotingList data={group} />
               </AccordionDetails>
             </Accordion>
@@ -79,4 +95,4 @@ const UpcomingVotings = () => {
     </Paper>
   );
 };
-export default UpcomingVotings;
+export default React.memo(UpcomingVotings);

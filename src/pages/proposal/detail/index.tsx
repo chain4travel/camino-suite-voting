@@ -1,31 +1,32 @@
-import React, { useMemo } from 'react';
-import { Container, Divider, Stack, Typography } from '@mui/material';
-import { useLoaderData, useNavigate, useParams } from 'react-router-dom';
-import { find, countBy, reduce, filter, map } from 'lodash';
-import { DateTime } from 'luxon';
+import { Box, Container, Divider, Stack, Typography } from '@mui/material';
 import Big from 'big.js';
+import { countBy, filter, find, map, reduce } from 'lodash';
+import { DateTime } from 'luxon';
+import React, { useMemo } from 'react';
+import { useLoaderData, useNavigate, useParams } from 'react-router-dom';
 import sanitizeHtml from 'sanitize-html';
 
-import {
-  Statistics,
-  Vote,
-  VotingOption,
-  ProposalType,
-  ProposalTypes,
-  Proposal,
-} from '@/types';
-import Header from '@/components/Header';
 import Button from '@/components/Button';
+import Header from '@/components/Header';
+import { countMultipleOptionsBy } from '@/helpers/util';
 import { useEligibleCMembers, useProposal } from '@/hooks/useProposals';
 import { useBaseFee, useFeeDistribution } from '@/hooks/useRpc';
 import useWallet from '@/hooks/useWallet';
-import { countMultipleOptionsBy } from '@/helpers/util';
-import ProposalStatus from './ProposalStatus';
-import VoteResult from './VoteResult';
-import VoteOptions from './VoteOptions';
-import OngoingState from './OngoingState';
-import CompletedStatistics from './CompletedStatistics';
 import { useWalletStore } from '@/store';
+import {
+  Proposal,
+  ProposalType,
+  ProposalTypes,
+  Statistics,
+  Vote,
+  VotingOption,
+} from '@/types';
+import CompletedStatistics from './CompletedStatistics';
+import OngoingState from './OngoingState';
+import ProposalStatus from './ProposalStatus';
+import VoteOptions from './VoteOptions';
+import VoteResult from './VoteResult';
+import { useProposalDescription } from '@/hooks/useProposalDescription';
 
 const Detail = () => {
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
@@ -45,7 +46,6 @@ const Detail = () => {
   const { baseFee } = useBaseFee();
   const { feeDistribution } = useFeeDistribution();
   const proposalWithEligibles = useEligibleCMembers(proposal as Proposal);
-
   const proposalType = proposalTypes.find(vtype => vtype.id === Number(type));
   const { result, statistics, votes, isCompleted, isAdminProposal } =
     useMemo(() => {
@@ -175,7 +175,7 @@ const Detail = () => {
       }
     }
   }, [proposalType, result, baseFee]);
-
+  const description = useProposalDescription(id);
   return (
     <>
       <Stack padding={2} alignItems="flex-start">
@@ -189,13 +189,16 @@ const Detail = () => {
         </Button>
       </Stack>
       <Container>
-        <Stack
-          direction="row"
-          spacing={4}
-          alignItems="flex-start"
-          justifyContent="space-between"
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'start',
+            justifyContent: 'space-between',
+            gap: '16px',
+            flexWrap: 'wrap',
+          }}
         >
-          <Stack spacing={2}>
+          <Stack spacing={2} sx={{ flex: '1' }}>
             <Stack spacing={2}>
               <Header
                 variant="h3"
@@ -250,12 +253,10 @@ const Detail = () => {
             </Stack>
             <Stack spacing={1.5} alignItems="flex-start">
               <Typography
-                component="p"
+                variant="caption"
                 color="grey.400"
                 dangerouslySetInnerHTML={{
-                  __html: sanitizeHtml(
-                    proposalWithEligibles?.description ?? ''
-                  ),
+                  __html: sanitizeHtml(description ?? ''),
                 }}
               />
               {proposalWithEligibles?.forumLink && (
@@ -277,7 +278,7 @@ const Detail = () => {
             extraInfo={extraInfo}
             isLoggedIn={!!wallet?.signer}
           />
-        </Stack>
+        </Box>
       </Container>
       <Divider color="divider" variant="fullWidth" sx={{ my: 4 }} />
       <Container sx={{ paddingBottom: 5 }}>
@@ -296,4 +297,4 @@ const Detail = () => {
     </>
   );
 };
-export default Detail;
+export default React.memo(Detail);

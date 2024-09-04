@@ -1,54 +1,24 @@
-import React, { useMemo } from 'react';
-import { NavLink } from 'react-router-dom';
-import { Box, Stack, Typography } from '@mui/material';
-import { filter } from 'lodash';
-import { PlatformVMConstants } from '@c4tplatform/caminojs/dist/apis/platformvm';
 import { useWalletStore } from '@/store';
-import Badge from './Badge';
+import { PlatformVMConstants } from '@c4tplatform/caminojs/dist/apis/platformvm';
+import { Box, Tab, Tabs, useTheme } from '@mui/material';
+import { filter } from 'lodash';
+import React, { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-interface NavItemProps {
-  to: string;
-  text: string;
-  notification?: string;
+function a11yProps(index: number) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
 }
-const NavItem = ({ to, text, notification }: NavItemProps) => {
-  return (
-    <NavLink
-      to={`/dac/${to}`}
-      style={{ textDecoration: 'none', position: 'relative' }}
-    >
-      {({ isActive }) => (
-        <>
-          {notification && (
-            <Badge
-              color="primary"
-              label={notification}
-              sx={{ position: 'absolute', top: 8, right: 4 }}
-            />
-          )}
-          <Typography
-            color={isActive ? 'text.primary' : 'grey.500'}
-            sx={{
-              paddingX: 1.25,
-              paddingY: 1.5,
-              paddingTop: 3,
-              fontWeight: 600,
-            }}
-          >
-            {text}
-          </Typography>
-          <Box
-            height={4}
-            borderRadius="4px 4px 0 0"
-            sx={{ backgroundColor: isActive ? 'primary.main' : 'transparent' }}
-          />
-        </>
-      )}
-    </NavLink>
-  );
-};
 
+//TODO: notification is removed need to be added
 const ProposalNavbar = () => {
+  const [value, setValue] = useState(0);
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  };
+  const theme = useTheme();
   const { addressState, currentWalletAddress, pendingMultisigTxs } =
     useWalletStore(state => ({
       addressState: state.addressState,
@@ -77,35 +47,73 @@ const ProposalNavbar = () => {
         pendingAddVoteCount > 0 ? `${pendingAddVoteCount} pending` : undefined,
     };
   }, [pendingMultisigTxs]);
+  const navigate = useNavigate();
   const isCreateProposalAllowed = isKycVerified || isConsortiumAdminProposer;
   const enableCreateButton = currentWalletAddress && isCreateProposalAllowed;
   return (
-    <Stack
-      direction="row"
-      borderBottom={1}
-      borderColor="divider"
-      paddingX={1.5}
-      alignItems="flex-end"
-      justifyContent="space-between"
+    <Box
+      sx={{
+        display: 'flex',
+        width: '100%',
+        maxWidth: '1536px',
+      }}
     >
-      <Stack direction="row" spacing={3} alignItems="flex-end">
-        <NavItem
-          to="active"
-          text="Ongoing Proposals"
-          notification={pendingAddVotes}
+      <Tabs
+        value={value}
+        onChange={handleChange}
+        textColor="secondary"
+        sx={{
+          '& .MuiTabs-indicator': { display: 'none' },
+          height: '61px',
+          '& .Mui-selected': {
+            color: `${theme.palette.text.primary} !important`,
+          },
+        }}
+        scrollButtons="auto"
+        variant="scrollable"
+        allowScrollButtonsMobile
+      >
+        <Tab
+          className="tab"
+          disableRipple
+          label="Ongoing Proposals"
+          {...a11yProps(0)}
+          key={0}
+          sx={{ '&::after': { display: value === 0 ? 'block' : 'none' } }}
+          onClick={() => navigate('/dac/active')}
         />
-        <NavItem to="upcoming" text="Upcoming Proposals" />
-        <NavItem to="completed" text="Completed Proposals" />
-      </Stack>
-      {enableCreateButton && (
-        <NavItem
-          to="creating"
-          text="Create Proposal"
-          notification={pendingAddProposals}
+        <Tab
+          className="tab"
+          disableRipple
+          label="Upcoming Proposals"
+          {...a11yProps(1)}
+          key={1}
+          sx={{ '&::after': { display: value === 1 ? 'block' : 'none' } }}
+          onClick={() => navigate('/dac/upcoming')}
         />
-      )}
-    </Stack>
+        <Tab
+          className="tab"
+          disableRipple
+          label="Completed Proposals"
+          {...a11yProps(2)}
+          key={2}
+          sx={{ '&::after': { display: value === 2 ? 'block' : 'none' } }}
+          onClick={() => navigate('/dac/completed')}
+        />
+        {enableCreateButton && (
+          <Tab
+            className="tab"
+            disableRipple
+            label="Create Proposal"
+            {...a11yProps(3)}
+            key={3}
+            sx={{ '&::after': { display: value === 3 ? 'block' : 'none' } }}
+            onClick={() => navigate('/dac/creating')}
+          />
+        )}
+      </Tabs>
+    </Box>
   );
 };
 
-export default ProposalNavbar;
+export default React.memo(ProposalNavbar);

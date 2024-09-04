@@ -1,9 +1,11 @@
 import React from 'react';
-import { ListItemText, Stack, Typography } from '@mui/material';
+import { Box, ListItemText, Stack, Typography } from '@mui/material';
 import sanitizeHtml from 'sanitize-html';
 import { ModelMultisigTx } from '@c4tplatform/signavaultjs';
 import type { Proposal } from '@/types';
 import DefaultVotingOptions from './DefaultVotingOptions';
+import { useProposalDescription } from '@/hooks/useProposalDescription';
+import LongString from '@/components/LongString';
 
 interface ExcludeMemberVotingProps {
   data: Proposal;
@@ -25,31 +27,44 @@ const ExcludeMemberVoting = ({
   onVoteSuccess,
   multisigFunctions,
 }: ExcludeMemberVotingProps) => {
+  const description = useProposalDescription(data.id);
   return (
-    <Stack direction="row" alignItems="center">
-      <ListItemText
-        primary={String(data.target)}
-        secondary={
-          <Typography
-            color="text.secondary"
-            style={{
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              textOverflow: 'ellipsis',
-              overflow: 'hidden',
-              WebkitBoxOrient: 'vertical',
-            }}
-            variant="body2"
-            dangerouslySetInnerHTML={{
-              __html: sanitizeHtml(data.description ?? ''),
-            }}
-          />
-        }
-        sx={{ marginRight: 3 }}
-        primaryTypographyProps={{
-          sx: { fontWeight: 500, marginBottom: 1 },
+    <Box
+      sx={{
+        display: 'flex',
+        gap: '8px',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+      }}
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '4px',
+          mb: '4px !important',
+          alignItems: 'start',
         }}
-      />
+      >
+        <LongString value={String(data.target)} />
+        <Typography
+          component="caption"
+          color="text.secondary"
+          style={{
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            textOverflow: 'ellipsis',
+            overflow: 'hidden',
+            WebkitBoxOrient: 'vertical',
+            textAlign: 'start',
+          }}
+          variant="caption"
+          dangerouslySetInnerHTML={{
+            __html: sanitizeHtml(description ?? ''),
+          }}
+        />
+      </Box>
       {isConsortiumMember && (
         <DefaultVotingOptions
           data={data}
@@ -60,7 +75,7 @@ const ExcludeMemberVoting = ({
           compact
         />
       )}
-    </Stack>
+    </Box>
   );
 };
 export default ExcludeMemberVoting;

@@ -1,4 +1,3 @@
-import React, { ReactNode } from 'react';
 import {
   Stack,
   SxProps,
@@ -6,8 +5,9 @@ import {
   Typography,
   TypographyPropsVariantOverrides,
 } from '@mui/material';
-import type { OverridableStringUnion } from '@mui/types';
 import type { Variant } from '@mui/material/styles/createTypography';
+import type { OverridableStringUnion } from '@mui/types';
+import React, { ReactNode } from 'react';
 
 type HeaderVariant =
   | OverridableStringUnion<'inherit' | Variant, TypographyPropsVariantOverrides>
@@ -29,7 +29,7 @@ const Header = ({
   let sx = {};
   switch (variant) {
     case 'h6':
-      sx = { marginBottom: 1 };
+      sx = { marginBottom: 2 };
       break;
     case 'h2':
     case 'h3':
@@ -47,4 +47,4 @@ const Header = ({
     </Stack>
   );
 };
-export default Header;
+export default React.memo(Header);

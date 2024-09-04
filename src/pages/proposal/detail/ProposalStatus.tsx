@@ -1,20 +1,20 @@
-import React, { useMemo } from 'react';
-import { Box, Stack, Typography } from '@mui/material';
-import { Cancel, CheckCircle } from '@mui/icons-material';
-import { DateTime } from 'luxon';
-import { filter, map } from 'lodash';
+import Button from '@/components/Button';
 import Paragraph from '@/components/Paragraph';
 import StateButton from '@/components/StateButton';
+import Tag from '@/components/Tag';
+import { toPastTense } from '@/helpers/string';
+import { getOptionLabel } from '@/helpers/util';
 import {
   Proposal,
   ProposalStatuses,
   ProposalTypes,
   VotingOption,
 } from '@/types';
-import { toPastTense } from '@/helpers/string';
-import Tag from '@/components/Tag';
-import Button from '@/components/Button';
-import { getOptionLabel } from '@/helpers/util';
+import { Cancel, CheckCircle } from '@mui/icons-material';
+import { Box, Stack, Typography, useTheme } from '@mui/material';
+import { filter, map } from 'lodash';
+import { DateTime } from 'luxon';
+import React, { useMemo } from 'react';
 
 interface ExtraInfo {
   label: string;
@@ -108,12 +108,19 @@ const ProposalStatus = ({
       extraInfoComponent,
     };
   }, [proposal?.type]);
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   return (
     <Box
       padding={2.5}
       minWidth={280}
       borderRadius={1.5}
-      sx={{ backgroundColor: 'grey.900' }}
+      sx={{
+        background: isDark
+          ? '#0F182A'
+          : `${theme.palette.background.default} !important`,
+        marginLeft: '0px',
+      }}
     >
       <Paragraph spacing="md">
         <Paragraph divider>
@@ -209,4 +216,4 @@ const ProposalStatus = ({
     </Box>
   );
 };
-export default ProposalStatus;
+export default React.memo(ProposalStatus);

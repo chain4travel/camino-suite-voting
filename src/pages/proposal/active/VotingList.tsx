@@ -1,18 +1,18 @@
-import React from 'react';
-import { List, ListItemButton, Stack } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import { ProposalTypes, type Applicant, type Proposal } from '@/types';
-import NewMemberVoting from './NewMemberVoting';
-import BaseFeeVoting from './BaseFeeVoting';
+import Button from '@/components/Button';
 import ListItemStatus from '@/components/ListItemStatus';
+import { getTxExplorerUrl } from '@/helpers/string';
+import { useMultisig } from '@/hooks/useMultisig';
+import useToast from '@/hooks/useToast';
+import { useNetworkStore } from '@/store/network';
+import { ProposalTypes, type Applicant, type Proposal } from '@/types';
+import { List, ListItemButton, Stack } from '@mui/material';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import BaseFeeVoting from './BaseFeeVoting';
 import ExcludeMemberVoting from './ExcludeMemberVoting';
 import FeeDistributionVoting from './FeeDistributionVoting';
 import GrantProgramVoting from './GrantProgram';
-import useToast from '@/hooks/useToast';
-import { useNetworkStore } from '@/store/network';
-import Button from '@/components/Button';
-import { getTxExplorerUrl } from '@/helpers/string';
-import { useMultisig } from '@/hooks/useMultisig';
+import NewMemberVoting from './NewMemberVoting';
 
 interface VotingListProps {
   data: { type: string; typeId: number; name: string; data: Proposal[] };
@@ -137,11 +137,10 @@ const VotingList = ({ data, isConsortiumMember, refresh }: VotingListProps) => {
             disableRipple
           >
             {Vote}
-            {/* <ArrowForwardIos /> */}
           </ListItemButton>
         );
       })}
     </List>
   );
 };
-export default VotingList;
+export default React.memo(VotingList);

@@ -1,3 +1,6 @@
+import Header from '@/components/Header';
+import InputField from '@/components/InputField';
+import TextEditor from '@/components/TextEditor';
 import {
   FormHelperText,
   InputLabel,
@@ -9,10 +12,7 @@ import {
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { z } from 'zod';
-import Header from '@/components/Header';
-import TextEditor from '@/components/TextEditor';
 import FormSection from './FormSection';
-import InputField from '@/components/InputField';
 
 const COMPANY_STAGES = [
   { label: 'MVP', value: 0 },
@@ -259,4 +259,4 @@ const GrantProgramForm = () => {
     </>
   );
 };
-export default GrantProgramForm;
+export default React.memo(GrantProgramForm);

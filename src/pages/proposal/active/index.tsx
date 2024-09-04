@@ -1,25 +1,25 @@
-import React, { useMemo, useState } from 'react';
-import { useLoaderData } from 'react-router-dom';
-import { FormControlLabel, Stack } from '@mui/material';
-import { ExpandMore } from '@mui/icons-material';
-import { filter, find } from 'lodash';
-import { useActiveVotings } from '@/hooks/useProposals';
-import useWallet from '@/hooks/useWallet';
-import Header from '@/components/Header';
 import {
   Accordion,
-  AccordionSummary,
   AccordionDetails,
+  AccordionSummary,
 } from '@/components/Accordion';
-import { ProposalType } from '@/types';
 import Checkbox from '@/components/Checkbox';
+import Header from '@/components/Header';
 import Paper from '@/components/Paper';
 import RefreshButton from '@/components/RefreshButton';
 import { usePendingMultisigAddVoteTxs } from '@/hooks/useMultisig';
+import { useActiveVotings } from '@/hooks/useProposals';
+import useWallet from '@/hooks/useWallet';
 import { useWalletStore } from '@/store';
-import VotingList from './VotingList';
+import { ProposalType } from '@/types';
+import { ExpandMore } from '@mui/icons-material';
+import { FormControlLabel, Stack, useTheme } from '@mui/material';
+import { filter, find } from 'lodash';
+import React, { useMemo, useState } from 'react';
+import { useLoaderData } from 'react-router-dom';
 import GroupHeader from './GroupHeader';
 import NoProposals from './NoProposals';
+import VotingList from './VotingList';
 
 const ActiveVotings = () => {
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
@@ -28,6 +28,8 @@ const ActiveVotings = () => {
     currentWalletAddress: state.currentWalletAddress,
     addressState: state.addressState,
   }));
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   const { isConsortiumMember } = addressState;
   const [onlyTodo, setOnlyTodo] = useState(false);
   const { proposals, error, refetch, isFetching } = useActiveVotings(
@@ -78,8 +80,8 @@ const ActiveVotings = () => {
     }, {});
   }, [proposals, onlyTodo, pendingMultisigAddVoteTxs]);
   return (
-    <Paper sx={{ px: 2 }}>
-      <Header headline="Ongoing Proposals" variant="h5">
+    <Paper sx={{ p: 2 }}>
+      <Header headline="Ongoing Proposals" variant="h6">
         <Stack direction="row" alignItems="center" spacing={1}>
           {isConsortiumMember && (
             <FormControlLabel
@@ -103,18 +105,31 @@ const ActiveVotings = () => {
             <Accordion
               key={proposalType}
               defaultExpanded={group.data.length > 0}
+              sx={{
+                borderRadius: '12px',
+              }}
             >
               <AccordionSummary
                 expandIcon={<ExpandMore />}
                 sx={{
-                  backgroundColor: 'grey.800',
-                  border: 1,
-                  borderColor: 'grey.700',
+                  background: isDark
+                    ? '#0F182A'
+                    : `${theme.palette.background.default} !important`,
+                  borderRadius: '0',
                 }}
               >
                 <GroupHeader group={group} />
               </AccordionSummary>
-              <AccordionDetails style={{ padding: 0 }}>
+              <AccordionDetails
+                sx={{
+                  p: 0,
+                  borderRadius: 0,
+                  '& .MuiList-root': {
+                    borderRadius: 0,
+                    maxWidth: 'none',
+                  },
+                }}
+              >
                 <VotingList
                   data={group}
                   isConsortiumMember={isConsortiumMember}
@@ -130,4 +145,4 @@ const ActiveVotings = () => {
     </Paper>
   );
 };
-export default ActiveVotings;
+export default React.memo(ActiveVotings);

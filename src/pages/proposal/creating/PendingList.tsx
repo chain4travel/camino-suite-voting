@@ -1,21 +1,21 @@
-import React, { useState } from 'react';
-import { List, ListItem, Stack } from '@mui/material';
-import { Cancel, CheckCircle } from '@mui/icons-material';
-import { countBy } from 'lodash';
+import Button from '@/components/Button';
+import ListItemStatus from '@/components/ListItemStatus';
+import {
+  Applicant,
+  ProposalTypes,
+  type PendingMultisigTx,
+  type Proposal,
+} from '@/types';
 import { ModelMultisigTx } from '@c4tplatform/signavaultjs';
-import NewMemberVoting from '../active/NewMemberVoting';
+import { Cancel, CheckCircle } from '@mui/icons-material';
+import { List, ListItem, Stack } from '@mui/material';
+import { countBy } from 'lodash';
+import React, { useState } from 'react';
 import BaseFeeVoting from '../active/BaseFeeVoting';
 import ExcludeMemberVoting from '../active/ExcludeMemberVoting';
 import FeeDistributionVoting from '../active/FeeDistributionVoting';
 import GrantProgramVoting from '../active/GrantProgram';
-import {
-  ProposalTypes,
-  type Proposal,
-  type PendingMultisigTx,
-  Applicant,
-} from '@/types';
-import Button from '@/components/Button';
-import ListItemStatus from '@/components/ListItemStatus';
+import NewMemberVoting from '../active/NewMemberVoting';
 
 type MultisigProposal = Proposal & { msigTx: PendingMultisigTx };
 interface PendingListProps {

@@ -1,5 +1,5 @@
 import { ProposalTypes } from '@/types';
-import { Buffer, BinTools } from '@c4tplatform/caminojs/dist';
+import { BinTools, Buffer } from '@c4tplatform/caminojs/dist';
 import {
   AddProposalTx,
   AdminProposal,

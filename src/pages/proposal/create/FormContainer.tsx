@@ -1,5 +1,4 @@
 import { Stack, styled } from '@mui/material';
-import React from 'react';
 
 const FormContainer = styled(Stack)(({ theme }) => ({
   marginBottom: theme.spacing(4),
