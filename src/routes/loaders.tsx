@@ -1,5 +1,5 @@
 import { ProposalType, ProposalTypes } from '@/types';
-import { isFeatureEnabled } from '@/utils/featureFlags/featureFlagUtils';
+import { useIsFeatureEnabled } from '@/utils/featureFlags/featureFlagUtils';
 import {
   DatasetOutlined,
   HelpCenterOutlined,
@@ -29,34 +29,43 @@ const iconSelector = (type: string) => {
   }
 };
 
-export const votingTypeLoader = (queryClient: QueryClient) => async () => {
-  // The following used when voting(proposal) types are fetching from backend API
-  // const query = {
-  //   queryKey: ['getVotingType'],
-  //   queryFn: async () => fetchVotingTypes(),
-  // };
-  // // ⬇️ return data or fetch it
-  // const result =
-  //   queryClient.getQueryData(query.queryKey) ??
-  //   (await queryClient.fetchQuery(query));
+export const votingTypeLoader =
+  (
+    queryClient: QueryClient,
+    isFeatureEnabled: (key: string) => Promise<boolean>
+  ) =>
+  async () => {
+    // The following used when voting(proposal) types are fetching from backend API
+    // const query = {
+    //   queryKey: ['getVotingType'],
+    //   queryFn: async () => fetchVotingTypes(),
+    // };
+    // // ⬇️ return data or fetch it
+    // const result =
+    //   queryClient.getQueryData(query.queryKey) ??
+    //   (await queryClient.fetchQuery(query));
 
-  const result = {
-    data: Object.keys(ProposalTypes).map((key, idx) => ({
-      id: idx,
-      name: ProposalTypes[key],
-      abbr: key,
-      disabled: !isFeatureEnabled(key),
-      restricted: !['NewMember'].includes(key),
-      isAdminProposal: ['AdminNewMember', 'AdminExcludeMember'].includes(key),
-      consortiumMemberOnly: ['ExcludeMember'].includes(key),
-      caminoOnly: ['BaseFee'].includes(key),
-    })),
+    const result = {
+      data: await Promise.all(
+        Object.keys(ProposalTypes).map(async (key, idx) => ({
+          id: idx,
+          name: ProposalTypes[key],
+          abbr: key,
+          disabled: !(await isFeatureEnabled(key)), // Pass caminoClient as an argument
+          restricted: !['NewMember'].includes(key),
+          isAdminProposal: ['AdminNewMember', 'AdminExcludeMember'].includes(
+            key
+          ),
+          consortiumMemberOnly: ['ExcludeMember'].includes(key),
+          caminoOnly: ['BaseFee'].includes(key),
+        }))
+      ),
+    };
+    return {
+      ...result,
+      data: result?.data?.map((vtype: ProposalType) => ({
+        ...vtype,
+        icon: iconSelector(vtype.name),
+      })),
+    };
   };
-  return {
-    ...result,
-    data: result?.data?.map((vtype: ProposalType) => ({
-      ...vtype,
-      icon: iconSelector(vtype.name),
-    })),
-  };
-};
