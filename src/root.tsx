@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import React, { useEffect } from 'react';
 import { RouterProvider } from 'react-router-dom';
+import { useIsFeatureEnabled } from '@/utils/featureFlags/featureFlagUtils';
 
 import Toast from '@/components/Toast';
 import { updateBaseUrl } from './helpers/http';
@@ -30,13 +31,15 @@ const Root = (props: RootProps) => {
   }, [props.network]);
   const caminoTheme = CaminoTheme.getThemeOptions('dark');
   const theme = props.theme ?? createTheme(caminoTheme);
+  const { isFeatureEnabled } = useIsFeatureEnabled();
+
   return (
     <React.StrictMode>
       <ThemeProvider theme={theme}>
         <CssBaseline enableColorScheme />
         <LocalizationProvider dateAdapter={AdapterLuxon}>
           <QueryClientProvider client={queryClient}>
-            <RouterProvider router={getRoutes(queryClient)} />
+            <RouterProvider router={getRoutes(queryClient, isFeatureEnabled)} />
             <Toast />
 
             <ReactQueryDevtools initialIsOpen={false} />
