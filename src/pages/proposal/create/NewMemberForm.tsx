@@ -72,8 +72,15 @@ const NewMemberForm = () => {
   return (
     <>
       <FormSection spacing="md" divider>
-        <Header headline="Wallet address" variant="h6" />
-        <Typography variant="body2" color="text.secondary">
+        <Typography
+          fontSize={16}
+          fontWeight={600}
+          lineHeight={'24px'}
+          sx={{ mb: '8px' }}
+        >
+          Wallet address
+        </Typography>
+        <Typography variant="caption">
           Please enter the wallet address you want to apply to become a member
           of the consortium
         </Typography>
@@ -82,7 +89,21 @@ const NewMemberForm = () => {
           control={control}
           defaultValue={''}
           render={({ field, fieldState: { error } }) => (
-            <TextField {...field} error={!!error} helperText={error?.message} />
+            <TextField
+              sx={{
+                '& .MuiInputBase-root': {
+                  height: '40px',
+                },
+                '& input': {
+                  fontSize: '14px',
+                  height: '100%',
+                  padding: '8px 14px',
+                },
+              }}
+              {...field}
+              error={!!error}
+              helperText={error?.message}
+            />
           )}
         />
       </FormSection>

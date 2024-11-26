@@ -52,8 +52,15 @@ const AdminExcludeMemberForm = () => {
   return (
     <>
       <FormSection spacing="md" divider>
-        <Header headline="Wallet address" variant="h6" />
-        <Typography variant="body2" color="text.secondary">
+        <Typography
+          fontSize={16}
+          fontWeight={600}
+          lineHeight={'24px'}
+          sx={{ mb: '8px' }}
+        >
+          Wallet address
+        </Typography>
+        <Typography variant="caption">
           Please enter the wallet address of the member you want to exclude from
           the consortium
         </Typography>
@@ -63,6 +70,16 @@ const AdminExcludeMemberForm = () => {
           defaultValue={''}
           render={({ field, fieldState: { error } }) => (
             <TextField
+              sx={{
+                '& .MuiInputBase-root': {
+                  height: '40px',
+                },
+                '& input': {
+                  fontSize: '14px',
+                  height: '100%',
+                  padding: '8px 14px',
+                },
+              }}
               {...field}
               placeholder="Enter p-chain address ..."
               error={!!error}

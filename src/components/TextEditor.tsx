@@ -82,11 +82,18 @@ const TextEditor = forwardRef(
 
     return (
       <Box>
-        {title && <Header headline={title} variant="h6" />}
-        {description && (
-          <Typography variant="body2" color="text.secondary">
-            {description}
+        {title && (
+          <Typography
+            fontSize={16}
+            fontWeight={600}
+            lineHeight={'24px'}
+            sx={{ mb: '8px' }}
+          >
+            {title}
           </Typography>
+        )}
+        {description && (
+          <Typography variant="caption">{description}</Typography>
         )}
         <StyledEditor error={!!error}>
           <QuillEditor

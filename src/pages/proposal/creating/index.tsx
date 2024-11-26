@@ -93,8 +93,8 @@ const CreatingProposals = () => {
   };
 
   return (
-    <Paper sx={{ px: 2 }}>
-      <Header headline="Creating Proposals" variant="h5">
+    <Paper sx={{ p: 2 }}>
+      <Header headline="Creating Proposals" variant="h6">
         <Stack direction="row" alignItems="center" spacing={1}>
           {currentWalletAddress && (
             <NavLink to={isKycVerified ? '/dac/create' : '#'}>
@@ -110,6 +110,7 @@ const CreatingProposals = () => {
           <RefreshButton loading={isFetching} onRefresh={refetch} />
         </Stack>
       </Header>
+
       {pendingMultisigAddProposalTxs?.length > 0 ? (
         Object.entries(groupedPendingProposals).map(
           ([proposalType, group]: [string, any]) => (

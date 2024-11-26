@@ -21,6 +21,7 @@ import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import FormContainer from './FormContainer';
 import FormSection from './FormSection';
+import CaminoDatePicker from '@/components/DatePicker';
 
 export const essentialSchema = (isAdminProposal: boolean) =>
   z.object({
@@ -94,6 +95,7 @@ const EssentialForm = ({
     'startDate',
     DateTime.now().plus({ day: 1 }).startOf('day')
   );
+  const watchEndDate = watch('endDate');
   useEffect(() => {
     reset({
       startDate: isAdminProposal
@@ -136,88 +138,104 @@ const EssentialForm = ({
     }
   };
 
+  const diff = useMemo(() => {
+    if (watchStartDate && watchEndDate) {
+      const diff = watchStartDate.diff(watchEndDate, [
+        'days',
+        'hours',
+        'minutes',
+      ]);
+      return diff;
+    }
+    return null;
+  }, [watchStartDate, watchEndDate]);
+
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onFormSubmit)}>
-        <FormContainer>
+        <FormContainer sx={{ mb: '0px !important', pb: '0px !important' }}>
           <Paragraph spacing="lg">
-            <FormSection spacing="md" divider>
-              <Paragraph>
-                <Header headline="Please select a voting period" variant="h6" />
-                <Typography variant="body2" color="text.secondary">
-                  The voting period will be{' '}
-                  <Typography variant="body2" component="span" fontWeight={700}>
-                    {'<number of entered days>'}
+            {!isAdminProposal && (
+              <FormSection spacing="md" divider>
+                <Paragraph>
+                  <Typography
+                    fontSize={16}
+                    fontWeight={600}
+                    lineHeight={'24px'}
+                    sx={{ mb: '8px' }}
+                  >
+                    Please select a voting period
                   </Typography>
-                  . It will start on{' '}
-                  <Typography variant="body2" component="span" fontWeight={700}>
-                    {'<start datetime>'}
-                  </Typography>{' '}
-                  and end on{' '}
-                  <Typography variant="body2" component="span" fontWeight={700}>
-                    {'<end datetime>'}
-                  </Typography>
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
+                  {diff && (
+                    <Typography variant="caption">
+                      The voting period will be{' '}
+                      <Typography
+                        variant="body2"
+                        component="span"
+                        fontWeight={700}
+                      >
+                        {Math.abs(diff.days)} days
+                      </Typography>
+                      . It will start on{' '}
+                      <Typography
+                        variant="caption"
+                        component="span"
+                        fontWeight={700}
+                      >
+                        {watchStartDate
+                          ?.setZone('local')
+                          .toLocaleString('yyyy-MM-dd HH:mm ZZZZ')}
+                      </Typography>{' '}
+                      and end on{' '}
+                      <Typography
+                        variant="caption"
+                        component="span"
+                        fontWeight={700}
+                      >
+                        {watchEndDate
+                          ?.setZone('local')
+                          .toLocaleString('yyyy-MM-dd HH:mm ZZZZ')}
+                      </Typography>
+                    </Typography>
+                  )}
+                  {/* <Typography variant="body2" color="text.secondary">
                   Please note that additional{' '}
                   <Typography variant="body2" component="span" fontWeight={700}>
                     {'<threshold -1>'}
                   </Typography>{' '}
                   members of your Multisignature Group must sign this voting
                   proposal before the start datetime of the vote
-                </Typography>
-              </Paragraph>
-              <Stack direction="row" spacing={2}>
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <InputLabel sx={{ color: 'text.secondary' }}>From</InputLabel>
-                  <Controller
-                    name="startDate"
-                    control={control}
-                    defaultValue={
-                      isAdminProposal
-                        ? DateTime.now()
-                        : DateTime.now().plus({ day: 1 }).startOf('day')
-                    }
-                    render={({ field, fieldState: { error } }) => (
-                      <>
-                        <DatePicker
-                          {...field}
-                          disablePast
-                          onChange={value => field.onChange(value)}
-                          minDate={
-                            isAdminProposal
-                              ? DateTime.now()
-                              : DateTime.now().plus({ day: 1 }).startOf('day')
-                          }
-                        />
-                        {error && (
-                          <FormHelperText error>{error.message}</FormHelperText>
-                        )}
-                      </>
-                    )}
-                  />
-                </Stack>
-                {!isAdminProposal && (
+                </Typography> */}
+                </Paragraph>
+                <Stack direction="row" spacing={2}>
                   <Stack direction="row" spacing={1} alignItems="center">
-                    <InputLabel sx={{ color: 'text.secondary' }}>To</InputLabel>
+                    <InputLabel sx={{ color: 'text.secondary' }}>
+                      <Typography variant="caption">From</Typography>
+                    </InputLabel>
                     <Controller
-                      name="endDate"
+                      name="startDate"
                       control={control}
-                      defaultValue={watchStartDate.plus({
-                        days: endDateRestriction.minDays,
-                      })}
+                      defaultValue={
+                        isAdminProposal
+                          ? DateTime.now()
+                          : DateTime.now().plus({ day: 1 }).startOf('day')
+                      }
                       render={({ field, fieldState: { error } }) => (
                         <>
-                          <DatePicker
+                          <CaminoDatePicker
                             {...field}
                             disablePast
                             onChange={value => field.onChange(value)}
-                            minDate={watchStartDate.plus({
-                              days: endDateRestriction.minDays,
-                            })}
-                            maxDate={watchStartDate.plus({
-                              days: endDateRestriction.maxDays,
-                            })}
+                            minDate={
+                              isAdminProposal
+                                ? DateTime.now()
+                                : DateTime.now().plus({ day: 1 }).startOf('day')
+                            }
+                            sx={{
+                              '& .MuiInputBase-root': {
+                                paddingLeft: '0px !important',
+                              },
+                            }}
                           />
                           {error && (
                             <FormHelperText error>
@@ -228,9 +246,48 @@ const EssentialForm = ({
                       )}
                     />
                   </Stack>
-                )}
-              </Stack>
-            </FormSection>
+                  {!isAdminProposal && (
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      <InputLabel sx={{ color: 'text.secondary' }}>
+                        <Typography variant="caption">To</Typography>
+                      </InputLabel>
+                      <Controller
+                        name="endDate"
+                        control={control}
+                        defaultValue={watchStartDate.plus({
+                          days: endDateRestriction.minDays,
+                        })}
+                        render={({ field, fieldState: { error } }) => (
+                          <>
+                            <CaminoDatePicker
+                              {...field}
+                              disablePast
+                              onChange={value => field.onChange(value)}
+                              minDate={watchStartDate.plus({
+                                days: endDateRestriction.minDays,
+                              })}
+                              maxDate={watchStartDate.plus({
+                                days: endDateRestriction.maxDays,
+                              })}
+                              sx={{
+                                '& .MuiInputBase-root': {
+                                  paddingLeft: '0px !important',
+                                },
+                              }}
+                            />
+                            {error && (
+                              <FormHelperText error>
+                                {error.message}
+                              </FormHelperText>
+                            )}
+                          </>
+                        )}
+                      />
+                    </Stack>
+                  )}
+                </Stack>
+              </FormSection>
+            )}
             {/* <FormSection spacing="md" divider sx={{ paddingX: 3 }}>
               <Header headline="Add link of forum of discussion" variant="h6" />
               <Controller
@@ -254,7 +311,6 @@ const EssentialForm = ({
         <Stack direction="row" spacing={2}>
           <Button
             variant="outlined"
-            sx={{ py: 1.5 }}
             color="inherit"
             onClick={() => {
               reset();
@@ -266,7 +322,6 @@ const EssentialForm = ({
           <Button
             type="submit"
             variant="contained"
-            sx={{ py: 1.5 }}
             color="primary"
             loading={formState.isSubmitting}
           >

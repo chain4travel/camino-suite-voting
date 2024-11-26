@@ -37,6 +37,7 @@
     "react-router-dom": "^6.4.5",
     "react-virtuoso": "^4.3.11",
     "sanitize-html": "^2.11.0",
+    "xss": "^1.0.15",
     "zod": "^3.21.4",
     "zustand": "^4.1.5"
   },
@@ -50,8 +51,7 @@
     "dev": "webpack-dev-server --mode development --open",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "prepare": "husky install",
-    "preinstall": "git submodule update --recursive --init"
+    "prepare": "husky install"
   },
   "eslintConfig": {
     "extends": [

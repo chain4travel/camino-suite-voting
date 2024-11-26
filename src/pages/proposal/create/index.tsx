@@ -159,10 +159,24 @@ const CreateNewVoting = () => {
 
   return (
     <Container>
-      <Header headline="Create Proposal" variant="h2" fontFamily="Inter" />
-      <Header headline="Voting type" variant="h6" />
-      <Typography variant="body2" color="text.secondary">
-        Please select the voting you want to start and we will show you all
+      <Typography
+        fontSize={28}
+        fontWeight={600}
+        lineHeight={'36px'}
+        sx={{ mb: '16px' }}
+      >
+        Create Proposal
+      </Typography>
+      <Typography
+        fontSize={16}
+        fontWeight={600}
+        lineHeight={'24px'}
+        sx={{ mb: '8px' }}
+      >
+        Voting type
+      </Typography>
+      <Typography variant="caption" color="text.secondary" sx={{ mb: '16px' }}>
+        Please select the proposal you want to start and we will show you all
         needed information and additional informations
       </Typography>
       <Select
@@ -178,15 +192,38 @@ const CreateNewVoting = () => {
           return selectedType?.name;
         }}
         onChange={handleChange}
-        sx={{ marginTop: '16px', borderRadius: '12px' }}
+        sx={{
+          marginTop: '16px',
+          width: '100%',
+          height: '40px !important',
+          '& .MuiSelect-select': {
+            height: '40px !important',
+            display: 'flex',
+            alignItems: 'center',
+            fontFamily: 'Inter',
+            fontSize: '14px',
+            fontWeight: 400,
+            boxSizing: 'border-box',
+            lineHeight: '20px',
+            padding: '0 14px',
+          },
+          '& .MuiOutlinedInput-root': {
+            height: '40px !important',
+            boxSizing: 'border-box',
+            '& fieldset': {
+              borderColor: theme => theme.palette.card.border,
+              borderRadius: '12px',
+            },
+          },
+        }}
       >
         {availableProposalTypes.map(pType => (
           <MenuItem key={pType.id} value={pType.id}>
-            {pType.name}
+            <Typography variant="caption">{pType.name}</Typography>
           </MenuItem>
         ))}
       </Select>
-      <Divider sx={{ marginY: 4 }} />
+      <Divider sx={{ marginY: '24px' }} />
       {formSchema ? (
         <EssentialForm
           proposalType={selectedProposalType}
