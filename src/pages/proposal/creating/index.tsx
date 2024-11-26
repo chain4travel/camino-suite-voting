@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { NavLink, useLoaderData, useNavigate } from 'react-router-dom';
 import { ExpandMore } from '@mui/icons-material';
-import { Stack } from '@mui/material';
+import { Stack, useTheme } from '@mui/material';
 import { omit } from 'lodash';
 import NoProposals from '../active/NoProposals';
 import Header from '@/components/Header';
@@ -91,7 +91,8 @@ const CreatingProposals = () => {
     );
     navigate('/dac/upcoming');
   };
-
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   return (
     <Paper sx={{ p: 2 }}>
       <Header headline="Creating Proposals" variant="h6">
@@ -117,18 +118,31 @@ const CreatingProposals = () => {
             <Accordion
               key={proposalType}
               defaultExpanded={group.data.length > 0}
+              sx={{
+                borderRadius: '12px',
+              }}
             >
               <AccordionSummary
                 expandIcon={<ExpandMore />}
                 sx={{
-                  backgroundColor: 'grey.800',
-                  border: 1,
-                  borderColor: 'grey.700',
+                  background: isDark
+                    ? '#0F182A'
+                    : `${theme.palette.background.default} !important`,
+                  border: 0,
                 }}
               >
                 <GroupHeader group={group} />
               </AccordionSummary>
-              <AccordionDetails style={{ padding: 0 }}>
+              <AccordionDetails
+                sx={{
+                  p: 0,
+                  borderRadius: 0,
+                  '& .MuiList-root': {
+                    borderRadius: 0,
+                    maxWidth: 'none',
+                  },
+                }}
+              >
                 <PendingList
                   data={group}
                   multisigFunctions={{

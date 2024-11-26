@@ -66,7 +66,7 @@ const PendingList = ({
         <Button
           variant="contained"
           color={msigTx.canExecute ? 'success' : 'primary'}
-          sx={{ py: 1.25, px: 2 }}
+          sx={{ py: 1.25, px: 2, width: 'fit-content' }}
           onClick={
             msigTx.canExecute
               ? () => executeMultisigTx?.(onTxSuccess)(msigTx)
@@ -88,7 +88,7 @@ const PendingList = ({
             <Button
               variant="contained"
               color="primary"
-              sx={{ py: 1.25, px: 2 }}
+              sx={{ py: 1.25, px: 2, width: 'fit-content' }}
               onClick={() => confrimToAbortPendingMultisigTx(msigTx)}
               // loading={isSubmitting}
               loadingPosition="start"
@@ -99,7 +99,7 @@ const PendingList = ({
             <Button
               variant="outlined"
               color="inherit"
-              sx={{ py: 1.25, px: 2 }}
+              sx={{ py: 1.25, px: 2, width: 'fit-content' }}
               onClick={cancelAbortTx}
             >
               Cancel
@@ -109,7 +109,7 @@ const PendingList = ({
           <Button
             variant="outlined"
             color="inherit"
-            sx={{ py: 1.25, px: 2 }}
+            sx={{ py: 1.25, px: 2, width: 'fit-content' }}
             onClick={abortPendingMultisigTx}
             loadingPosition="start"
             startIcon={<Cancel />}

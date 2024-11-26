@@ -369,7 +369,7 @@ export const useAddProposal = (
         const unsignedTx = await pchainAPI.buildAddProposalTx(
           txs.utxos,
           [multisigAlias, ...multisigWallet.keyData.owner.addresses],
-          [multisigAlias],
+          [],
           serialization.typeToBuffer(description, 'utf8'),
           proposal,
           multisigWallet.keyData.alias,

@@ -51,7 +51,8 @@
     "dev": "webpack-dev-server --mode development --open",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "preinstall": "git submodule update --recursive --init"
   },
   "eslintConfig": {
     "extends": [

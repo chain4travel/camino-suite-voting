@@ -22,6 +22,8 @@ import { z } from 'zod';
 import FormContainer from './FormContainer';
 import FormSection from './FormSection';
 import CaminoDatePicker from '@/components/DatePicker';
+import { usePendingMultisigAddProposalTxs } from '@/hooks/useMultisig';
+import useWallet from '@/hooks/useWallet';
 
 export const essentialSchema = (isAdminProposal: boolean) =>
   z.object({
@@ -106,9 +108,15 @@ const EssentialForm = ({
   const navigate = useNavigate();
   const toast = useToast();
   const activeNetwork = useNetworkStore(state => state.activeNetwork);
+  const { refetch } = usePendingMultisigAddProposalTxs();
+  const { multisigWallet } = useWallet();
   const addProposal = useAddProposal(proposalType, {
     onSuccess: data => {
       reset({});
+      if (multisigWallet) {
+        refetch();
+        navigate('/dac/creating');
+      }
       toast.success(
         'AddProposalTx sent successfully',
         data,
@@ -123,7 +131,7 @@ const EssentialForm = ({
           </Button>
         )
       );
-      // navigate('/dac/upcoming'); .. TODO
+      if (!multisigWallet) navigate('/dac/upcoming');
     },
   });
 
