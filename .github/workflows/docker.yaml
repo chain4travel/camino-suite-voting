@@ -1,0 +1,101 @@
+name: build-docker-image
+on:
+  pull_request:
+    branches:
+      - c4t
+      - dev
+      - suite
+      - suite-c4t
+  push:
+    branches:
+      - c4t
+      - dev
+      - suite
+      - suite-c4t
+env:
+  node_version: 18
+  module_docker_image: 'europe-west3-docker.pkg.dev/pwk-c4t-dev/camino-suite-apps/camino-suite-voting'
+jobs:
+  build_docker:
+    name: Build Docker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Prepare Image Tag
+        id: setDefaults
+        run: |
+          DOCKER_IMAGE_NAME="europe-west3-docker.pkg.dev/pwk-c4t-dev/internal-camino-dev/camino-suite"
+          if [[ "${{ github.ref }}" == "refs/heads/c4t" ]]; then
+              echo "docker_image=$DOCKER_IMAGE_NAME:stage" >> $GITHUB_OUTPUT
+              echo "build_env=stage" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == "refs/heads/suite-c4t" ]]; then
+              echo "docker_image=$DOCKER_IMAGE_NAME:stage" >> $GITHUB_OUTPUT
+              echo "build_env=stage" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
+              echo "docker_image=$DOCKER_IMAGE_NAME:dev" >> $GITHUB_OUTPUT
+              echo "build_env=dev" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == "refs/heads/suite" ]]; then
+              echo "docker_image=$DOCKER_IMAGE_NAME:dev" >> $GITHUB_OUTPUT
+              echo "build_env=dev" >> $GITHUB_OUTPUT 
+          else
+              echo "docker_image=$DOCKER_IMAGE_NAME:temp" >> $GITHUB_OUTPUT
+              echo "build_env=dev" >> $GITHUB_OUTPUT   
+          fi
+      - name: Cloud authentication
+        if: github.event_name == 'push'
+        id: auth
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
+      - name: create module docker image
+        if: github.event_name == 'push'
+        run: |
+          gcloud auth configure-docker --quiet europe-west3-docker.pkg.dev     
+          docker build . -t ${{ env.module_docker_image }}:${{ github.ref_name }} --build-arg BUILD_ENV=build:${{ steps.setDefaults.outputs.build_env }}
+          docker push ${{ env.module_docker_image }}:${{ github.ref_name }}
+      - name: create suite docker image
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            docker build . -f Dockerfile_SUITE -t ${{ steps.setDefaults.outputs.docker_image }} --build-arg BUILD_ENV=build:${{ steps.setDefaults.outputs.build_env }} --build-arg SUITE_BRANCH=${{ github.base_ref }} --build-arg EXPLORER_BRANCH=${{ github.base_ref }}
+          else
+            docker build . -f Dockerfile_SUITE -t ${{ steps.setDefaults.outputs.docker_image }} --build-arg BUILD_ENV=build:${{ steps.setDefaults.outputs.build_env }} --build-arg SUITE_BRANCH=${{ github.ref_name }} --build-arg EXPLORER_BRANCH=${{ github.ref_name }}
+          fi
+      - name: push and deploy docker
+        if: ${{ (github.event_name == 'push') && (github.ref  == 'refs/heads/suite') }}
+        run: |
+          gcloud auth configure-docker --quiet europe-west3-docker.pkg.dev
+          docker push ${{ steps.setDefaults.outputs.docker_image }}
+          gcloud run deploy camino-suite-${{ steps.setDefaults.outputs.build_env }} --image ${{ steps.setDefaults.outputs.docker_image }} --region=europe-west1
+      - name: checkout camino-suite
+        if: ${{ (github.event_name == 'push') && (steps.setDefaults.outputs.build_env  == 'stage') }}
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          fetch-depth: 0
+          repository: 'chain4travel/camino-suite'
+          ref: 'refs/heads/suite-c4t'
+          path: './camino-suite'
+          token: '${{ secrets.GIT_TAGS_TOKEN }}'
+      - name: Create suite tag
+        id: createTag
+        working-directory: ./camino-suite
+        if: ${{ (github.event_name == 'push') && (steps.setDefaults.outputs.build_env  == 'stage') }}
+        run: |
+          echo "create_tag=false" >> $GITHUB_OUTPUT
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          CURRENT_TAG=$(git describe --abbrev=0 --tags)
+          if [[ $CURRENT_TAG == *"-rc"* ]]; then
+            TAG=$(echo "$CURRENT_TAG"|awk -F'-rc' -v OFS='-rc' '{$2=sprintf("%1d",++$2)}7')
+            git tag -a $TAG -m "create tag $TAG for staging"
+            git push --tags
+            echo "create_tag=true" >> $GITHUB_OUTPUT
+            echo "suite_tag=$TAG" >> $GITHUB_OUTPUT
+          fi
+      - name: Create tag
+        if: ${{ (github.event_name == 'push') && (steps.setDefaults.outputs.build_env  == 'stage') && (steps.createTag.outputs.create_tag == 'true') }}
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git tag ${{ steps.createTag.outputs.suite_tag }}
+          git push --tags
