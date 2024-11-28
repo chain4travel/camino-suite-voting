@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import ProposalCard from '../ProposalCard';
+import React from 'react';
 
 describe('renders a proposal card', () => {
   test('test title', () => {
