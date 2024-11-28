@@ -41,21 +41,6 @@
     "zod": "^3.21.4",
     "zustand": "^4.1.5"
   },
-  "jest": {
-    "transformIgnorePatterns": [
-      "node_modules/(?!(@adraffy/ens-normalize|@tanstack)/)"
-    ],
-    "transform": {
-      "^.+\\.(js|jsx|ts|tsx)$": "babel-jest"
-    },
-    "testEnvironment": "jsdom",
-    "setupFilesAfterEnv": [
-      "@testing-library/jest-dom/extend-expect"
-    ],
-    "moduleNameMapper": {
-      "^@/(.*)$": "<rootDir>/src/$1"
-    }
-  },
   "scripts": {
     "build": "PUBLIC_PATH=https://suite.camino.network/dac/ webpack --config webpack.prod.js",
     "build:dev": "PUBLIC_PATH=https://dev.suite.camino.network/dac/ webpack --config webpack.prod.js",
