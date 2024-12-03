@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@c4tplatform/caminojs": "file:caminojs",
+    "@c4tplatform/caminojs": "^1.2.0-rc1",
     "@c4tplatform/signavaultjs": "^1.0.11",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
