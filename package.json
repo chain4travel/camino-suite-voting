@@ -53,8 +53,7 @@
     "eject": "react-scripts eject",
     "prepare": "husky install",
     "format-check": "prettier --check '{*.js, src/**/*.{js,jsx,ts,tsx}, .github/workflows/*.{yml,yaml}}'",
-    "format": "prettier --write '{*.js, src/**/*.{js,jsx,ts,tsx}, .github/workflows/*.{yml,yaml}}'",
-    "preinstall": "git submodule update --recursive --init"
+    "format": "prettier --write '{*.js, src/**/*.{js,jsx,ts,tsx}, .github/workflows/*.{yml,yaml}}'"
   },
   "eslintConfig": {
     "extends": [
