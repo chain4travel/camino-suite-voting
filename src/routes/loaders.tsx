@@ -57,7 +57,7 @@ export const votingTypeLoader =
             key
           ),
           consortiumMemberOnly: ['ExcludeMember'].includes(key),
-          caminoOnly: ['BaseFee'].includes(key),
+          caminoOnly: ['BaseFee', 'General'].includes(key),
         }))
       ),
     };
