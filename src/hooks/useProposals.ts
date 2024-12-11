@@ -21,6 +21,7 @@ import { DateTime } from 'luxon';
 import { useMultisig } from './useMultisig';
 import useToast from './useToast';
 import useWallet from './useWallet';
+import { GeneralProposal } from '@c4tplatform/caminojs/dist/apis/platformvm';
 
 const bintools: BinTools = BinTools.getInstance();
 
@@ -34,7 +35,8 @@ const parseAPIProposal = (proposal?: APIProposal) => {
       const outcomeBuf = serialization.typeToBuffer(proposal.outcome, 'base64');
       outcome = JSON.parse(outcomeBuf.toString());
     }
-    const proposalType = Object.values(ProposalTypes)[proposal.type];
+    const proposalType =
+      Object.values(ProposalTypes)[proposal.type === 3 ? 5 : proposal.type];
     let target;
     if (proposal.data) {
       const data = serialization.typeToBuffer(proposal.data, 'base64');
@@ -60,7 +62,7 @@ const parseAPIProposal = (proposal?: APIProposal) => {
     return {
       ...proposal,
       outcome,
-      typeId: proposal.type,
+      typeId: proposal.type === 3 ? 5 : proposal.type,
       type: proposalType,
       options: options.map((opt: number, idx: number) => ({
         option: idx,
@@ -332,6 +334,27 @@ export const useAddProposal = (
             );
           }
           break;
+        case 5:
+          {
+            const startDate = new Date();
+            startDate.setDate(startDate.getDate() + 1);
+            const endDate = new Date(startDate);
+            endDate.setDate(endDate.getDate() + 20);
+
+            const startTimestamp: number = Math.floor(
+              startDate.getTime() / 1000
+            );
+            const endTimestamp = Math.floor(endDate.getTime() / 1000);
+            proposal = new GeneralProposal(
+              startTimestamp,
+              endTimestamp,
+              390000,
+              680000,
+              false
+            );
+            proposal.addGeneralOption('option');
+          }
+          break;
         default:
           throw `Unsupported proposal type: ${proposalType}`;
       }
@@ -348,7 +371,7 @@ export const useAddProposal = (
           txs.utxos,
           pchainAPI.keyChain().getAddressStrings(),
           pchainAPI.keyChain().getAddressStrings(),
-          serialization.typeToBuffer(description, 'utf8'),
+          serialization.typeToBuffer(description ? description : '', 'utf8'),
           proposal,
           signer.getAddress(),
           0
