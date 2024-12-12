@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@c4tplatform/caminojs": "file:caminojs",
+    "@c4tplatform/caminojs": "^1.2.0-rc1",
     "@c4tplatform/signavaultjs": "^1.0.11",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
@@ -41,18 +41,6 @@
     "zod": "^3.21.4",
     "zustand": "^4.1.5"
   },
-  "jest": {
-    "transformIgnorePatterns": [
-      "node_modules/(?!(@adraffy/ens-normalize|@tanstack)/)"
-    ],
-    "transform": {
-      "^.+\\.(js|jsx|ts|tsx)$": "babel-jest"
-    },
-    "testEnvironment": "jsdom",
-    "moduleNameMapper": {
-      "^@/(.*)$": "<rootDir>/src/$1"
-    }
-  },
   "scripts": {
     "build": "PUBLIC_PATH=https://suite.camino.network/dac/ webpack --config webpack.prod.js",
     "build:dev": "PUBLIC_PATH=https://dev.suite.camino.network/dac/ webpack --config webpack.prod.js",
@@ -64,7 +52,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "prepare": "husky install",
-    "preinstall": "git submodule update --recursive --init"
+    "format-check": "prettier --check '{*.js, src/**/*.{js,jsx,ts,tsx}, .github/workflows/*.{yml,yaml}}'",
+    "format": "prettier --write '{*.js, src/**/*.{js,jsx,ts,tsx}, .github/workflows/*.{yml,yaml}}'"
   },
   "eslintConfig": {
     "extends": [
