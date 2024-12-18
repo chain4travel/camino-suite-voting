@@ -135,8 +135,13 @@ const CreateNewVoting = () => {
             proposalTypes,
             ptype => !!ptype.consortiumMemberOnly
           );
-          types = [...types, ...consortiumMemberProposalTypes];
           // Check address state of camino-only proposer
+          const generalPropsal = filter(proposalTypes, ptype => ptype.id === 5);
+          types = [
+            ...types,
+            ...consortiumMemberProposalTypes,
+            ...generalPropsal,
+          ];
           if (isCaminoProposer) {
             const caminoProposalTypes = filter(
               proposalTypes,

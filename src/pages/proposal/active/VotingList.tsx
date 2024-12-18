@@ -13,6 +13,7 @@ import ExcludeMemberVoting from './ExcludeMemberVoting';
 import FeeDistributionVoting from './FeeDistributionVoting';
 import GrantProgramVoting from './GrantProgram';
 import NewMemberVoting from './NewMemberVoting';
+import GeneralProposalVoting from './GeneralProposalVoting';
 
 interface VotingListProps {
   data: { type: string; typeId: number; name: string; data: Proposal[] };
@@ -102,6 +103,17 @@ const VotingList = ({ data, isConsortiumMember, refresh }: VotingListProps) => {
               <FeeDistributionVoting
                 data={proposal}
                 isConsortiumMember={isConsortiumMember}
+              />
+            );
+            break;
+          case ProposalTypes.General:
+            Vote = (
+              <GeneralProposalVoting
+                data={proposal}
+                isConsortiumMember={isConsortiumMember}
+                refresh={refresh}
+                onVoteSuccess={onVoteTxSuccess}
+                multisigFunctions={multisigFunctions}
               />
             );
             break;

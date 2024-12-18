@@ -20,6 +20,7 @@ import React from 'react';
 import BaseFeeVoting from '../active/BaseFeeVoting';
 import DefaultVotingOptions from '../active/DefaultVotingOptions';
 import GrantProgramVotingOptions from '../active/GrantProgram/GrantProgramVotingOptions';
+import GeneralProposalVoting from '../active/GeneralProposalVoting';
 
 type VotedOption = VotingOption & Percentage;
 
@@ -86,6 +87,17 @@ const VoteOptions = ({
             refresh={refresh}
             multisigFunctions={multisigFunctions}
             onVoteSuccess={onVoteTxSuccess}
+          />
+        );
+        break;
+      case ProposalTypes.General:
+        item = (
+          <GeneralProposalVoting
+            data={proposal}
+            isConsortiumMember={isConsortiumMember}
+            refresh={refresh}
+            onVoteSuccess={onVoteTxSuccess}
+            multisigFunctions={multisigFunctions}
           />
         );
         break;

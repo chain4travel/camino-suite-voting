@@ -21,6 +21,7 @@ import { DateTime } from 'luxon';
 import { useMultisig } from './useMultisig';
 import useToast from './useToast';
 import useWallet from './useWallet';
+import { GeneralProposal } from '@c4tplatform/caminojs/dist/apis/platformvm';
 
 const bintools: BinTools = BinTools.getInstance();
 
@@ -34,7 +35,8 @@ const parseAPIProposal = (proposal?: APIProposal) => {
       const outcomeBuf = serialization.typeToBuffer(proposal.outcome, 'base64');
       outcome = JSON.parse(outcomeBuf.toString());
     }
-    const proposalType = Object.values(ProposalTypes)[proposal.type];
+    const proposalType =
+      Object.values(ProposalTypes)[proposal.type === 3 ? 5 : proposal.type];
     let target;
     if (proposal.data) {
       const data = serialization.typeToBuffer(proposal.data, 'base64');
@@ -60,7 +62,7 @@ const parseAPIProposal = (proposal?: APIProposal) => {
     return {
       ...proposal,
       outcome,
-      typeId: proposal.type,
+      typeId: proposal.type === 3 ? 5 : proposal.type,
       type: proposalType,
       options: options.map((opt: number, idx: number) => ({
         option: idx,
@@ -260,12 +262,20 @@ export const useAddProposal = (
       votingOptions,
       description,
       targetAddress,
+      earlyFinish,
+      majority,
+      proposalSubject,
+      quorum,
     }: {
       startDate: DateTime;
       endDate: DateTime;
-      votingOptions?: VotingOption[];
+      votingOptions?: VotingOption[] | string[];
       description?: string;
       targetAddress?: string;
+      earlyFinish?: boolean;
+      majority?: number;
+      proposalSubject?: string;
+      quorum?: number;
     }) => {
       let proposal: platformvm.Proposal;
       switch (proposalType) {
@@ -332,10 +342,25 @@ export const useAddProposal = (
             );
           }
           break;
+        case 5:
+          {
+            proposal = new GeneralProposal(
+              startDate.startOf('day').toUnixInteger(),
+              endDate.endOf('day').toUnixInteger(),
+              majority,
+              quorum,
+              earlyFinish
+            );
+            votingOptions?.forEach(option => {
+              (proposal as platformvm.GeneralProposal).addGeneralOption(
+                option as string
+              );
+            });
+          }
+          break;
         default:
           throw `Unsupported proposal type: ${proposalType}`;
       }
-
       // return if cannot access RPC
       if (!pchainAPI) return;
 
@@ -348,10 +373,11 @@ export const useAddProposal = (
           txs.utxos,
           pchainAPI.keyChain().getAddressStrings(),
           pchainAPI.keyChain().getAddressStrings(),
-          serialization.typeToBuffer(description, 'utf8'),
+          serialization.typeToBuffer(description ? description : '', 'utf8'),
           proposal,
           signer.getAddress(),
-          0
+          0,
+          Buffer.from(proposalSubject ? proposalSubject : '')
         );
         const tx = unsignedTx.sign(pchainAPI.keyChain());
         const txid: string = await pchainAPI.issueTx(tx);
@@ -373,7 +399,8 @@ export const useAddProposal = (
           serialization.typeToBuffer(description, 'utf8'),
           proposal,
           multisigWallet.keyData.alias,
-          0
+          0,
+          Buffer.from(proposalSubject ? proposalSubject : '')
         );
         // - check signavault to get pending Txs
         tryToCreateMultisig && (await tryToCreateMultisig(unsignedTx));
