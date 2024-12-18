@@ -15,7 +15,7 @@ import { Box, Stack, Typography, useTheme } from '@mui/material';
 import { filter, map } from 'lodash';
 import { DateTime } from 'luxon';
 import React, { useMemo } from 'react';
-
+import { Serialization } from '@c4tplatform/caminojs/dist/utils';
 interface ExtraInfo {
   label: string;
   value: number | string;
@@ -25,6 +25,9 @@ interface ProposalStatusProps {
   isLoggedIn?: boolean;
   extraInfo?: ExtraInfo | ExtraInfo[];
 }
+
+const serialization = Serialization.getInstance();
+
 const ProposalStatus = ({
   proposal,
   isLoggedIn,
@@ -99,6 +102,17 @@ const ProposalStatus = ({
           );
           getVotedState = (option: VotingOption) =>
             `Distribution #${option.option}`;
+        }
+        break;
+      case ProposalTypes.General:
+        {
+          getVotedState = (option: VotingOption) =>
+            `${serialization.decoder(
+              option.value,
+              'base64',
+              'base64',
+              'utf8'
+            )}`; // khass nserializi hadi
         }
         break;
       default:

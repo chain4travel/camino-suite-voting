@@ -262,12 +262,20 @@ export const useAddProposal = (
       votingOptions,
       description,
       targetAddress,
+      earlyFinish,
+      majority,
+      proposalSubject,
+      quorum,
     }: {
       startDate: DateTime;
       endDate: DateTime;
-      votingOptions?: VotingOption[];
+      votingOptions?: VotingOption[] | string[];
       description?: string;
       targetAddress?: string;
+      earlyFinish?: boolean;
+      majority?: number;
+      proposalSubject?: string;
+      quorum?: number;
     }) => {
       let proposal: platformvm.Proposal;
       switch (proposalType) {
@@ -336,29 +344,23 @@ export const useAddProposal = (
           break;
         case 5:
           {
-            const startDate = new Date();
-            startDate.setDate(startDate.getDate() + 1);
-            const endDate = new Date(startDate);
-            endDate.setDate(endDate.getDate() + 20);
-
-            const startTimestamp: number = Math.floor(
-              startDate.getTime() / 1000
-            );
-            const endTimestamp = Math.floor(endDate.getTime() / 1000);
             proposal = new GeneralProposal(
-              startTimestamp,
-              endTimestamp,
-              390000,
-              680000,
-              false
+              startDate.startOf('day').toUnixInteger(),
+              endDate.endOf('day').toUnixInteger(),
+              majority,
+              quorum,
+              earlyFinish
             );
-            proposal.addGeneralOption('option');
+            votingOptions?.forEach(option => {
+              (proposal as platformvm.GeneralProposal).addGeneralOption(
+                option as string
+              );
+            });
           }
           break;
         default:
           throw `Unsupported proposal type: ${proposalType}`;
       }
-
       // return if cannot access RPC
       if (!pchainAPI) return;
 
@@ -374,7 +376,8 @@ export const useAddProposal = (
           serialization.typeToBuffer(description ? description : '', 'utf8'),
           proposal,
           signer.getAddress(),
-          0
+          0,
+          Buffer.from(proposalSubject ? proposalSubject : '')
         );
         const tx = unsignedTx.sign(pchainAPI.keyChain());
         const txid: string = await pchainAPI.issueTx(tx);
@@ -396,7 +399,8 @@ export const useAddProposal = (
           serialization.typeToBuffer(description, 'utf8'),
           proposal,
           multisigWallet.keyData.alias,
-          0
+          0,
+          Buffer.from(proposalSubject ? proposalSubject : '')
         );
         // - check signavault to get pending Txs
         tryToCreateMultisig && (await tryToCreateMultisig(unsignedTx));

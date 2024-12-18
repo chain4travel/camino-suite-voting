@@ -251,27 +251,29 @@ const Detail = () => {
                 refresh={refetch}
               />
             </Stack>
-            <Stack spacing={1.5} alignItems="flex-start">
-              <Typography
-                variant="caption"
-                color="grey.400"
-                dangerouslySetInnerHTML={{
-                  __html: sanitizeHtml(description ?? ''),
-                }}
-              />
-              {proposalWithEligibles?.forumLink && (
-                <Button
-                  sx={{
-                    backgroundColor: '#242729',
-                    color: 'white',
-                    paddingX: 2,
-                    paddingY: 1,
+            {ProposalTypes.General !== proposalWithEligibles.type && (
+              <Stack spacing={1.5} alignItems="flex-start">
+                <Typography
+                  variant="caption"
+                  color="grey.400"
+                  dangerouslySetInnerHTML={{
+                    __html: sanitizeHtml(description ?? ''),
                   }}
-                >
-                  OPEN FORUM
-                </Button>
-              )}
-            </Stack>
+                />
+                {proposalWithEligibles?.forumLink && (
+                  <Button
+                    sx={{
+                      backgroundColor: '#242729',
+                      color: 'white',
+                      paddingX: 2,
+                      paddingY: 1,
+                    }}
+                  >
+                    OPEN FORUM
+                  </Button>
+                )}
+              </Stack>
+            )}
           </Stack>
           <ProposalStatus
             proposal={proposalWithEligibles}

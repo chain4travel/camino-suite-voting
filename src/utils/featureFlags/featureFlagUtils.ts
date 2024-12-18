@@ -17,7 +17,7 @@ export function useIsFeatureEnabled() {
     }
 
     if (BerlinPhase >= 1) {
-      const berlinFeatures = ['NewMember', 'ExcludeMember'];
+      const berlinFeatures = ['NewMember', 'ExcludeMember', 'General'];
       if (berlinFeatures.includes(key)) {
         return true;
       }
