@@ -181,8 +181,8 @@ export const useCompletedVotes = (
   page = 0
 ) => {
   const { data, isFetching, error, refetch } = useQuery(
-    ['getCompletedVotes', type, startTime, endTime, page],
-    async () => fetchCompletedVotes(type, startTime, endTime),
+    ['getCompletedVotes', type === 5 ? 3 : type, startTime, endTime, page],
+    async () => fetchCompletedVotes(type === 5 ? 3 : type, startTime, endTime),
     {
       refetchOnWindowFocus: false,
       // notifyOnChangeProps: ['data', 'error'],
@@ -347,8 +347,8 @@ export const useAddProposal = (
             proposal = new GeneralProposal(
               startDate.startOf('day').toUnixInteger(),
               endDate.endOf('day').toUnixInteger(),
-              majority,
-              quorum,
+              majority * 1000,
+              quorum * 1000,
               earlyFinish
             );
             votingOptions?.forEach(option => {
