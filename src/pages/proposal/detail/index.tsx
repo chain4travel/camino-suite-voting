@@ -27,7 +27,8 @@ import ProposalStatus from './ProposalStatus';
 import VoteOptions from './VoteOptions';
 import VoteResult from './VoteResult';
 import { useProposalDescription } from '@/hooks/useProposalDescription';
-
+import { Serialization } from '@c4tplatform/caminojs/dist/utils';
+const serialization = Serialization.getInstance();
 const Detail = () => {
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
   const wallet = useWallet();
@@ -107,6 +108,7 @@ const Detail = () => {
               (v: Vote) => v.voterAddr === eligible.consortiumMemberAddress
             );
             let option = '';
+            let op;
             switch (proposalWithEligibles.type) {
               case ProposalTypes.BaseFee:
                 option = `Future Base Fee ${
@@ -114,6 +116,14 @@ const Detail = () => {
                     participant?.votedOptions.includes(opt.option)
                   )?.value
                 } nCAM`;
+                break;
+              case ProposalTypes.General:
+                op = proposalWithEligibles.options.find((opt: VotingOption) =>
+                  participant?.votedOptions.includes(opt.option)
+                )?.option;
+                if (op) {
+                  option = `Option ${op}`;
+                }
                 break;
               case ProposalTypes.NewMember:
               case ProposalTypes.ExcludeMember:
@@ -210,6 +220,21 @@ const Detail = () => {
                 }
                 sx={{ margin: 0 }}
               />
+              {proposalType?.name === ProposalTypes.General && (
+                <Typography
+                  variant="h6"
+                  dangerouslySetInnerHTML={{
+                    __html: proposal.memo
+                      ? serialization.decoder(
+                          proposal.memo as string,
+                          'base64',
+                          'base64',
+                          'utf8'
+                        )
+                      : 'No Title Provided',
+                  }}
+                ></Typography>
+              )}
               <Typography
                 variant="caption"
                 color="info.light"
@@ -231,25 +256,27 @@ const Detail = () => {
             </Stack>
             <Stack>
               <Header variant="h6" headline="Voting options" />
-              <VoteOptions
-                proposal={proposalWithEligibles}
-                isConsortiumMember={isConsortiumMember}
-                options={proposalWithEligibles?.options?.map(
-                  (opt: VotingOption) => ({
-                    ...opt,
-                    label:
-                      opt.value === true
-                        ? 'Accept'
-                        : opt.value === false
-                        ? 'Decline'
-                        : opt.label,
-                    percent: statistics?.summary[opt.option]?.percent ?? 0,
-                  })
-                )}
-                result={result}
-                baseFee={baseFee}
-                refresh={refetch}
-              />
+              {proposalWithEligibles && (
+                <VoteOptions
+                  proposal={proposalWithEligibles}
+                  isConsortiumMember={isConsortiumMember}
+                  options={proposalWithEligibles?.options?.map(
+                    (opt: VotingOption) => ({
+                      ...opt,
+                      label:
+                        opt.value === true
+                          ? 'Accept'
+                          : opt.value === false
+                          ? 'Decline'
+                          : opt.label,
+                      percent: statistics?.summary[opt.option]?.percent ?? 0,
+                    })
+                  )}
+                  result={result}
+                  baseFee={baseFee}
+                  refresh={refetch}
+                />
+              )}
             </Stack>
             {ProposalTypes.General !== proposalWithEligibles.type && (
               <Stack spacing={1.5} alignItems="flex-start">

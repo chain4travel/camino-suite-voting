@@ -10,11 +10,12 @@ import {
   ProposalTypes,
   VotingOption,
 } from '@/types';
+import { Serialization } from '@c4tplatform/caminojs/dist/utils';
 import { Circle } from '@mui/icons-material';
 import { Box, Stack, Typography } from '@mui/material';
 import Big from 'big.js';
 import React, { useMemo } from 'react';
-
+const serialization = Serialization.getInstance();
 interface VoteResultProps {
   result: VotingOption & {
     baseFee?: number | string;
@@ -30,30 +31,12 @@ const VoteResult = ({ result, proposalType }: VoteResultProps) => {
   const { content, noBox } = useMemo(() => {
     let content,
       noBox = false;
-    // No matter result.value, default display
     if (result.target) {
       switch (proposalType) {
-        case ProposalTypes.General:
-          content = (
-            <Stack spacing={1} alignItems="flex-start">
-              <Typography fontWeight={600}>{String(result.target)}</Typography>
-            </Stack>
-          );
-          break;
         case ProposalTypes.NewMember:
           content = (
             <Stack spacing={1} alignItems="flex-start">
               <LongString value={String(result.target)} />
-              {/* <Typography
-                fontWeight={600}
-                sx={{
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
-              >
-                {String(result.target)}
-              </Typography> */}
             </Stack>
           );
           break;
@@ -296,7 +279,19 @@ const VoteResult = ({ result, proposalType }: VoteResultProps) => {
         case ProposalTypes.General:
           content = (
             <Stack spacing={1} alignItems="flex-start">
-              <Typography fontWeight={600}>{String(result.target)}</Typography>
+              <Typography
+                variant="body2"
+                dangerouslySetInnerHTML={{
+                  __html: result.value
+                    ? serialization.decoder(
+                        result.value as string,
+                        'base64',
+                        'base64',
+                        'utf8'
+                      )
+                    : 'No Title Provided',
+                }}
+              ></Typography>
               <Tag
                 color={result.value ? 'success' : 'error'}
                 label={result.value ? 'ACCEPTED' : 'DECLINED'}

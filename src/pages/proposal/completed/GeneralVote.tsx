@@ -7,6 +7,9 @@ import { toPastTense } from '@/helpers/string';
 import ListItemStatus from '@/components/ListItemStatus';
 import { useProposalDescription } from '@/hooks/useProposalDescription';
 import { getOptionLabel } from '@/helpers/util';
+import { Serialization } from '@c4tplatform/caminojs/dist/utils';
+
+const serialization = Serialization.getInstance();
 
 interface GeneralVoteProps {
   data: Proposal;
@@ -39,6 +42,19 @@ const GeneralVote = ({ data, voteTypeName }: GeneralVoteProps) => {
         }}
       >
         <Typography
+          variant="body2"
+          dangerouslySetInnerHTML={{
+            __html: data.memo
+              ? serialization.decoder(
+                  data.memo as string,
+                  'base64',
+                  'base64',
+                  'utf8'
+                )
+              : 'No Title Provided',
+          }}
+        ></Typography>
+        <Typography
           variant="caption"
           className="clamp-3-lines"
           sx={{
@@ -60,7 +76,20 @@ const GeneralVote = ({ data, voteTypeName }: GeneralVoteProps) => {
             startIcon={voted.value ? <CheckCircle /> : <Cancel />}
             color={voted.value ? 'success' : 'error'}
           >
-            {toPastTense(String(getOptionLabel(voted)))}
+            {toPastTense(
+              String(
+                getOptionLabel({
+                  label: serialization.decoder(
+                    voted.value as string,
+                    'base64',
+                    'base64',
+                    'utf8'
+                  ) as string,
+                  option: voted.option,
+                  value: voted.value,
+                })
+              )
+            )}{' '}
           </StateButton>
         ))}
         {outcome.length === 0 && (
