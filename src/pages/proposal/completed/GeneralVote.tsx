@@ -69,29 +69,32 @@ const GeneralVote = ({ data, voteTypeName }: GeneralVoteProps) => {
         />
       </Box>
       <Box>
-        {outcome.map(voted => (
-          <StateButton
-            variant="contained"
-            key={voted.option}
-            startIcon={voted.value ? <CheckCircle /> : <Cancel />}
-            color={voted.value ? 'success' : 'error'}
-          >
-            {toPastTense(
-              String(
-                getOptionLabel({
-                  label: serialization.decoder(
-                    voted.value as string,
-                    'base64',
-                    'base64',
-                    'utf8'
-                  ) as string,
-                  option: voted.option,
-                  value: voted.value,
-                })
-              )
-            )}{' '}
-          </StateButton>
-        ))}
+        {outcome.map(voted => {
+          if (typeof voted.value === 'string')
+            return (
+              <StateButton
+                variant="contained"
+                key={voted.option}
+                startIcon={voted.value ? <CheckCircle /> : <Cancel />}
+                color={voted.value ? 'success' : 'error'}
+              >
+                {toPastTense(
+                  String(
+                    getOptionLabel({
+                      label: serialization.decoder(
+                        voted.value as string,
+                        'base64',
+                        'base64',
+                        'utf8'
+                      ) as string,
+                      option: voted.option,
+                      value: voted.value,
+                    })
+                  )
+                )}{' '}
+              </StateButton>
+            );
+        })}
         {outcome.length === 0 && (
           <StateButton variant="contained" color="error">
             Failed
