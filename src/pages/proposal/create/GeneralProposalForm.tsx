@@ -1,15 +1,10 @@
-import Paragraph from '@/components/Paragraph';
-import TextEditor from '@/components/TextEditor';
-import useToast from '@/hooks/useToast';
-import { VotingOption } from '@/types';
-import { AddCircle, DeleteForever } from '@mui/icons-material';
+import React from 'react';
 import {
   Box,
   Button,
   FormControlLabel,
   FormHelperText,
   IconButton,
-  InputLabel,
   Slider,
   Stack,
   Switch as MuiSwitch,
@@ -18,11 +13,37 @@ import {
   FormControl,
   Divider,
 } from '@mui/material';
-import React from 'react';
+import { styled } from '@mui/material/styles';
 import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
-import { z } from 'zod';
+import { AddCircle, DeleteForever } from '@mui/icons-material';
 import FormSection from './FormSection';
+import Paragraph from '@/components/Paragraph';
+import TextEditor from '@/components/TextEditor';
+import useToast from '@/hooks/useToast';
+import { z } from 'zod';
 import { uniqBy } from 'lodash';
+
+// Custom styled switch with color transitions
+const StyledSwitch = styled(MuiSwitch)(({ theme }) => ({
+  '& .MuiSwitch-switchBase': {
+    '&.Mui-checked': {
+      color: '#2196f3',
+      '& + .MuiSwitch-track': {
+        backgroundColor: '#90caf9',
+        opacity: 0.7,
+      },
+    },
+    '&.Mui-unchecked': {
+      '& + .MuiSwitch-track': {
+        backgroundColor: '#grey.400',
+        opacity: 0.3,
+      },
+    },
+  },
+  '& .MuiSwitch-track': {
+    transition: 'background-color 0.2s',
+  },
+}));
 
 const MAX_OPTIONS = 3;
 export const generalFormSchema = {
@@ -65,6 +86,7 @@ export const generalFormSchema = {
   },
   endDateRestriction: { minDays: 1, maxDays: 30, fixed: false },
 };
+
 const schema = z.object(generalFormSchema.schema);
 type GeneralFormSchema = z.infer<typeof schema>;
 
@@ -73,7 +95,7 @@ const GeneralProposalForm = () => {
     control,
     formState: { errors },
   } = useFormContext<GeneralFormSchema>();
-  // Form fields
+
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'votingOptions',
@@ -100,17 +122,20 @@ const GeneralProposalForm = () => {
         >
           Please select the criteria for the approval of this proposal
         </Typography>
+
+        {/* Majority Section */}
         <Controller
           name="majority"
           control={control}
+          defaultValue={50}
           render={({ field }) => (
-            <>
+            <Box sx={{ mb: 3 }}>
               <Typography variant="caption">
-                Majority: {field.value || 0}%
+                Majority: {field.value || 50}%
               </Typography>
               <Slider
                 {...field}
-                value={field.value || 0}
+                value={field.value || 50}
                 onChange={(_, value) => field.onChange(value)}
                 aria-label="Majority"
                 step={10}
@@ -121,25 +146,30 @@ const GeneralProposalForm = () => {
               <FormHelperText error={!!errors.majority}>
                 {errors.majority?.message}
               </FormHelperText>
-            </>
+              <Typography variant="overline">
+                If &quot;Any&quot; a relative majority wins, that is the option
+                with the most votes. Otherwise, a qualified majority between 50%
+                + 1 and 100% of votes is needed.
+              </Typography>
+            </Box>
           )}
         />
-        <Typography variant="overline">
-          if &quot;Any&quot; a relative majority wins, that is the option with
-          the most vote. Otherwise, a qualified majority between 50% + 1 and
-          100% of votes is needed.
-        </Typography>
+
+        <Divider sx={{ my: 2 }} />
+
+        {/* Quorum Section */}
         <Controller
           name="quorum"
           control={control}
+          defaultValue={30}
           render={({ field }) => (
-            <>
+            <Box sx={{ mb: 3 }}>
               <Typography variant="caption">
-                Quorum: {field.value || 0}%
+                Quorum: {field.value || 30}%
               </Typography>
               <Slider
                 {...field}
-                value={field.value || 0}
+                value={field.value || 30}
                 onChange={(_, value) => field.onChange(value)}
                 aria-label="Quorum"
                 step={10}
@@ -150,52 +180,54 @@ const GeneralProposalForm = () => {
               <FormHelperText error={!!errors.quorum}>
                 {errors.quorum?.message}
               </FormHelperText>
-            </>
+              <Typography variant="overline">
+                These many votes are necessary for a proposal to be deemed
+                valid.
+              </Typography>
+            </Box>
           )}
         />
-        <Typography variant="overline">
-          these many votes are necessary for a proposal to be deemed valid.
-        </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-          <Typography fontSize={16} fontWeight={600} lineHeight="24px">
-            Early Exit:
-          </Typography>
-          <Controller
-            name="earlyFinish"
-            control={control}
-            defaultValue={false} // Default value
-            render={({ field }) => (
-              <>
+
+        <Divider sx={{ my: 2 }} />
+
+        {/* Early Exit Section */}
+        <Box sx={{ mb: 3 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <Typography fontSize={16} fontWeight={600} lineHeight="24px">
+              Early Exit:
+            </Typography>
+            <Controller
+              name="earlyFinish"
+              control={control}
+              defaultValue={false}
+              render={({ field }) => (
                 <FormControlLabel
                   control={
-                    <MuiSwitch
-                      {...field} // Spread field to connect to form state
-                      checked={field.value} // Ensures the switch reflects form state
-                      onChange={e => field.onChange(e.target.checked)} // Updates form state on toggle
+                    <StyledSwitch
+                      {...field}
+                      checked={field.value}
+                      onChange={e => field.onChange(e.target.checked)}
                     />
                   }
                   label=""
                 />
-                {errors.earlyFinish && (
-                  <FormHelperText error>
-                    {errors.earlyFinish?.message}
-                  </FormHelperText>
-                )}
-              </>
-            )}
-          />
+              )}
+            />
+          </Box>
+          <FormHelperText error={!!errors.earlyFinish}>
+            {errors.earlyFinish?.message}
+          </FormHelperText>
+          <Typography variant="overline">
+            The voting process can be closed as soon as a winning option has
+            been found given the criteria above, or it can run until the end of
+            the period anyway as final percentages matter, depending on the
+            nature of the proposal.
+          </Typography>
         </Box>
-        <FormHelperText error={!!errors.earlyFinish}>
-          {errors.earlyFinish?.message}
-        </FormHelperText>
 
-        <Typography variant="overline">
-          the voting process can be closed as soon as a winning option has been
-          found given th criteria above, or it can run until the end of the
-          period anyway as final percentages matter, depending on the nature of
-          the propsal.
-        </Typography>
-        <Divider />
+        <Divider sx={{ my: 2 }} />
+
+        {/* Proposal Subject Section */}
         <Typography fontSize={16} fontWeight={600} lineHeight="24px">
           Describe the voting
         </Typography>
@@ -240,6 +272,8 @@ const GeneralProposalForm = () => {
             />
           </FormSection>
         </Box>
+
+        {/* Voting Options Section */}
         {fields.map((item, index) => (
           <Paragraph key={item.id} spacing="sm">
             <Stack
@@ -293,6 +327,8 @@ const GeneralProposalForm = () => {
             />
           </Paragraph>
         ))}
+
+        {/* Add Option Button */}
         <Button
           variant="text"
           startIcon={<AddCircle />}
@@ -303,6 +339,8 @@ const GeneralProposalForm = () => {
           Add Option
         </Button>
       </FormSection>
+
+      {/* Description Section */}
       <FormSection>
         <Controller
           name="description"
@@ -324,4 +362,5 @@ const GeneralProposalForm = () => {
     </>
   );
 };
+
 export default React.memo(GeneralProposalForm);
