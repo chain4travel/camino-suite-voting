@@ -47,13 +47,13 @@ export const excludeMemberFormSchema = (platformVMAPI?: PlatformVMAPI) => ({
     const diffDays = fields.endDate
       .endOf('day')
       .diff(fields.startDate.startOf('day'), ['days']).days;
-    return true;
+    return diffDays >= 7 && diffDays <= 30;
   },
   error: {
     path: ['endDate'],
-    message: 'end date should be 60 days after start date',
+    message: 'end date must be between 7 and 30 days after start date',
   },
-  endDateRestriction: { minDays: 7, maxDays: 30 },
+  endDateRestriction: { minDays: 7, maxDays: 30, fixed: false },
 });
 const ExcludeMemberForm = () => {
   const { control } = useFormContext();

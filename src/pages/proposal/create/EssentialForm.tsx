@@ -24,7 +24,6 @@ import FormSection from './FormSection';
 import CaminoDatePicker from '@/components/DatePicker';
 import { usePendingMultisigAddProposalTxs } from '@/hooks/useMultisig';
 import useWallet from '@/hooks/useWallet';
-
 export const essentialSchema = (isAdminProposal: boolean) =>
   z.object({
     startDate: z
@@ -42,7 +41,6 @@ export const essentialSchema = (isAdminProposal: boolean) =>
       return url === '' ? undefined : url;
     }, z.string().url().optional()),
   });
-
 interface EssentialFormProps {
   proposalType: number | string;
   children?: ReactNode;
@@ -50,7 +48,7 @@ interface EssentialFormProps {
     schema: z.ZodRawShape;
     refine?: (fields: { [x: string]: any }) => void;
     error?: { path: string[]; message: string };
-    endDateRestriction?: { minDays: number; maxDays: number };
+    endDateRestriction?: { minDays: number; maxDays: number; fixed: any };
   };
   onCancel?: () => void;
 }
@@ -67,21 +65,65 @@ const EssentialForm = ({
       proposalIds.indexOf(ProposalTypes.AdminExcludeMember) === proposalType
     );
   }, [proposalType]);
+
+  const endDateRestriction = useMemo(() => {
+    const proposalIds = Object.values(ProposalTypes);
+    // Default restriction if no specific case matches
+    const defaultRestriction = {
+      minDays: formSchema.endDateRestriction?.minDays ?? 1,
+      maxDays: formSchema.endDateRestriction?.maxDays ?? 30,
+      fixed: formSchema.endDateRestriction?.fixed ?? false,
+    };
+
+    if (
+      proposalIds.indexOf(ProposalTypes.NewMember) === proposalType ||
+      proposalIds.indexOf(ProposalTypes.AdminNewMember) === proposalType
+    ) {
+      return {
+        minDays: 60,
+        maxDays: 60,
+        fixed: true,
+      };
+    } else if (
+      proposalIds.indexOf(ProposalTypes.ExcludeMember) === proposalType ||
+      proposalIds.indexOf(ProposalTypes.AdminExcludeMember) === proposalType
+    ) {
+      return {
+        minDays: 7,
+        maxDays: 30,
+        fixed: false,
+      };
+    } else if (proposalIds.indexOf(ProposalTypes.General) === proposalType) {
+      return {
+        minDays: 1,
+        maxDays: 30,
+        fixed: false,
+      };
+    }
+    return defaultRestriction;
+  }, [proposalType, formSchema.endDateRestriction]);
+
   const essentialRefinement = (fields: { [x: string]: any }) => {
     if (isAdminProposal) return true;
     const diffDays = fields.endDate
       .endOf('day')
       .diff(fields.startDate.startOf('day'), ['days']).days;
-    return diffDays > 1 && diffDays <= 30;
+    if (endDateRestriction.fixed) {
+      return diffDays === endDateRestriction.minDays;
+    }
+    return (
+      diffDays >= endDateRestriction.minDays &&
+      diffDays <= endDateRestriction.maxDays
+    );
   };
+
   const essentialRefinementError = {
     path: ['endDate'],
-    message: 'end date must after start date and maximum in 30 days',
+    message: endDateRestriction.fixed
+      ? `end date must be exactly ${endDateRestriction.minDays} days after start date`
+      : `end date must be between ${endDateRestriction.minDays} and ${endDateRestriction.maxDays} days after start date`,
   };
-  const endDateRestriction = formSchema.endDateRestriction ?? {
-    minDays: 1,
-    maxDays: 30,
-  };
+
   const schema = essentialSchema(isAdminProposal)
     .extend(formSchema.schema)
     .refine(
@@ -91,15 +133,36 @@ const EssentialForm = ({
   type CreateProposalSchema = z.infer<typeof schema>;
   const methods = useForm<CreateProposalSchema>({
     resolver: zodResolver(schema),
+    mode: 'onChange',
   });
-  const { handleSubmit, control, reset, formState, watch } = methods;
+
+  const { handleSubmit, control, formState, watch, setValue } = methods;
   const watchStartDate = watch('startDate', DateTime.now());
   const watchEndDate = watch('endDate');
+
+  // Effect to handle start date changes
   useEffect(() => {
-    reset({
-      startDate: DateTime.now(),
-    });
-  }, [isAdminProposal]);
+    if (watchStartDate) {
+      const newEndDate = watchStartDate.plus({
+        days: endDateRestriction.minDays,
+      });
+      if (endDateRestriction.fixed || !watchEndDate) {
+        setValue('endDate', newEndDate, { shouldValidate: true });
+      }
+    }
+  }, [watchStartDate, endDateRestriction.fixed, endDateRestriction.minDays]);
+
+  // Effect to initialize dates
+  useEffect(() => {
+    const now = DateTime.now();
+    setValue('startDate', now, { shouldValidate: true });
+    if (!isAdminProposal) {
+      setValue('endDate', now.plus({ days: endDateRestriction.minDays }), {
+        shouldValidate: true,
+      });
+    }
+  }, [isAdminProposal, proposalType]);
+
   const navigate = useNavigate();
   const toast = useToast();
   const activeNetwork = useNetworkStore(state => state.activeNetwork);
@@ -107,7 +170,6 @@ const EssentialForm = ({
   const { multisigWallet } = useWallet();
   const addProposal = useAddProposal(proposalType, {
     onSuccess: data => {
-      reset({});
       if (multisigWallet) {
         refetch();
         navigate('/dac/creating');
@@ -143,12 +205,7 @@ const EssentialForm = ({
 
   const diff = useMemo(() => {
     if (watchStartDate && watchEndDate) {
-      const diff = watchStartDate.diff(watchEndDate, [
-        'days',
-        'hours',
-        'minutes',
-      ]);
-      return diff;
+      return watchEndDate.diff(watchStartDate, ['days', 'hours', 'minutes']);
     }
     return null;
   }, [watchStartDate, watchEndDate]);
@@ -249,6 +306,7 @@ const EssentialForm = ({
                             <CaminoDatePicker
                               {...field}
                               disablePast
+                              disabled={endDateRestriction.fixed}
                               onChange={value => field.onChange(value)}
                               minDate={watchStartDate.plus({
                                 days: endDateRestriction.minDays,
@@ -283,7 +341,7 @@ const EssentialForm = ({
             variant="outlined"
             color="inherit"
             onClick={() => {
-              reset();
+              methods.reset();
               onCancel && onCancel();
             }}
           >
@@ -307,4 +365,5 @@ const EssentialForm = ({
     </FormProvider>
   );
 };
+
 export default React.memo(EssentialForm);
