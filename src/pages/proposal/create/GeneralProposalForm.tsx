@@ -53,6 +53,17 @@ export const generalFormSchema = {
       .min(1, 'Proposal subject is required')
       .max(256, 'Proposal subject cannot exceed 256 characters'),
   },
+  refine: (fields: { [x: string]: any }) => {
+    const diffDays = fields.endDate
+      .startOf('day')
+      .diff(fields.startDate.startOf('day'), ['days']).days;
+    return diffDays >= 1 && diffDays <= 30;
+  },
+  error: {
+    path: ['endDate'],
+    message: 'end date must be between 1 and 30 days after start date',
+  },
+  endDateRestriction: { minDays: 1, maxDays: 30, fixed: false },
 };
 const schema = z.object(generalFormSchema.schema);
 type GeneralFormSchema = z.infer<typeof schema>;
