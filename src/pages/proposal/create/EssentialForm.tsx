@@ -93,16 +93,11 @@ const EssentialForm = ({
     resolver: zodResolver(schema),
   });
   const { handleSubmit, control, reset, formState, watch } = methods;
-  const watchStartDate = watch(
-    'startDate',
-    DateTime.now().plus({ day: 1 }).startOf('day')
-  );
+  const watchStartDate = watch('startDate', DateTime.now());
   const watchEndDate = watch('endDate');
   useEffect(() => {
     reset({
-      startDate: isAdminProposal
-        ? DateTime.now()
-        : DateTime.now().plus({ day: 1 }).startOf('day'),
+      startDate: DateTime.now(),
     });
   }, [isAdminProposal]);
   const navigate = useNavigate();
@@ -206,14 +201,6 @@ const EssentialForm = ({
                       </Typography>
                     </Typography>
                   )}
-                  {/* <Typography variant="body2" color="text.secondary">
-                  Please note that additional{' '}
-                  <Typography variant="body2" component="span" fontWeight={700}>
-                    {'<threshold -1>'}
-                  </Typography>{' '}
-                  members of your Multisignature Group must sign this voting
-                  proposal before the start datetime of the vote
-                </Typography> */}
                 </Paragraph>
                 <Stack direction="row" spacing={2}>
                   <Stack direction="row" spacing={1} alignItems="center">
@@ -223,22 +210,14 @@ const EssentialForm = ({
                     <Controller
                       name="startDate"
                       control={control}
-                      defaultValue={
-                        isAdminProposal
-                          ? DateTime.now()
-                          : DateTime.now().plus({ day: 1 }).startOf('day')
-                      }
+                      defaultValue={DateTime.now()}
                       render={({ field, fieldState: { error } }) => (
                         <>
                           <CaminoDatePicker
                             {...field}
                             disablePast
                             onChange={value => field.onChange(value)}
-                            minDate={
-                              isAdminProposal
-                                ? DateTime.now()
-                                : DateTime.now().plus({ day: 1 }).startOf('day')
-                            }
+                            minDate={DateTime.now()}
                             sx={{
                               '& .MuiInputBase-root': {
                                 paddingLeft: '0px !important',
@@ -296,23 +275,6 @@ const EssentialForm = ({
                 </Stack>
               </FormSection>
             )}
-            {/* <FormSection spacing="md" divider sx={{ paddingX: 3 }}>
-              <Header headline="Add link of forum of discussion" variant="h6" />
-              <Controller
-                name="forumLink"
-                control={control}
-                defaultValue={''}
-                render={({ field, fieldState: { error } }) => (
-                  <TextField
-                    {...field}
-                    variant="filled"
-                    fullWidth
-                    error={!!error}
-                    helperText={error?.message}
-                  />
-                )}
-              />
-            </FormSection> */}
             {children}
           </Paragraph>
         </FormContainer>

@@ -28,6 +28,7 @@ import VoteOptions from './VoteOptions';
 import VoteResult from './VoteResult';
 import { useProposalDescription } from '@/hooks/useProposalDescription';
 import { Serialization } from '@c4tplatform/caminojs/dist/utils';
+import VotingSection from './VotingSection';
 const serialization = Serialization.getInstance();
 const Detail = () => {
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
@@ -256,27 +257,14 @@ const Detail = () => {
             </Stack>
             <Stack>
               <Header variant="h6" headline="Voting options" />
-              {proposalWithEligibles && (
-                <VoteOptions
-                  proposal={proposalWithEligibles}
-                  isConsortiumMember={isConsortiumMember}
-                  options={proposalWithEligibles?.options?.map(
-                    (opt: VotingOption) => ({
-                      ...opt,
-                      label:
-                        opt.value === true
-                          ? 'Accept'
-                          : opt.value === false
-                          ? 'Decline'
-                          : opt.label,
-                      percent: statistics?.summary[opt.option]?.percent ?? 0,
-                    })
-                  )}
-                  result={result}
-                  baseFee={baseFee}
-                  refresh={refetch}
-                />
-              )}
+              <VotingSection
+                proposalWithEligibles={proposalWithEligibles}
+                isConsortiumMember={isConsortiumMember}
+                statistics={statistics}
+                result={result}
+                baseFee={baseFee}
+                refetch={refetch}
+              />
             </Stack>
             {ProposalTypes.General !== proposalWithEligibles.type && (
               <Stack spacing={1.5} alignItems="flex-start">
