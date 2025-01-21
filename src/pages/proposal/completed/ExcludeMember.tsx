@@ -1,7 +1,7 @@
 import ListItemStatus from '@/components/ListItemStatus';
 import StateButton from '@/components/StateButton';
 import { toPastTense } from '@/helpers/string';
-import { getOptionLabel } from '@/helpers/util';
+import { getOptionLabel, sanitizeOptions } from '@/helpers/util';
 import { useProposalDescription } from '@/hooks/useProposalDescription';
 import type { Proposal, VotingOption } from '@/types';
 import { Cancel, CheckCircle } from '@mui/icons-material';
@@ -49,7 +49,9 @@ const ExcludeMember = ({ data, voteTypeName }: NewMemberVoteProps) => {
           sx={{
             color: '#CBD5E1',
           }}
-          dangerouslySetInnerHTML={{ __html: description }}
+          dangerouslySetInnerHTML={{
+            __html: sanitizeHtml(description ?? '', sanitizeOptions),
+          }}
         ></Typography>
         <ListItemStatus
           startTimestamp={data.startTimestamp}

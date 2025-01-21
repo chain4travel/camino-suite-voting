@@ -4,6 +4,7 @@ import DistributionBar, {
 import LongString from '@/components/LongString';
 import Paragraph from '@/components/Paragraph';
 import Tag from '@/components/Tag';
+import { sanitizeOptions } from '@/helpers/util';
 import {
   Applicant,
   ProposalStatuses,
@@ -15,6 +16,7 @@ import { Circle } from '@mui/icons-material';
 import { Box, Stack, Typography } from '@mui/material';
 import Big from 'big.js';
 import React, { useMemo } from 'react';
+import sanitizeHtml from 'sanitize-html';
 const serialization = Serialization.getInstance();
 interface VoteResultProps {
   result: VotingOption & {
@@ -282,14 +284,17 @@ const VoteResult = ({ result, proposalType }: VoteResultProps) => {
               <Typography
                 variant="body2"
                 dangerouslySetInnerHTML={{
-                  __html: result.value
-                    ? serialization.decoder(
-                        result.value as string,
-                        'base64',
-                        'base64',
-                        'utf8'
-                      )
-                    : 'No Title Provided',
+                  __html: sanitizeHtml(
+                    result.value
+                      ? serialization.decoder(
+                          result.value as string,
+                          'base64',
+                          'base64',
+                          'utf8'
+                        )
+                      : 'No Title Provided',
+                    sanitizeOptions
+                  ),
                 }}
               ></Typography>
               <Tag

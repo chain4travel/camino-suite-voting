@@ -10,6 +10,7 @@ import useVote from '@/hooks/useVote';
 import VotingOptionCard from './VotingOptionCard';
 import { Serialization } from '@c4tplatform/caminojs/dist/utils';
 import { useProposalDescription } from '@/hooks/useProposalDescription';
+import { sanitizeOptions } from '@/helpers/util';
 
 const serialization = Serialization.getInstance();
 interface BaseFeeVotingProps {
@@ -81,7 +82,7 @@ const GeneralProposalVoting = ({
         }}
         variant="caption"
         dangerouslySetInnerHTML={{
-          __html: sanitizeHtml(description ?? ''),
+          __html: sanitizeHtml(description ?? '', sanitizeOptions),
         }}
       />
       <Stack direction="row" sx={{ marginRight: 3 }} spacing={3} width="100%">
