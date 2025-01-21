@@ -6,6 +6,7 @@ import type { Proposal } from '@/types';
 import DefaultVotingOptions from './DefaultVotingOptions';
 import LongString from '@/components/LongString';
 import { useProposalDescription } from '@/hooks/useProposalDescription';
+import { sanitizeOptions } from '@/helpers/util';
 
 interface NewMemberVotingProps {
   data: Proposal;
@@ -62,7 +63,7 @@ const NewMemberVoting = ({
           }}
           variant="caption"
           dangerouslySetInnerHTML={{
-            __html: sanitizeHtml(description ?? ''),
+            __html: sanitizeHtml(description ?? '', sanitizeOptions),
           }}
         />
       </Box>

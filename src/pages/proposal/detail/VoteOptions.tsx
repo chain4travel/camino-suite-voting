@@ -20,9 +20,11 @@ import { filter, find } from 'lodash';
 import { Serialization } from '@c4tplatform/caminojs/dist/utils';
 
 import BaseFeeVoting from '../active/BaseFeeVoting';
+import sanitizeHtml from 'sanitize-html';
 import DefaultVotingOptions from '../active/DefaultVotingOptions';
 import GrantProgramVotingOptions from '../active/GrantProgram/GrantProgramVotingOptions';
 import GeneralProposalVoting from '../active/GeneralProposalVoting';
+import { sanitizeOptions } from '@/helpers/util';
 
 type VotedOption = VotingOption & Percentage;
 const serialization = Serialization.getInstance();
@@ -217,14 +219,17 @@ const VoteOptions: React.FC<VoteOptionsProps> = ({
                 variant="body2"
                 fontWeight={600}
                 dangerouslySetInnerHTML={{
-                  __html: opt.value
-                    ? serialization.decoder(
-                        opt.value as string,
-                        'base64',
-                        'base64',
-                        'utf8'
-                      )
-                    : '',
+                  __html: sanitizeHtml(
+                    opt.value
+                      ? serialization.decoder(
+                          opt.value as string,
+                          'base64',
+                          'base64',
+                          'utf8'
+                        )
+                      : '',
+                    sanitizeOptions
+                  ),
                 }}
               />
             </Stack>

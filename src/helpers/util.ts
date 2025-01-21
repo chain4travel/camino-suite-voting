@@ -1,5 +1,6 @@
 import { reduce } from 'lodash';
 import { VotingOption } from '@/types';
+import sanitizeHtml from 'sanitize-html';
 
 export const countMultipleOptionsBy = (items: any, byField: string) => {
   return reduce(
@@ -12,6 +13,14 @@ export const countMultipleOptionsBy = (items: any, byField: string) => {
     },
     {}
   );
+};
+
+export const sanitizeOptions: sanitizeHtml.IOptions = {
+  allowedTags: ['b', 'i', 'em', 'strong', 'p', 'br'],
+  allowedAttributes: {},
+  disallowedTagsMode: 'recursiveEscape' as sanitizeHtml.DisallowedTagsModes,
+  allowedSchemes: [],
+  allowProtocolRelative: false,
 };
 
 export const getOptionLabel = (option: VotingOption) => {

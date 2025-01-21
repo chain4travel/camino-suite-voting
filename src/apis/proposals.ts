@@ -10,7 +10,7 @@ export const fetchCompletedVotes = async (
 ) =>
   get(
     `/proposals?proposalType=${proposalType}&proposalStatus=3${
-      startTime ? `&startTime=${startTime}` : ''
+      startTime ? `&minStartTime=${startTime}` : ''
     }${endTime ? `&endTime=${endTime}` : ''}`
   );
 

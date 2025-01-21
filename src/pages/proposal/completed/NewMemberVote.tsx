@@ -1,13 +1,13 @@
 import ListItemStatus from '@/components/ListItemStatus';
 import StateButton from '@/components/StateButton';
 import { toPastTense } from '@/helpers/string';
-import { getOptionLabel } from '@/helpers/util';
+import { getOptionLabel, sanitizeOptions } from '@/helpers/util';
 import type { Proposal, VotingOption } from '@/types';
 import { Cancel, CheckCircle } from '@mui/icons-material';
 import { Box, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
 import { useProposalDescription } from '@/hooks/useProposalDescription';
-
+import sanitizeHtml from 'sanitize-html';
 interface NewMemberVoteProps {
   data: Proposal;
   voteTypeName?: string;
@@ -47,7 +47,9 @@ const NewMemberVote = ({ data, voteTypeName }: NewMemberVoteProps) => {
           sx={{
             color: '#CBD5E1',
           }}
-          dangerouslySetInnerHTML={{ __html: description }}
+          dangerouslySetInnerHTML={{
+            __html: sanitizeHtml(description, sanitizeOptions),
+          }}
         ></Typography>
         <ListItemStatus
           startTimestamp={data.startTimestamp}
