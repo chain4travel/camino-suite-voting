@@ -11,12 +11,19 @@ const StateButton = styled(
       disabled
       {...props}
     >
-      {children}
+      <span className="StateButton-text">{children}</span>
     </Button>
   )
 )(({ theme }) => ({
   minWidth: '150px',
   padding: theme.spacing(1.25, 2),
+  '& .StateButton-text': {
+    display: 'inline-block',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    maxWidth: '100%',
+  },
   '&.Mui-disabled': {
     borderColor: 'inherit',
     color: theme.palette.grey[50],
@@ -31,4 +38,5 @@ const StateButton = styled(
     },
   },
 }));
+
 export default StateButton;

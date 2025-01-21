@@ -68,16 +68,6 @@ const GeneralProposalVoting = ({
         gap: '8px',
       }}
     >
-      <Typography variant="body2" fontWeight={600}>
-        {data.memo
-          ? serialization.decoder(
-              data.memo as string,
-              'base64',
-              'base64',
-              'utf8'
-            )
-          : 'No Title Provided'}
-      </Typography>
       <Typography
         component="caption"
         color="text.secondary"

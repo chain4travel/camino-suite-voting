@@ -65,8 +65,9 @@ export const newMemberFormSchema = (platformVMAPI?: PlatformVMAPI) => ({
     path: ['endDate'],
     message: 'end date should be 60 days after start date',
   },
-  endDateRestriction: { minDays: 60, maxDays: 60 },
+  endDateRestriction: { minDays: 60, maxDays: 60, fixed: true },
 });
+
 const NewMemberForm = () => {
   const { control } = useFormContext();
   return (

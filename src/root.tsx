@@ -21,18 +21,27 @@ interface RootProps {
   network: Network;
   theme?: Theme;
 }
+
 const Root = (props: RootProps) => {
-  const setActiveNetwork = useNetworkStore(state => state.setActiveNetwork);
-  useEffect(() => {
+  const [load, setLoad] = React.useState(true);
+  function init() {
+    setLoad(true);
     if (props.network) {
       setActiveNetwork(props.network);
       updateBaseUrl(props.network.explorerUrl!);
+      setLoad(false);
+    }
+  }
+  const setActiveNetwork = useNetworkStore(state => state.setActiveNetwork);
+  useEffect(() => {
+    if (load) {
+      init();
     }
   }, [props.network]);
   const caminoTheme = CaminoTheme.getThemeOptions('dark');
   const theme = props.theme ?? createTheme(caminoTheme);
   const { isFeatureEnabled } = useIsFeatureEnabled();
-
+  if (load) return;
   return (
     <React.StrictMode>
       <ThemeProvider theme={theme}>

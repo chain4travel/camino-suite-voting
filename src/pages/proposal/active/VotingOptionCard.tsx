@@ -185,7 +185,6 @@ const VotingOptionCard = ({
       );
     }
   }
-
   return (
     <StyledCard active={isSelected} isVoted={isVoted}>
       <StyledCardHeader
