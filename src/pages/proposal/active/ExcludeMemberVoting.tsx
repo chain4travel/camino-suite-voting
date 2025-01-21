@@ -6,6 +6,7 @@ import type { Proposal } from '@/types';
 import DefaultVotingOptions from './DefaultVotingOptions';
 import { useProposalDescription } from '@/hooks/useProposalDescription';
 import LongString from '@/components/LongString';
+import { sanitizeOptions } from '@/helpers/util';
 
 interface ExcludeMemberVotingProps {
   data: Proposal;
@@ -61,7 +62,7 @@ const ExcludeMemberVoting = ({
           }}
           variant="caption"
           dangerouslySetInnerHTML={{
-            __html: sanitizeHtml(description ?? ''),
+            __html: sanitizeHtml(description ?? '', sanitizeOptions),
           }}
         />
       </Box>

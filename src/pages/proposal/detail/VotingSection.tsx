@@ -45,7 +45,6 @@ const VotingSection: React.FC<VotingSectionProps> = React.memo(
 
     return (
       <Stack>
-        <Header variant="h6" headline="Voting options" />
         <VoteOptions
           proposal={proposalWithEligibles}
           isConsortiumMember={isConsortiumMember}

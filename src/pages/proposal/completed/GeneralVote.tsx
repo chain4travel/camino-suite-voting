@@ -6,8 +6,9 @@ import StateButton from '@/components/StateButton';
 import { toPastTense } from '@/helpers/string';
 import ListItemStatus from '@/components/ListItemStatus';
 import { useProposalDescription } from '@/hooks/useProposalDescription';
-import { getOptionLabel } from '@/helpers/util';
+import { getOptionLabel, sanitizeOptions } from '@/helpers/util';
 import { Serialization } from '@c4tplatform/caminojs/dist/utils';
+import sanitizeHtml from 'sanitize-html';
 
 const serialization = Serialization.getInstance();
 
@@ -44,14 +45,17 @@ const GeneralVote = ({ data, voteTypeName }: GeneralVoteProps) => {
         <Typography
           variant="body2"
           dangerouslySetInnerHTML={{
-            __html: data.memo
-              ? serialization.decoder(
-                  data.memo as string,
-                  'base64',
-                  'base64',
-                  'utf8'
-                )
-              : 'No Title Provided',
+            __html: sanitizeHtml(
+              data.memo
+                ? serialization.decoder(
+                    data.memo as string,
+                    'base64',
+                    'base64',
+                    'utf8'
+                  )
+                : 'No Title Provided',
+              sanitizeOptions
+            ),
           }}
         ></Typography>
         <Typography
@@ -60,7 +64,9 @@ const GeneralVote = ({ data, voteTypeName }: GeneralVoteProps) => {
           sx={{
             color: '#CBD5E1',
           }}
-          dangerouslySetInnerHTML={{ __html: description }}
+          dangerouslySetInnerHTML={{
+            __html: sanitizeHtml(description, sanitizeOptions),
+          }}
         ></Typography>
         <ListItemStatus
           startTimestamp={data.startTimestamp}

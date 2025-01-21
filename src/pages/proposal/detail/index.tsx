@@ -8,7 +8,7 @@ import sanitizeHtml from 'sanitize-html';
 
 import Button from '@/components/Button';
 import Header from '@/components/Header';
-import { countMultipleOptionsBy } from '@/helpers/util';
+import { countMultipleOptionsBy, sanitizeOptions } from '@/helpers/util';
 import { useEligibleCMembers, useProposal } from '@/hooks/useProposals';
 import { useBaseFee, useFeeDistribution } from '@/hooks/useRpc';
 import useWallet from '@/hooks/useWallet';
@@ -225,14 +225,17 @@ const Detail = () => {
                 <Typography
                   variant="h6"
                   dangerouslySetInnerHTML={{
-                    __html: proposal.memo
-                      ? serialization.decoder(
-                          proposal.memo as string,
-                          'base64',
-                          'base64',
-                          'utf8'
-                        )
-                      : 'No Title Provided',
+                    __html: sanitizeHtml(
+                      proposal.memo
+                        ? serialization.decoder(
+                            proposal.memo as string,
+                            'base64',
+                            'base64',
+                            'utf8'
+                          )
+                        : 'No Title Provided',
+                      sanitizeOptions
+                    ),
                   }}
                 ></Typography>
               )}
@@ -272,7 +275,7 @@ const Detail = () => {
                   variant="caption"
                   color="grey.400"
                   dangerouslySetInnerHTML={{
-                    __html: sanitizeHtml(description ?? ''),
+                    __html: sanitizeHtml(description ?? '', sanitizeOptions),
                   }}
                 />
                 {proposalWithEligibles?.forumLink && (
