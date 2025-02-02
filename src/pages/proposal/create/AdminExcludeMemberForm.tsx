@@ -107,7 +107,7 @@ const AdminExcludeMemberForm = () => {
           )}
         />
       </FormSection>
-      <FormSection spacing="sm">
+      <FormSection spacing="sm" sx={{ marginBottom: '16px !important' }}>
         <Information>
           <Stack direction="row" spacing={1.5}>
             <InfoRounded sx={{ color: 'grey.300', width: 28, height: 28 }} />
