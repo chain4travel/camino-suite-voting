@@ -293,23 +293,27 @@ export const useAddProposal = (
             );
           break;
         case 1:
-          startDate = startDate.startOf('day');
-          endDate = endDate.startOf('day');
           proposal = new platformvm.AddMemberProposal(
             startDate.toUnixInteger(),
             endDate.toUnixInteger(),
             targetAddress
           );
           break;
-        case 2:
-          startDate = startDate.startOf('day');
-          endDate = endDate.startOf('day');
+        case 2: {
+          const startUnixTime = startDate.toUnixInteger();
+
+          const THIRTY_DAYS_IN_SECONDS = 2592000;
+          const maxEndTime = startUnixTime + THIRTY_DAYS_IN_SECONDS;
+
+          const endUnixTime = Math.min(endDate.toUnixInteger(), maxEndTime);
+
           proposal = new platformvm.ExcludeMemberProposal(
-            startDate.toUnixInteger(),
-            endDate.toUnixInteger(),
+            startUnixTime,
+            endUnixTime,
             targetAddress
           );
           break;
+        }
         case 3:
           {
             startDate = startDate.plus({ hours: 2 });
@@ -344,9 +348,15 @@ export const useAddProposal = (
           break;
         case 5:
           {
+            const startUnixTime = startDate.toUnixInteger();
+
+            const THIRTY_DAYS_IN_SECONDS = 2592000;
+            const maxEndTime = startUnixTime + THIRTY_DAYS_IN_SECONDS;
+
+            const endUnixTime = Math.min(endDate.toUnixInteger(), maxEndTime);
             proposal = new GeneralProposal(
-              startDate.startOf('day').toUnixInteger(),
-              endDate.endOf('day').toUnixInteger(),
+              startDate.toUnixInteger(),
+              endUnixTime,
               majority * 1000,
               quorum * 1000,
               earlyFinish
