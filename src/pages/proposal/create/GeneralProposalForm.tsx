@@ -142,6 +142,17 @@ const GeneralProposalForm = () => {
                 min={0}
                 max={100}
                 valueLabelDisplay="auto"
+                sx={{
+                  '& .MuiSlider-thumb': {
+                    color: '#1976d2',
+                  },
+                  '& .MuiSlider-track': {
+                    color: '#1976d2',
+                  },
+                  '& .MuiSlider-rail': {
+                    color: '#ccc',
+                  },
+                }}
               />
               <FormHelperText error={!!errors.majority}>
                 {errors.majority?.message}
@@ -176,6 +187,17 @@ const GeneralProposalForm = () => {
                 min={0}
                 max={100}
                 valueLabelDisplay="auto"
+                sx={{
+                  '& .MuiSlider-thumb': {
+                    color: '#1976d2',
+                  },
+                  '& .MuiSlider-track': {
+                    color: '#1976d2',
+                  },
+                  '& .MuiSlider-rail': {
+                    color: '#ccc',
+                  },
+                }}
               />
               <FormHelperText error={!!errors.quorum}>
                 {errors.quorum?.message}

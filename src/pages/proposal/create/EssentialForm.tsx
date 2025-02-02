@@ -24,6 +24,12 @@ import FormSection from './FormSection';
 import CaminoDatePicker from '@/components/DatePicker';
 import { usePendingMultisigAddProposalTxs } from '@/hooks/useMultisig';
 import useWallet from '@/hooks/useWallet';
+
+const MINUTES_IN_FUTURE = 15;
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+const MS_IN_60_DAYS = 60 * MS_PER_DAY;
+const MAX_FUTURE_HOURS = 336;
+
 export const essentialSchema = (isAdminProposal: boolean) =>
   z.object({
     startDate: z
@@ -31,7 +37,11 @@ export const essentialSchema = (isAdminProposal: boolean) =>
       .refine(
         (d: DateTime) => d.isValid && d.diffNow(['days', 'hours']).days >= 0,
         'invalid start date'
-      ),
+      )
+      .refine((d: DateTime) => {
+        const diffHours = d.diffNow().as('hours');
+        return diffHours <= MAX_FUTURE_HOURS;
+      }, 'start date cannot be more than 14 days in the future'),
     endDate: z.custom<DateTime>().refine((d: DateTime) => {
       if (isAdminProposal) return true;
       else return d.isValid && d.diffNow(['days']).days > 0;
@@ -41,6 +51,7 @@ export const essentialSchema = (isAdminProposal: boolean) =>
       return url === '' ? undefined : url;
     }, z.string().url().optional()),
   });
+
 interface EssentialFormProps {
   proposalType: number | string;
   children?: ReactNode;
@@ -52,6 +63,7 @@ interface EssentialFormProps {
   };
   onCancel?: () => void;
 }
+
 const EssentialForm = ({
   proposalType,
   children,
@@ -69,6 +81,7 @@ const EssentialForm = ({
   const endDateRestriction = useMemo(() => {
     const proposalIds = Object.values(ProposalTypes);
     // Default restriction if no specific case matches
+
     const defaultRestriction = {
       minDays: formSchema.endDateRestriction?.minDays ?? 1,
       maxDays: formSchema.endDateRestriction?.maxDays ?? 30,
@@ -103,23 +116,49 @@ const EssentialForm = ({
     return defaultRestriction;
   }, [proposalType, formSchema.endDateRestriction]);
 
-  const essentialRefinement = (fields: { [x: string]: any }) => {
-    if (isAdminProposal) return true;
-    const diffDays = fields.endDate
-      .endOf('day')
-      .diff(fields.startDate.startOf('day'), ['days']).days;
-    if (endDateRestriction.fixed) {
-      return diffDays === endDateRestriction.minDays;
+  const calculateEndDate = (startDate: DateTime): DateTime => {
+    if (!startDate.isValid) return startDate;
+    const proposalIds = Object.values(ProposalTypes);
+    const utcStart = startDate.toUTC().startOf('minute');
+    if (
+      isAdminProposal ||
+      proposalIds.indexOf(ProposalTypes.NewMember) === proposalType
+    ) {
+      const endMillis = utcStart.toMillis() + 60 * 24 * 60 * 60 * 1000;
+      return DateTime.fromMillis(endMillis).toLocal();
     }
+
+    return startDate.plus({ days: endDateRestriction.minDays });
+  };
+
+  const essentialRefinement = (fields: { [x: string]: any }) => {
+    if (!fields.startDate?.isValid || !fields.endDate?.isValid) return false;
+
+    const startMs = fields.startDate.startOf('minute').toMillis();
+    const endMs = fields.endDate.startOf('minute').toMillis();
+    const durationMs = endMs - startMs;
+
+    if (isAdminProposal) {
+      return Math.abs(durationMs - MS_IN_60_DAYS) < 60000;
+    }
+
+    const durationDays = durationMs / MS_PER_DAY;
+
+    if (endDateRestriction.fixed) {
+      return Math.abs(durationDays - endDateRestriction.minDays) < 0.1;
+    }
+
     return (
-      diffDays >= endDateRestriction.minDays &&
-      diffDays <= endDateRestriction.maxDays
+      durationDays >= endDateRestriction.minDays &&
+      durationDays <= endDateRestriction.maxDays
     );
   };
 
   const essentialRefinementError = {
     path: ['endDate'],
-    message: endDateRestriction.fixed
+    message: isAdminProposal
+      ? 'end date must be exactly 60 days after start date'
+      : endDateRestriction.fixed
       ? `end date must be exactly ${endDateRestriction.minDays} days after start date`
       : `end date must be between ${endDateRestriction.minDays} and ${endDateRestriction.maxDays} days after start date`,
   };
@@ -130,7 +169,9 @@ const EssentialForm = ({
       formSchema.refine ?? essentialRefinement,
       formSchema.error ?? essentialRefinementError
     );
+
   type CreateProposalSchema = z.infer<typeof schema>;
+
   const methods = useForm<CreateProposalSchema>({
     resolver: zodResolver(schema),
     mode: 'onChange',
@@ -140,27 +181,21 @@ const EssentialForm = ({
   const watchStartDate = watch('startDate', DateTime.now());
   const watchEndDate = watch('endDate');
 
-  // Effect to handle start date changes
   useEffect(() => {
-    if (watchStartDate) {
-      const newEndDate = watchStartDate.plus({
-        days: endDateRestriction.minDays,
-      });
-      if (endDateRestriction.fixed || !watchEndDate) {
-        setValue('endDate', newEndDate, { shouldValidate: true });
-      }
+    if (watchStartDate?.isValid) {
+      const newEndDate = calculateEndDate(watchStartDate);
+      setValue('endDate', newEndDate, { shouldValidate: true });
     }
-  }, [watchStartDate, endDateRestriction.fixed, endDateRestriction.minDays]);
+  }, [watchStartDate]);
 
   // Effect to initialize dates
   useEffect(() => {
-    const now = DateTime.now();
-    setValue('startDate', now, { shouldValidate: true });
-    if (!isAdminProposal) {
-      setValue('endDate', now.plus({ days: endDateRestriction.minDays }), {
-        shouldValidate: true,
-      });
-    }
+    const startDate = DateTime.now()
+      .plus({ minutes: MINUTES_IN_FUTURE })
+      .startOf('minute');
+
+    setValue('startDate', startDate, { shouldValidate: true });
+    setValue('endDate', calculateEndDate(startDate), { shouldValidate: true });
   }, [isAdminProposal, proposalType]);
 
   const navigate = useNavigate();
@@ -168,6 +203,7 @@ const EssentialForm = ({
   const activeNetwork = useNetworkStore(state => state.activeNetwork);
   const { refetch } = usePendingMultisigAddProposalTxs();
   const { multisigWallet } = useWallet();
+
   const addProposal = useAddProposal(proposalType, {
     onSuccess: data => {
       if (multisigWallet) {
@@ -194,18 +230,48 @@ const EssentialForm = ({
 
   const onFormSubmit: SubmitHandler<CreateProposalSchema> = async data => {
     try {
-      addProposal(data);
+      const startDate = data.startDate.startOf('minute');
+      const endDate = data.endDate.startOf('minute');
+
+      if (isAdminProposal) {
+        const durationMs = endDate.toMillis() - startDate.toMillis();
+        if (Math.abs(durationMs - MS_IN_60_DAYS) >= 60000) {
+          throw new Error('Invalid proposal duration');
+        }
+      }
+
+      addProposal({
+        ...data,
+        startDate,
+        endDate,
+      });
     } catch (error) {
       if (error instanceof Error) {
-        console.error('failed to submit to create proposal: ', error);
-        toast.error(`cannot create proposal: ${error.message}`);
+        console.error('Failed to submit proposal:', error);
+        toast.error(`Cannot create proposal: ${error.message}`);
       }
     }
   };
 
   const diff = useMemo(() => {
-    if (watchStartDate && watchEndDate) {
-      return watchEndDate.diff(watchStartDate, ['days', 'hours', 'minutes']);
+    if (
+      watchStartDate &&
+      watchEndDate &&
+      watchStartDate.isValid &&
+      watchEndDate.isValid
+    ) {
+      const startUtc = watchStartDate.toUTC();
+      const endUtc = watchEndDate.toUTC();
+
+      const diffDays = Math.floor(endUtc.diff(startUtc).as('days'));
+
+      return {
+        days: diffDays,
+        formatted: {
+          start: watchStartDate.toLocaleString(DateTime.DATETIME_FULL),
+          end: watchEndDate.toLocaleString(DateTime.DATETIME_FULL),
+        },
+      };
     }
     return null;
   }, [watchStartDate, watchEndDate]);
@@ -234,7 +300,7 @@ const EssentialForm = ({
                         component="span"
                         fontWeight={700}
                       >
-                        {Math.abs(diff.days)} days
+                        {diff.days} days
                       </Typography>
                       . It will start on{' '}
                       <Typography
@@ -242,9 +308,7 @@ const EssentialForm = ({
                         component="span"
                         fontWeight={700}
                       >
-                        {watchStartDate
-                          ?.setZone('local')
-                          .toLocaleString('yyyy-MM-dd HH:mm ZZZZ')}
+                        {diff.formatted.start}
                       </Typography>{' '}
                       and end on{' '}
                       <Typography
@@ -252,9 +316,7 @@ const EssentialForm = ({
                         component="span"
                         fontWeight={700}
                       >
-                        {watchEndDate
-                          ?.setZone('local')
-                          .toLocaleString('yyyy-MM-dd HH:mm ZZZZ')}
+                        {diff.formatted.end}
                       </Typography>
                     </Typography>
                   )}
@@ -267,14 +329,47 @@ const EssentialForm = ({
                     <Controller
                       name="startDate"
                       control={control}
-                      defaultValue={DateTime.now()}
+                      defaultValue={DateTime.now().plus({
+                        minutes: MINUTES_IN_FUTURE,
+                      })}
                       render={({ field, fieldState: { error } }) => (
                         <>
                           <CaminoDatePicker
                             {...field}
+                            slotProps={{
+                              textField: {
+                                size: 'small',
+                              },
+                              day: {
+                                sx: {
+                                  '&.Mui-selected': {
+                                    color: '#FFFFFF !important',
+                                    backgroundColor: '#2196F3 !important',
+                                    borderColor: '#2196F3 !important',
+                                    ':hover': {
+                                      color: '#FFFFFF !important',
+                                      backgroundColor: '#1976D2 !important',
+                                      borderColor: '#1976D2 !important',
+                                    },
+                                  },
+                                  '&.MuiPickersDay-today': {
+                                    borderColor: '#2196F3 !important',
+                                  },
+                                  '&:hover': {
+                                    backgroundColor:
+                                      'rgba(33, 150, 243, 0.04) !important',
+                                  },
+                                },
+                              },
+                            }}
                             disablePast
                             onChange={value => field.onChange(value)}
-                            minDate={DateTime.now()}
+                            minDate={DateTime.now().plus({
+                              minutes: MINUTES_IN_FUTURE,
+                            })}
+                            maxDate={DateTime.now().plus({
+                              hours: MAX_FUTURE_HOURS,
+                            })}
                             sx={{
                               '& .MuiInputBase-root': {
                                 paddingLeft: '0px !important',
@@ -305,6 +400,32 @@ const EssentialForm = ({
                           <>
                             <CaminoDatePicker
                               {...field}
+                              slotProps={{
+                                textField: {
+                                  size: 'small',
+                                },
+                                day: {
+                                  sx: {
+                                    '&.Mui-selected': {
+                                      color: '#FFFFFF !important',
+                                      backgroundColor: '#2196F3 !important',
+                                      borderColor: '#2196F3 !important',
+                                      ':hover': {
+                                        color: '#FFFFFF !important',
+                                        backgroundColor: '#1976D2 !important',
+                                        borderColor: '#1976D2 !important',
+                                      },
+                                    },
+                                    '&.MuiPickersDay-today': {
+                                      borderColor: '#2196F3 !important',
+                                    },
+                                    '&:hover': {
+                                      backgroundColor:
+                                        'rgba(33, 150, 243, 0.04) !important',
+                                    },
+                                  },
+                                },
+                              }}
                               disablePast
                               disabled={endDateRestriction.fixed}
                               onChange={value => field.onChange(value)}
