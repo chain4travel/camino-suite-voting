@@ -71,8 +71,8 @@ const AdminNewMemberForm = () => {
           Wallet address
         </Typography>
         <Typography variant="caption">
-          Please enter the wallet address you want to apply to become a member
-          of the consortium
+          Please enter the P-Chain wallet address you want to apply to become a
+          member of the consortium
         </Typography>
         <Controller
           name="targetAddress"

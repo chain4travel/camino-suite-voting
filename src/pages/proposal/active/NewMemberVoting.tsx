@@ -1,12 +1,10 @@
 import React from 'react';
-import { Box, ListItemText, Stack, Typography } from '@mui/material';
-import sanitizeHtml from 'sanitize-html';
+import { Box, Typography } from '@mui/material';
 import { ModelMultisigTx } from '@c4tplatform/signavaultjs';
 import type { Proposal } from '@/types';
 import DefaultVotingOptions from './DefaultVotingOptions';
 import LongString from '@/components/LongString';
 import { useProposalDescription } from '@/hooks/useProposalDescription';
-import { sanitizeOptions } from '@/helpers/util';
 
 interface NewMemberVotingProps {
   data: Proposal;
@@ -28,7 +26,7 @@ const NewMemberVoting = ({
   onVoteSuccess,
   multisigFunctions,
 }: NewMemberVotingProps) => {
-  const description = useProposalDescription(data.id);
+  const { description, isLoading, error } = useProposalDescription(data.id);
   return (
     <Box
       sx={{
@@ -50,22 +48,37 @@ const NewMemberVoting = ({
         }}
       >
         <LongString value={String(data.target)} />
-        <Typography
-          component="caption"
-          color="text.secondary"
-          style={{
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            textOverflow: 'ellipsis',
-            overflow: 'hidden',
-            WebkitBoxOrient: 'vertical',
-            textAlign: 'start',
-          }}
-          variant="caption"
-          dangerouslySetInnerHTML={{
-            __html: sanitizeHtml(description ?? '', sanitizeOptions),
-          }}
-        />
+        {isLoading ? (
+          <Box
+            sx={{
+              width: '100%',
+              height: '20px',
+              bgcolor: 'action.hover',
+              borderRadius: 1,
+            }}
+          />
+        ) : error ? (
+          <Typography variant="caption" color="error">
+            Failed to load description
+          </Typography>
+        ) : (
+          <Typography
+            component="caption"
+            color="text.secondary"
+            sx={{
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              textOverflow: 'ellipsis',
+              overflow: 'hidden',
+              WebkitBoxOrient: 'vertical',
+              textAlign: 'start',
+            }}
+            variant="caption"
+            dangerouslySetInnerHTML={{
+              __html: description,
+            }}
+          />
+        )}
       </Box>
       {isConsortiumMember && (
         <DefaultVotingOptions

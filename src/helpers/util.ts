@@ -16,7 +16,6 @@ export const countMultipleOptionsBy = (items: any, byField: string) => {
 };
 
 export const sanitizeOptions: sanitizeHtml.IOptions = {
-  allowedTags: ['b', 'i', 'em', 'strong', 'p', 'br'],
   allowedAttributes: {},
   disallowedTagsMode: 'recursiveEscape' as sanitizeHtml.DisallowedTagsModes,
   allowedSchemes: [],

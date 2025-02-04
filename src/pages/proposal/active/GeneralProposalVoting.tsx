@@ -1,15 +1,13 @@
 import React from 'react';
 import { Box, Stack, Typography } from '@mui/material';
-import Big from 'big.js';
 import { findIndex } from 'lodash';
 import { ModelMultisigTx } from '@c4tplatform/signavaultjs';
 import type { Proposal, VotingOption } from '@/types';
-import { useBaseFee } from '@/hooks/useRpc';
-import sanitizeHtml from 'sanitize-html';
 import useVote from '@/hooks/useVote';
 import VotingOptionCard from './VotingOptionCard';
 import { Serialization } from '@c4tplatform/caminojs/dist/utils';
 import { useProposalDescription } from '@/hooks/useProposalDescription';
+import sanitizeHtml from 'sanitize-html';
 import { sanitizeOptions } from '@/helpers/util';
 
 const serialization = Serialization.getInstance();
@@ -59,7 +57,7 @@ const GeneralProposalVoting = ({
       optionIndex,
     });
   };
-  const description = useProposalDescription(data.id);
+  const { description, isLoading, error } = useProposalDescription(data.id);
   return (
     <Box
       sx={{
@@ -70,28 +68,59 @@ const GeneralProposalVoting = ({
       }}
     >
       <Typography
-        component="caption"
-        color="text.secondary"
-        style={{
-          display: '-webkit-box',
-          WebkitLineClamp: 2,
-          textOverflow: 'ellipsis',
-          overflow: 'hidden',
-          WebkitBoxOrient: 'vertical',
-          textAlign: 'start',
-        }}
-        variant="caption"
+        variant="body2"
         dangerouslySetInnerHTML={{
-          __html: sanitizeHtml(description ?? '', sanitizeOptions),
+          __html: sanitizeHtml(
+            data.memo
+              ? serialization.decoder(
+                  data.memo as string,
+                  'base64',
+                  'base64',
+                  'utf8'
+                )
+              : 'No Title Provided',
+            sanitizeOptions
+          ),
         }}
-      />
+      ></Typography>
+      {isLoading ? (
+        <Box
+          sx={{
+            width: '100%',
+            height: '20px',
+            bgcolor: 'action.hover',
+            borderRadius: 1,
+          }}
+        />
+      ) : error ? (
+        <Typography variant="caption" color="error">
+          Failed to load description
+        </Typography>
+      ) : (
+        <Typography
+          component="caption"
+          color="text.secondary"
+          sx={{
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            textOverflow: 'ellipsis',
+            overflow: 'hidden',
+            WebkitBoxOrient: 'vertical',
+            textAlign: 'start',
+          }}
+          variant="caption"
+          dangerouslySetInnerHTML={{
+            __html: description,
+          }}
+        />
+      )}
       <Stack direction="row" sx={{ marginRight: 3 }} spacing={3} width="100%">
         {data.options.map((opt, index) => {
           return (
             <VotingOptionCard
               key={`basefee-${data.id}-${opt.option}`}
               option={opt}
-              title={String('Option ' + index)}
+              title={String('Option ' + (index + 1))}
               isConsortiumMember={isConsortiumMember}
               voted={data.voted}
               selected={selectedOption?.option}

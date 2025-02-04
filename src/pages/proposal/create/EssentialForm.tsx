@@ -8,7 +8,6 @@ import { useNetworkStore } from '@/store/network';
 import { ProposalTypes } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormHelperText, InputLabel, Stack, Typography } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers';
 import { DateTime } from 'luxon';
 import React, { ReactNode, useEffect, useMemo } from 'react';
 import {
@@ -202,8 +201,8 @@ const EssentialForm = ({
   const toast = useToast();
   const activeNetwork = useNetworkStore(state => state.activeNetwork);
   const { refetch } = usePendingMultisigAddProposalTxs();
-  const { multisigWallet } = useWallet();
-
+  const { multisigWallet, pchainAPI } = useWallet();
+  const [txID, setTxID] = React.useState<string | null>(null);
   const addProposal = useAddProposal(proposalType, {
     onSuccess: data => {
       if (multisigWallet) {
@@ -224,21 +223,31 @@ const EssentialForm = ({
           </Button>
         )
       );
-      if (!multisigWallet) navigate('/dac/upcoming');
+      if (!multisigWallet) {
+        setTxID(data);
+      }
     },
   });
+
+  async function waitTxConfirmation(txID: string) {
+    const status = await pchainAPI?.getTxStatus(txID);
+    if (status === 'Unknown' || status === 'Processing') {
+      setTimeout(() => waitTxConfirmation(txID), 500);
+    } else {
+      setTxID(null);
+      setTimeout(() => navigate('/dac/upcoming'), 500);
+    }
+  }
+  useEffect(() => {
+    if (txID) {
+      waitTxConfirmation(txID);
+    }
+  }, [txID]);
 
   const onFormSubmit: SubmitHandler<CreateProposalSchema> = async data => {
     try {
       const startDate = data.startDate.startOf('minute');
       const endDate = data.endDate.startOf('minute');
-
-      if (isAdminProposal) {
-        const durationMs = endDate.toMillis() - startDate.toMillis();
-        if (Math.abs(durationMs - MS_IN_60_DAYS) >= 60000) {
-          throw new Error('Invalid proposal duration');
-        }
-      }
 
       addProposal({
         ...data,

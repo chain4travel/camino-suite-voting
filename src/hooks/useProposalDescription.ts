@@ -7,14 +7,33 @@ import { useState, useEffect } from 'react';
 import { Buffer } from 'buffer/';
 import DOMPurify from 'dompurify';
 
-export const useProposalDescription = (dataId: string) => {
+interface ProposalDescriptionState {
+  description: string;
+  isLoading: boolean;
+  error: Error | null;
+}
+
+export const useProposalDescription = (
+  dataId: string
+): ProposalDescriptionState => {
   const caminoClient = useNetworkStore(state => state.caminoClient);
-  const [description, setDescription] = useState('');
+  const [state, setState] = useState<ProposalDescriptionState>({
+    description: '',
+    isLoading: false,
+    error: null,
+  });
 
   useEffect(() => {
     const fetchAndProcessTx = async () => {
+      if (!dataId || !caminoClient) {
+        setState(prev => ({ ...prev, isLoading: false }));
+        return;
+      }
+
+      setState(prev => ({ ...prev, isLoading: true, error: null }));
+
       try {
-        const res = await caminoClient?.PChain().getTx(dataId);
+        const res = await caminoClient.PChain().getTx(dataId);
         if (res) {
           const addProposalTxHex: string = (res as string).slice(2);
           const unsignedTx = new UnsignedTx();
@@ -23,17 +42,28 @@ export const useProposalDescription = (dataId: string) => {
           const sanitizedDescription = DOMPurify.sanitize(
             addProposalTx.getProposalDescription().toString()
           );
-          setDescription(sanitizedDescription);
+
+          setState({
+            description: sanitizedDescription,
+            isLoading: false,
+            error: null,
+          });
         }
       } catch (error) {
         console.error('Failed to fetch or process the transaction:', error);
+        setState({
+          description: '',
+          isLoading: false,
+          error:
+            error instanceof Error
+              ? error
+              : new Error('Unknown error occurred'),
+        });
       }
     };
 
-    if (dataId && caminoClient) {
-      fetchAndProcessTx();
-    }
-  }, [dataId]);
+    fetchAndProcessTx();
+  }, [dataId, caminoClient]);
 
-  return description;
+  return state;
 };
