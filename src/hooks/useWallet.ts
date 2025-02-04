@@ -97,6 +97,12 @@ const useWallet = () => {
         multisigWallet,
       };
     } else {
+      setAddressState({
+        isCaminoProposer: false,
+        isConsortiumAdminProposer: false,
+        isConsortiumMember: false,
+        isKycVerified: false,
+      });
       setCurrentWalletAddress('');
     }
     return {};

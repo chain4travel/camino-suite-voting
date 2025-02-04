@@ -21,7 +21,7 @@ const GeneralVote = ({ data, voteTypeName }: GeneralVoteProps) => {
     () => data.options.filter(opt => data.outcome === opt.option),
     [data.outcome]
   );
-  const description = useProposalDescription(data.id);
+  const { isLoading, error, description } = useProposalDescription(data.id);
   return (
     <Box
       sx={{
@@ -58,16 +58,38 @@ const GeneralVote = ({ data, voteTypeName }: GeneralVoteProps) => {
             ),
           }}
         ></Typography>
-        <Typography
-          variant="caption"
-          className="clamp-3-lines"
-          sx={{
-            color: '#CBD5E1',
-          }}
-          dangerouslySetInnerHTML={{
-            __html: sanitizeHtml(description, sanitizeOptions),
-          }}
-        ></Typography>
+        {isLoading ? (
+          <Box
+            sx={{
+              width: '100%',
+              height: '20px',
+              bgcolor: 'action.hover',
+              borderRadius: 1,
+            }}
+          />
+        ) : error ? (
+          <Typography variant="caption" color="error">
+            Failed to load description
+          </Typography>
+        ) : (
+          <Typography
+            component="caption"
+            color="text.secondary"
+            sx={{
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              textOverflow: 'ellipsis',
+              overflow: 'hidden',
+              WebkitBoxOrient: 'vertical',
+              textAlign: 'start',
+            }}
+            variant="caption"
+            dangerouslySetInnerHTML={{
+              __html: description,
+            }}
+          />
+        )}
+
         <ListItemStatus
           startTimestamp={data.startTimestamp}
           endTimestamp={data.endTimestamp}

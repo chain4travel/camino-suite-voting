@@ -88,6 +88,11 @@ const ActiveVotings = () => {
               control={<Checkbox />}
               onChange={(_event, checked) => setOnlyTodo(checked)}
               label="Show only TODO"
+              sx={{
+                '& .Mui-checked ': {
+                  color: `${theme.palette.text.primary} !important`,
+                },
+              }}
             />
           )}
           <RefreshButton

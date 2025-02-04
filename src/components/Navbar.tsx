@@ -2,7 +2,7 @@ import { useWalletStore } from '@/store';
 import { PlatformVMConstants } from '@c4tplatform/caminojs/dist/apis/platformvm';
 import { Box, Tab, Tabs, useTheme } from '@mui/material';
 import { filter } from 'lodash';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function a11yProps(index: number) {
@@ -18,6 +18,17 @@ const ProposalNavbar = () => {
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
+  useEffect(() => {
+    if (location.pathname.includes('active')) {
+      setValue(0);
+    } else if (location.pathname.includes('upcoming')) {
+      setValue(1);
+    } else if (location.pathname.includes('completed')) {
+      setValue(2);
+    } else if (location.pathname.includes('creating')) {
+      setValue(3);
+    }
+  }, [location.pathname]);
   const theme = useTheme();
   const { addressState, currentWalletAddress, pendingMultisigTxs } =
     useWalletStore(state => ({

@@ -22,6 +22,7 @@ import TextEditor from '@/components/TextEditor';
 import useToast from '@/hooks/useToast';
 import { z } from 'zod';
 import { uniqBy } from 'lodash';
+import MajoritySelection from './MajoritySelection';
 
 // Custom styled switch with color transitions
 const StyledSwitch = styled(MuiSwitch)(({ theme }) => ({
@@ -50,14 +51,7 @@ export const generalFormSchema = {
   schema: {
     description: z.string().optional(),
     votingOptions: z
-      .array(
-        z
-          .string()
-          .transform(value => value.trim())
-          .refine(value => value.length > 0, {
-            message: 'Voting option must not be empty',
-          })
-      )
+      .array(z.string().trim().min(1, 'Voting option must not be empty'))
       .min(1, 'You must add at least one voting option')
       .refine(
         options => {
@@ -66,7 +60,8 @@ export const generalFormSchema = {
         },
         { message: 'Each voting option must be unique' }
       ),
-    majority: z.number().max(100, 'Majority cannot exceed 100%'),
+    majorityType: z.enum(['relative', 'qualified', 'unanimous']),
+    majorityValue: z.number().min(0).max(100),
     quorum: z.number().max(100, 'Quorum cannot exceed 100%'),
     earlyFinish: z.boolean(),
     proposalSubject: z
@@ -94,6 +89,8 @@ const GeneralProposalForm = () => {
   const {
     control,
     formState: { errors },
+    watch,
+    setValue,
   } = useFormContext<GeneralFormSchema>();
 
   const { fields, append, remove } = useFieldArray({
@@ -101,6 +98,10 @@ const GeneralProposalForm = () => {
     name: 'votingOptions',
   });
 
+  React.useEffect(() => {
+    setValue('proposalSubject', '');
+    setValue('votingOptions', []);
+  }, []);
   const toast = useToast();
 
   const handleAppendOption = () => {
@@ -110,7 +111,10 @@ const GeneralProposalForm = () => {
       append('');
     }
   };
-
+  const handleMajorityChange = (type, value) => {
+    setValue('majorityType', type);
+    setValue('majorityValue', value);
+  };
   return (
     <>
       <FormSection divider spacing="md">
@@ -124,46 +128,10 @@ const GeneralProposalForm = () => {
         </Typography>
 
         {/* Majority Section */}
-        <Controller
-          name="majority"
-          control={control}
-          defaultValue={50}
-          render={({ field }) => (
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="caption">
-                Majority: {field.value || 50}%
-              </Typography>
-              <Slider
-                {...field}
-                value={field.value || 50}
-                onChange={(_, value) => field.onChange(value)}
-                aria-label="Majority"
-                step={10}
-                min={0}
-                max={100}
-                valueLabelDisplay="auto"
-                sx={{
-                  '& .MuiSlider-thumb': {
-                    color: '#1976d2',
-                  },
-                  '& .MuiSlider-track': {
-                    color: '#1976d2',
-                  },
-                  '& .MuiSlider-rail': {
-                    color: '#ccc',
-                  },
-                }}
-              />
-              <FormHelperText error={!!errors.majority}>
-                {errors.majority?.message}
-              </FormHelperText>
-              <Typography variant="overline">
-                If &quot;Any&quot; a relative majority wins, that is the option
-                with the most votes. Otherwise, a qualified majority between 50%
-                + 1 and 100% of votes is needed.
-              </Typography>
-            </Box>
-          )}
+        <MajoritySelection
+          value={watch('majorityValue')}
+          type={watch('majorityType')}
+          onChange={handleMajorityChange}
         />
 
         <Divider sx={{ my: 2 }} />
@@ -172,15 +140,13 @@ const GeneralProposalForm = () => {
         <Controller
           name="quorum"
           control={control}
-          defaultValue={30}
+          defaultValue={0}
           render={({ field }) => (
             <Box sx={{ mb: 3 }}>
-              <Typography variant="caption">
-                Quorum: {field.value || 30}%
-              </Typography>
+              <Typography variant="caption">Quorum: {field.value}%</Typography>
               <Slider
                 {...field}
-                value={field.value || 30}
+                value={field.value}
                 onChange={(_, value) => field.onChange(value)}
                 aria-label="Quorum"
                 step={10}

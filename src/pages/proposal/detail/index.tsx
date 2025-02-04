@@ -24,7 +24,6 @@ import {
 import CompletedStatistics from './CompletedStatistics';
 import OngoingState from './OngoingState';
 import ProposalStatus from './ProposalStatus';
-import VoteOptions from './VoteOptions';
 import VoteResult from './VoteResult';
 import { useProposalDescription } from '@/hooks/useProposalDescription';
 import { Serialization } from '@c4tplatform/caminojs/dist/utils';
@@ -186,7 +185,7 @@ const Detail = () => {
       }
     }
   }, [proposalType, result, baseFee]);
-  const description = useProposalDescription(id);
+  const { description, isLoading, error } = useProposalDescription(id);
   return (
     <>
       <Stack padding={2} alignItems="flex-start">
@@ -271,13 +270,37 @@ const Detail = () => {
             </Stack>
             {ProposalTypes.General !== proposalWithEligibles.type && (
               <Stack spacing={1.5} alignItems="flex-start">
-                <Typography
-                  variant="caption"
-                  color="grey.400"
-                  dangerouslySetInnerHTML={{
-                    __html: sanitizeHtml(description ?? '', sanitizeOptions),
-                  }}
-                />
+                {isLoading ? (
+                  <Box
+                    sx={{
+                      width: '100%',
+                      height: '20px',
+                      bgcolor: 'action.hover',
+                      borderRadius: 1,
+                    }}
+                  />
+                ) : error ? (
+                  <Typography variant="caption" color="error">
+                    Failed to load description
+                  </Typography>
+                ) : (
+                  <Typography
+                    component="caption"
+                    color="text.secondary"
+                    sx={{
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      textOverflow: 'ellipsis',
+                      overflow: 'hidden',
+                      WebkitBoxOrient: 'vertical',
+                      textAlign: 'start',
+                    }}
+                    variant="caption"
+                    dangerouslySetInnerHTML={{
+                      __html: description,
+                    }}
+                  />
+                )}
                 {proposalWithEligibles?.forumLink && (
                   <Button
                     sx={{
