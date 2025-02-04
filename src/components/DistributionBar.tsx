@@ -1,4 +1,4 @@
-import { ButtonGroup, styled } from '@mui/material';
+import { Box, ButtonGroup, styled } from '@mui/material';
 import React, { ReactNode } from 'react';
 import { map } from 'lodash';
 import { Percentage } from '@/types';
@@ -53,13 +53,13 @@ const DistributionBar = <T extends Percentage>({
               key={`dist-${variant ?? ''}-${idx}`}
               disabled
               sx={{
+                boxSizing: 'border-box',
                 backgroundColor: colors[idx],
                 display: 'block',
                 textAlign: 'left',
                 textTransform: 'none',
-                width: `${datum.percent}%`,
+                flex: `0 0 ${datum.percent}%`,
                 borderRadius,
-                flex: 1,
               }}
             >
               {renderContent && renderContent(datum)}

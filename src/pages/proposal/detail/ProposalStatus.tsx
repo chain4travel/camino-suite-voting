@@ -16,6 +16,7 @@ import { filter, map } from 'lodash';
 import { DateTime } from 'luxon';
 import React, { useMemo } from 'react';
 import { Serialization } from '@c4tplatform/caminojs/dist/utils';
+import useWallet from '@/hooks/useWallet';
 interface ExtraInfo {
   label: string;
   value: number | string;
@@ -39,6 +40,7 @@ const ProposalStatus = ({
       (opt: VotingOption) => opt.option === v.option
     ).map(opt => ({ ...opt, label: getOptionLabel(opt) }))
   );
+  const { signer } = useWallet();
   const isSuccess =
     proposal?.status ===
     Object.values(ProposalStatuses).indexOf(ProposalStatuses.Success);
@@ -112,7 +114,7 @@ const ProposalStatus = ({
               'base64',
               'base64',
               'utf8'
-            )}`; // khass nserializi hadi
+            )}`;
         }
         break;
       default:
@@ -185,47 +187,52 @@ const ProposalStatus = ({
             {extraInfoComponent}
           </Paragraph>
         )}
-        <Paragraph spacing="md">
-          <Typography
-            variant="caption"
-            fontWeight={600}
-            letterSpacing={2}
-            sx={{ textTransform: 'uppercase' }}
-          >
-            Your vote
-          </Typography>
-          <Paragraph spacing="sm" alignItems="flex-start">
-            {voted ? (
-              voted.map((v: VotingOption) => (
-                <StateButton
-                  key={v.option}
-                  variant="contained"
-                  color={v.value ? 'success' : 'error'}
-                  startIcon={v.value ? <CheckCircle /> : <Cancel />}
-                  sx={{ textTransform: 'none', textAlign: 'left' }}
-                >
-                  {getVotedState(v)}
-                </StateButton>
-              ))
-            ) : isCompleted ? (
-              <Typography variant="body2" color="text.secondary">
-                Did not participate
-              </Typography>
-            ) : isLoggedIn ? (
-              <Typography variant="body2" color="text.secondary">
-                You have not voted yet
-              </Typography>
-            ) : (
-              <Button
-                variant="outlined"
-                color="inherit"
-                onClick={() => (location.pathname = '/login')}
+        {signer && (
+          <Paragraph spacing="md">
+            <>
+              <Typography
+                variant="caption"
+                fontWeight={600}
+                letterSpacing={2}
+                sx={{ textTransform: 'uppercase' }}
               >
-                Please login to vote
-              </Button>
-            )}
+                Your vote
+              </Typography>
+
+              <Paragraph spacing="sm" alignItems="flex-start">
+                {voted ? (
+                  voted.map((v: VotingOption) => (
+                    <StateButton
+                      key={v.option}
+                      variant="contained"
+                      color={v.value ? 'success' : 'error'}
+                      startIcon={v.value ? <CheckCircle /> : <Cancel />}
+                      sx={{ textTransform: 'none', textAlign: 'left' }}
+                    >
+                      {getVotedState(v)}
+                    </StateButton>
+                  ))
+                ) : isCompleted ? (
+                  <Typography variant="body2" color="text.secondary">
+                    Did not participate
+                  </Typography>
+                ) : isLoggedIn ? (
+                  <Typography variant="body2" color="text.secondary">
+                    You have not voted yet
+                  </Typography>
+                ) : (
+                  <Button
+                    variant="outlined"
+                    color="inherit"
+                    onClick={() => (location.pathname = '/login')}
+                  >
+                    Please login to vote
+                  </Button>
+                )}
+              </Paragraph>
+            </>
           </Paragraph>
-        </Paragraph>
+        )}
       </Paragraph>
     </Box>
   );

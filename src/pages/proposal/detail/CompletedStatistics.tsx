@@ -26,8 +26,6 @@ const CompletedStatistics = ({
   baseFee,
   votes,
 }: CompletedStatisticsProps) => {
-  const theme = useTheme();
-  const isDark = theme.palette.mode === 'dark';
   return (
     <Stack spacing={3}>
       <Stack spacing={1}>

@@ -163,6 +163,7 @@ export const useActiveVotings = (
 export const useUpcomingVotings = (page = 0) => {
   const { proposals, isFetching, error, refetch } = useActiveVotings(
     undefined,
+    undefined,
     page
   );
   const upcomings = filter(proposals, proposal => proposal.inactive);
@@ -263,7 +264,7 @@ export const useAddProposal = (
       description,
       targetAddress,
       earlyFinish,
-      majority,
+      majorityValue,
       proposalSubject,
       quorum,
     }: {
@@ -273,7 +274,7 @@ export const useAddProposal = (
       description?: string;
       targetAddress?: string;
       earlyFinish?: boolean;
-      majority?: number;
+      majorityValue?: number;
       proposalSubject?: string;
       quorum?: number;
     }) => {
@@ -357,7 +358,7 @@ export const useAddProposal = (
             proposal = new GeneralProposal(
               startDate.toUnixInteger(),
               endUnixTime,
-              majority * 1000,
+              majorityValue * 1000,
               quorum * 1000,
               earlyFinish
             );

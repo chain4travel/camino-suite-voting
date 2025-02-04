@@ -13,6 +13,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { z } from 'zod';
 import FormSection from './FormSection';
 import Information from './Information';
+import { useNetworkStore } from '@/store/network';
 
 export const excludeMemberFormSchema = (platformVMAPI?: PlatformVMAPI) => ({
   schema: {
@@ -54,6 +55,7 @@ export const excludeMemberFormSchema = (platformVMAPI?: PlatformVMAPI) => ({
   endDateRestriction: { minDays: 7, maxDays: 30, fixed: false },
 });
 const ExcludeMemberForm = () => {
+  const activeNetwork = useNetworkStore(state => state.activeNetwork);
   const { control } = useFormContext();
   return (
     <>
@@ -67,8 +69,8 @@ const ExcludeMemberForm = () => {
           Wallet address
         </Typography>
         <Typography variant="caption">
-          Please enter the wallet address of the member you want to exclude from
-          the consortium
+          Please enter the P-Chain wallet address of the member you want to
+          exclude from the consortium
         </Typography>
         <Controller
           name="targetAddress"
@@ -142,7 +144,11 @@ const ExcludeMemberForm = () => {
                   join the consortium.
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {`Please note that <X CAM (from chain configuration)> will be bonded from your funds as part of this proposal to prevent spam. 
+                  {`Please note that ${
+                    activeNetwork?.name.toLocaleLowerCase() === 'camino'
+                      ? '1000 CAM'
+                      : '100 CAM'
+                  } will be bonded from your funds as part of this proposal to prevent spam. 
   Once the voting concludes, the funds will be returned to your wallet.`}
                 </Typography>
               </Paragraph>

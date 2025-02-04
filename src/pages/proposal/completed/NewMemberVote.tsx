@@ -1,13 +1,12 @@
 import ListItemStatus from '@/components/ListItemStatus';
 import StateButton from '@/components/StateButton';
 import { toPastTense } from '@/helpers/string';
-import { getOptionLabel, sanitizeOptions } from '@/helpers/util';
+import { getOptionLabel } from '@/helpers/util';
 import type { Proposal, VotingOption } from '@/types';
 import { Cancel, CheckCircle } from '@mui/icons-material';
 import { Box, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
 import { useProposalDescription } from '@/hooks/useProposalDescription';
-import sanitizeHtml from 'sanitize-html';
 interface NewMemberVoteProps {
   data: Proposal;
   voteTypeName?: string;
@@ -17,7 +16,7 @@ const NewMemberVote = ({ data, voteTypeName }: NewMemberVoteProps) => {
     () => data.options.filter(opt => data.outcome === opt.option),
     [data.outcome]
   );
-  const description = useProposalDescription(data.id);
+  const { error, isLoading, description } = useProposalDescription(data.id);
   const content = (
     <Box
       sx={{
@@ -41,16 +40,37 @@ const NewMemberVote = ({ data, voteTypeName }: NewMemberVoteProps) => {
         <Typography variant="body2">
           {(data.target as string) ?? voteTypeName}
         </Typography>
-        <Typography
-          variant="caption"
-          className="clamp-3-lines"
-          sx={{
-            color: '#CBD5E1',
-          }}
-          dangerouslySetInnerHTML={{
-            __html: sanitizeHtml(description, sanitizeOptions),
-          }}
-        ></Typography>
+        {isLoading ? (
+          <Box
+            sx={{
+              width: '100%',
+              height: '20px',
+              bgcolor: 'action.hover',
+              borderRadius: 1,
+            }}
+          />
+        ) : error ? (
+          <Typography variant="caption" color="error">
+            Failed to load description
+          </Typography>
+        ) : (
+          <Typography
+            component="caption"
+            color="text.secondary"
+            sx={{
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              textOverflow: 'ellipsis',
+              overflow: 'hidden',
+              WebkitBoxOrient: 'vertical',
+              textAlign: 'start',
+            }}
+            variant="caption"
+            dangerouslySetInnerHTML={{
+              __html: description,
+            }}
+          />
+        )}
         <ListItemStatus
           startTimestamp={data.startTimestamp}
           endTimestamp={data.endTimestamp}

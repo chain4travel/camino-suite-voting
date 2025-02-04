@@ -61,8 +61,8 @@ const AdminExcludeMemberForm = () => {
           Wallet address
         </Typography>
         <Typography variant="caption">
-          Please enter the wallet address of the member you want to exclude from
-          the consortium
+          Please enter the P-Chain wallet address of the member you want to
+          exclude from the consortium
         </Typography>
         <Controller
           name="targetAddress"
