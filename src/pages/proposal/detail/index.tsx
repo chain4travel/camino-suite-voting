@@ -280,53 +280,51 @@ const Detail = () => {
                 Network Foundation procedures.
               </Typography>
             )}
-            {ProposalTypes.General !== proposalWithEligibles.type && (
-              <Stack spacing={1.5} alignItems="flex-start">
-                {isLoading ? (
-                  <Box
-                    sx={{
-                      width: '100%',
-                      height: '20px',
-                      bgcolor: 'action.hover',
-                      borderRadius: 1,
-                    }}
-                  />
-                ) : error ? (
-                  <Typography variant="caption" color="error">
-                    Failed to load description
-                  </Typography>
-                ) : (
-                  <Typography
-                    component="caption"
-                    color="text.secondary"
-                    sx={{
-                      display: '-webkit-box',
-                      WebkitLineClamp: 2,
-                      textOverflow: 'ellipsis',
-                      overflow: 'hidden',
-                      WebkitBoxOrient: 'vertical',
-                      textAlign: 'start',
-                    }}
-                    variant="caption"
-                    dangerouslySetInnerHTML={{
-                      __html: description,
-                    }}
-                  />
-                )}
-                {proposalWithEligibles?.forumLink && (
-                  <Button
-                    sx={{
-                      backgroundColor: '#242729',
-                      color: 'white',
-                      paddingX: 2,
-                      paddingY: 1,
-                    }}
-                  >
-                    OPEN FORUM
-                  </Button>
-                )}
-              </Stack>
-            )}
+            <Stack spacing={1.5} alignItems="flex-start">
+              {isLoading ? (
+                <Box
+                  sx={{
+                    width: '100%',
+                    height: '20px',
+                    bgcolor: 'action.hover',
+                    borderRadius: 1,
+                  }}
+                />
+              ) : error ? (
+                <Typography variant="caption" color="error">
+                  Failed to load description
+                </Typography>
+              ) : (
+                <Typography
+                  component="caption"
+                  color="text.secondary"
+                  sx={{
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    textOverflow: 'ellipsis',
+                    overflow: 'hidden',
+                    WebkitBoxOrient: 'vertical',
+                    textAlign: 'start',
+                  }}
+                  variant="caption"
+                  dangerouslySetInnerHTML={{
+                    __html: description,
+                  }}
+                />
+              )}
+              {proposalWithEligibles?.forumLink && (
+                <Button
+                  sx={{
+                    backgroundColor: '#242729',
+                    color: 'white',
+                    paddingX: 2,
+                    paddingY: 1,
+                  }}
+                >
+                  OPEN FORUM
+                </Button>
+              )}
+            </Stack>
           </Stack>
           <ProposalStatus
             proposal={proposalWithEligibles}
