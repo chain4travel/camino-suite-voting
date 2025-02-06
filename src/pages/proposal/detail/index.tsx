@@ -121,8 +121,8 @@ const Detail = () => {
                 op = proposalWithEligibles.options.find((opt: VotingOption) =>
                   participant?.votedOptions.includes(opt.option)
                 )?.option;
-                if (op) {
-                  option = `Option ${op}`;
+                if (op !== undefined) {
+                  option = `Option ${Number(op) + 1}`;
                 }
                 break;
               case ProposalTypes.NewMember:
@@ -257,17 +257,29 @@ const Detail = () => {
                 proposalType={proposalType?.name}
               />
             </Stack>
-            <Stack>
-              <Header variant="h6" headline="Voting options" />
-              <VotingSection
-                proposalWithEligibles={proposalWithEligibles}
-                isConsortiumMember={isConsortiumMember}
-                statistics={statistics}
-                result={result}
-                baseFee={baseFee}
-                refetch={refetch}
-              />
-            </Stack>
+            {isAdminProposal ? (
+              <Typography variant="body2">
+                Executed by the administrator.
+              </Typography>
+            ) : (
+              <Stack>
+                <Header variant="h6" headline="Voting options" />
+                <VotingSection
+                  proposalWithEligibles={proposalWithEligibles}
+                  isConsortiumMember={isConsortiumMember}
+                  statistics={statistics}
+                  result={result}
+                  baseFee={baseFee}
+                  refetch={refetch}
+                />
+              </Stack>
+            )}
+            {isAdminProposal && (
+              <Typography variant="caption">
+                This is the record of public actions taken per the Camino
+                Network Foundation procedures.
+              </Typography>
+            )}
             {ProposalTypes.General !== proposalWithEligibles.type && (
               <Stack spacing={1.5} alignItems="flex-start">
                 {isLoading ? (

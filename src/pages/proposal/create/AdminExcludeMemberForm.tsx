@@ -13,6 +13,7 @@ import Paragraph from '@/components/Paragraph';
 import TextEditor from '@/components/TextEditor';
 import FormSection from './FormSection';
 import Information from './Information';
+import { useNetworkStore } from '@/store/network';
 
 export const adminExcludeMemberFormSchema = (
   platformVMAPI?: PlatformVMAPI
@@ -48,6 +49,7 @@ export const adminExcludeMemberFormSchema = (
   endDateRestriction: { minDays: 7, maxDays: 30 },
 });
 const AdminExcludeMemberForm = () => {
+  const activeNetwork = useNetworkStore(state => state.activeNetwork);
   const { control } = useFormContext();
   return (
     <>
@@ -138,7 +140,11 @@ const AdminExcludeMemberForm = () => {
                   consortium may re-apply to join the consortium again.
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {`Please note that < X CAM (from chain configuration) > from your funds will be bonded within this proposal to prevent spam. Once the voting has been concluded, the funds will be returned to your wallet.`}
+                  {`Please note that ${
+                    activeNetwork?.name.toLocaleLowerCase() === 'camino'
+                      ? '1000 CAM'
+                      : '100 CAM'
+                  } from your funds will be bonded within this proposal to prevent spam. Once the voting has been concluded, the funds will be returned to your wallet.`}
                 </Typography>
               </Paragraph>
             </Stack>

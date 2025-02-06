@@ -98,7 +98,11 @@ const VoteResultTable = ({ votes }: VoteResultTableProps) => {
                 >
                   <Stack direction="row" alignItems="center" spacing={2}>
                     {idx === 0 && (
-                      <AccountBalanceWalletOutlined color="primary" />
+                      <AccountBalanceWalletOutlined
+                        sx={{
+                          color: 'text.primary',
+                        }}
+                      />
                     )}
                     <Typography
                       variant="caption"

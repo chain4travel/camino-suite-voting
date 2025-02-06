@@ -98,7 +98,7 @@ const CompletedStatistics = ({
             return (
               <>
                 {label}
-                <Typography color="text.primary" fontWeight={700}>
+                <Typography color="info.contrastText" fontWeight={700}>
                   {statistics?.summary?.[option.option]?.percent ?? 0}% /{' '}
                   {statistics?.summary?.[option.option]?.count ?? 0}
                 </Typography>
