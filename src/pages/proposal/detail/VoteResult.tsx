@@ -280,27 +280,35 @@ const VoteResult = ({ result, proposalType }: VoteResultProps) => {
           break;
         case ProposalTypes.General:
           content = (
-            <Stack spacing={1} alignItems="flex-start">
-              <Typography
-                variant="body2"
-                dangerouslySetInnerHTML={{
-                  __html: sanitizeHtml(
-                    result.value
-                      ? serialization.decoder(
-                          result.value as string,
-                          'base64',
-                          'base64',
-                          'utf8'
-                        )
-                      : 'No Title Provided',
-                    sanitizeOptions
-                  ),
-                }}
-              ></Typography>
-              <Tag
-                color={result.value ? 'success' : 'error'}
-                label={result.value ? 'ACCEPTED' : 'DECLINED'}
-              />
+            <Stack direction="column" spacing={1}>
+              <Stack direction="row" spacing={1}>
+                <Typography variant="h6">
+                  {'Option ' + (+result.option + 1)}
+                </Typography>
+              </Stack>
+              <Stack spacing={1} alignItems="flex-start">
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  dangerouslySetInnerHTML={{
+                    __html: sanitizeHtml(
+                      result.value
+                        ? serialization.decoder(
+                            result.value as string,
+                            'base64',
+                            'base64',
+                            'utf8'
+                          )
+                        : 'No Title Provided',
+                      sanitizeOptions
+                    ),
+                  }}
+                ></Typography>
+                <Tag
+                  color={result.value ? 'success' : 'error'}
+                  label={result.value ? 'ACCEPTED' : 'DECLINED'}
+                />
+              </Stack>
             </Stack>
           );
           break;
