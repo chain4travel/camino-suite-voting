@@ -186,7 +186,6 @@ const Detail = () => {
     }
   }, [proposalType, result, baseFee]);
   const { description, isLoading, error } = useProposalDescription(id);
-  console.log(description);
   return (
     <>
       <Stack padding={2} alignItems="flex-start">
