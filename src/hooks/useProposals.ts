@@ -317,15 +317,17 @@ export const useAddProposal = (
         }
         case 3:
           {
-            startDate = startDate.plus({ hours: 2 });
-            endDate = startDate.plus({ days: 60 });
+            const startUnixTime = startDate.toUnixInteger();
+            const SIXTY_DAYS_IN_SECONDS = 5184000;
+
+            const endUnixTime = startUnixTime + SIXTY_DAYS_IN_SECONDS;
             const optionIndex = Buffer.alloc(4);
             optionIndex.writeInt32BE(0, 0);
             proposal = new platformvm.AdminProposal(
               optionIndex,
               new platformvm.AddMemberProposal(
-                startDate.toUnixInteger(),
-                endDate.toUnixInteger(),
+                startUnixTime,
+                endUnixTime,
                 targetAddress
               )
             );

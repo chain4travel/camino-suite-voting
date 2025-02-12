@@ -296,20 +296,13 @@ const Detail = () => {
                 </Typography>
               ) : (
                 <Typography
-                  component="caption"
+                  component="div"
                   color="text.secondary"
-                  sx={{
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    textOverflow: 'ellipsis',
-                    overflow: 'hidden',
-                    WebkitBoxOrient: 'vertical',
-                    textAlign: 'start',
-                  }}
                   variant="caption"
                   dangerouslySetInnerHTML={{
                     __html: description,
                   }}
+                  sx={DescriptionStyles}
                 />
               )}
               {proposalWithEligibles?.forumLink && (
@@ -351,3 +344,63 @@ const Detail = () => {
   );
 };
 export default React.memo(Detail);
+
+const DescriptionStyles = {
+  '& p': { margin: '0.5em 0', lineHeight: 1.5 },
+  '& strong, & b': { fontWeight: 700 },
+  '& em, & i': { fontStyle: 'italic' },
+  '& u': { textDecoration: 'underline' },
+  '& s, & del': { textDecoration: 'line-through' },
+  '& blockquote': {
+    margin: '1em 0',
+    padding: '0.5em 1em',
+    borderLeft: '4px solid',
+    borderColor: 'primary.main',
+    bgcolor: 'action.hover',
+  },
+  '& pre.ql-syntax': {
+    margin: '1em 0',
+    padding: '1em',
+    bgcolor: 'grey.900',
+    color: 'common.white',
+    borderRadius: 1,
+    fontFamily: 'monospace',
+  },
+  '& ol, & ul': {
+    paddingLeft: '2em',
+    margin: '0.5em 0',
+  },
+  '& .ql-align-center': { textAlign: 'center' },
+  '& .ql-align-right': { textAlign: 'right' },
+  '& .ql-align-justify': { textAlign: 'justify' },
+  '& sub': {
+    verticalAlign: 'sub',
+    fontSize: '0.8em',
+    position: 'relative',
+    bottom: '-0.2em',
+    lineHeight: 0,
+  },
+  '& sup': {
+    verticalAlign: 'super',
+    fontSize: '0.8em',
+    position: 'relative',
+    top: '-0.2em',
+    lineHeight: 0,
+  },
+  '& h1': { fontSize: '1.5em', fontWeight: 700, margin: '0.5em 0' },
+  '& h2': { fontSize: '1.3em', fontWeight: 700, margin: '0.5em 0' },
+  '& h3': { fontSize: '1.2em', fontWeight: 700, margin: '0.5em 0' },
+  '& h4': { fontSize: '1.1em', fontWeight: 700, margin: '0.5em 0' },
+  '& h5': { fontSize: '1em', fontWeight: 700, margin: '0.5em 0' },
+  '& h6': { fontSize: '0.9em', fontWeight: 700, margin: '0.5em 0' },
+  '& [style*="color: rgb"]': {
+    color: 'inherit',
+    '&[style*="background-color"]': {
+      padding: '0 4px',
+      borderRadius: '2px',
+    },
+  },
+  width: '100%',
+  textAlign: 'left',
+  whiteSpace: 'pre-wrap',
+};
