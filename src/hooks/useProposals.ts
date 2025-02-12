@@ -317,7 +317,7 @@ export const useAddProposal = (
         }
         case 3:
           {
-            const startUnixTime = startDate.plus({ hours: 2 }).toUnixInteger();
+            const startUnixTime = startDate.toUnixInteger();
 
             const SIXTY_DAYS_IN_SECONDS = 5184000;
             const maxEndTime = startUnixTime + SIXTY_DAYS_IN_SECONDS;
