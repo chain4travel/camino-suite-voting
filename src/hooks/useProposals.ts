@@ -318,11 +318,9 @@ export const useAddProposal = (
         case 3:
           {
             const startUnixTime = startDate.toUnixInteger();
-
             const SIXTY_DAYS_IN_SECONDS = 5184000;
-            const maxEndTime = startUnixTime + SIXTY_DAYS_IN_SECONDS;
 
-            const endUnixTime = Math.min(endDate.toUnixInteger(), maxEndTime);
+            const endUnixTime = startUnixTime + SIXTY_DAYS_IN_SECONDS;
             const optionIndex = Buffer.alloc(4);
             optionIndex.writeInt32BE(0, 0);
             proposal = new platformvm.AdminProposal(
