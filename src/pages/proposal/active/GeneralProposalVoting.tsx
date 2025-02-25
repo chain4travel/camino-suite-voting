@@ -139,7 +139,14 @@ const GeneralProposalVoting = ({
                 return (
                   <>
                     <Stack direction="row" justifyContent="space-between">
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{
+                          overflow: 'hidden',
+                          wordBreak: 'break-all',
+                        }}
+                      >
                         {serialization.decoder(
                           option.value as string,
                           'base64',
