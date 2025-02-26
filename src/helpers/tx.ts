@@ -51,6 +51,10 @@ export const parseUnsignedTx = (tx: string, hrp?: string, chainId?: string) => {
             chainId,
             proposal.getApplicantAddress()
           );
+        proposal.memo = addProposalTx.getMemo();
+        proposal.description = addProposalTx
+          .getProposalDescription()
+          .toString();
         proposal.inactive = true;
         break;
       case PlatformVMConstants.EXCLUDEMEMBERPORPOSAL_TYPE_ID:
@@ -61,9 +65,31 @@ export const parseUnsignedTx = (tx: string, hrp?: string, chainId?: string) => {
         proposal.typeId = Object.values(ProposalTypes).indexOf(
           ProposalTypes.ExcludeMember
         );
+        proposal.memo = addProposalTx.getMemo();
+        proposal.description = addProposalTx
+          .getProposalDescription()
+          .toString();
         proposal.target =
           proposal.getMemberAddress() &&
           bintools.addressToString(hrp, chainId, proposal.getMemberAddress());
+        proposal.inactive = true;
+        break;
+      case PlatformVMConstants.GENERALPROPOSAL_TYPE_ID:
+        proposal = proposalPayload.getProposal();
+        proposal.startTimestamp = proposal.start.readInt32BE(4);
+        proposal.endTimestamp = proposal.end.readInt32BE(4);
+        proposal.type = ProposalTypes.General;
+        proposal.typeId = Object.values(ProposalTypes).indexOf(
+          ProposalTypes.General
+        );
+        proposal.options = proposal.options.map((opt, idx) => ({
+          option: idx,
+          value: opt.option,
+        }));
+        proposal.memo = addProposalTx.getMemo();
+        proposal.description = addProposalTx
+          .getProposalDescription()
+          .toString();
         proposal.inactive = true;
         break;
       case PlatformVMConstants.ADMINPROPOSAL_TYPE_ID:
@@ -72,6 +98,10 @@ export const parseUnsignedTx = (tx: string, hrp?: string, chainId?: string) => {
           const execProposal = proposal.getProposal();
           proposal.startTimestamp = execProposal.getStart().readInt32BE(4);
           proposal.endTimestamp = execProposal.getEnd().readInt32BE(4);
+          proposal.memo = addProposalTx.getMemo();
+          proposal.description = addProposalTx
+            .getProposalDescription()
+            ?.toString();
           switch (execProposal.getTypeID()) {
             case PlatformVMConstants.ADDMEMBERPORPOSAL_TYPE_ID:
               proposal.type = ProposalTypes.NewMember;

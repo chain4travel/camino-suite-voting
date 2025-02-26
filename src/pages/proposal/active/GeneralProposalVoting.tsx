@@ -9,6 +9,7 @@ import { Serialization } from '@c4tplatform/caminojs/dist/utils';
 import { useProposalDescription } from '@/hooks/useProposalDescription';
 import sanitizeHtml from 'sanitize-html';
 import { sanitizeOptions } from '@/helpers/util';
+import DOMPurify from 'dompurify';
 
 const serialization = Serialization.getInstance();
 interface BaseFeeVotingProps {
@@ -93,9 +94,28 @@ const GeneralProposalVoting = ({
           }}
         />
       ) : error ? (
-        <Typography variant="caption" color="error">
-          Failed to load description
-        </Typography>
+        data.description ? (
+          <Typography
+            component="caption"
+            color="text.secondary"
+            sx={{
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              textOverflow: 'ellipsis',
+              overflow: 'hidden',
+              WebkitBoxOrient: 'vertical',
+              textAlign: 'start',
+            }}
+            variant="caption"
+            dangerouslySetInnerHTML={{
+              __html: DOMPurify.sanitize(data.description),
+            }}
+          />
+        ) : (
+          <Typography variant="caption" color="error">
+            Failed to load description
+          </Typography>
+        )
       ) : (
         <Typography
           component="caption"
