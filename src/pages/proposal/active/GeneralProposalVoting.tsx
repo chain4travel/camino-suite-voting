@@ -68,71 +68,76 @@ const GeneralProposalVoting = ({
         gap: '8px',
       }}
     >
-      <Typography
-        variant="body2"
-        dangerouslySetInnerHTML={{
-          __html: sanitizeHtml(
-            data.memo
-              ? serialization.decoder(
-                  data.memo as string,
-                  'base64',
-                  'base64',
-                  'utf8'
-                )
-              : 'No Title Provided',
-            sanitizeOptions
-          ),
-        }}
-      ></Typography>
-      {isLoading ? (
-        <Box
-          sx={{
-            width: '100%',
-            height: '20px',
-            bgcolor: 'action.hover',
-            borderRadius: 1,
-          }}
-        />
-      ) : error ? (
-        data.description ? (
+      {(location.pathname === '/dac/active' ||
+        location.pathname === '/dac/upcoming') && (
+        <>
           <Typography
-            component="caption"
-            color="text.secondary"
-            sx={{
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              textOverflow: 'ellipsis',
-              overflow: 'hidden',
-              WebkitBoxOrient: 'vertical',
-              textAlign: 'start',
-            }}
-            variant="caption"
+            variant="body2"
             dangerouslySetInnerHTML={{
-              __html: DOMPurify.sanitize(data.description),
+              __html: sanitizeHtml(
+                data.memo
+                  ? serialization.decoder(
+                      data.memo as string,
+                      'base64',
+                      'base64',
+                      'utf8'
+                    )
+                  : 'No Title Provided',
+                sanitizeOptions
+              ),
             }}
-          />
-        ) : (
-          <Typography variant="caption" color="error">
-            Failed to load description
-          </Typography>
-        )
-      ) : (
-        <Typography
-          component="caption"
-          color="text.secondary"
-          sx={{
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            textOverflow: 'ellipsis',
-            overflow: 'hidden',
-            WebkitBoxOrient: 'vertical',
-            textAlign: 'start',
-          }}
-          variant="caption"
-          dangerouslySetInnerHTML={{
-            __html: description,
-          }}
-        />
+          ></Typography>
+          {isLoading ? (
+            <Box
+              sx={{
+                width: '100%',
+                height: '20px',
+                bgcolor: 'action.hover',
+                borderRadius: 1,
+              }}
+            />
+          ) : error ? (
+            data.description ? (
+              <Typography
+                component="caption"
+                color="text.secondary"
+                sx={{
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
+                  WebkitBoxOrient: 'vertical',
+                  textAlign: 'start',
+                }}
+                variant="caption"
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(data.description),
+                }}
+              />
+            ) : (
+              <Typography variant="caption" color="error">
+                Failed to load description
+              </Typography>
+            )
+          ) : (
+            <Typography
+              component="caption"
+              color="text.secondary"
+              sx={{
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                WebkitBoxOrient: 'vertical',
+                textAlign: 'start',
+              }}
+              variant="caption"
+              dangerouslySetInnerHTML={{
+                __html: description,
+              }}
+            />
+          )}
+        </>
       )}
       <Stack direction="row" sx={{ marginRight: 3 }} spacing={3} width="100%">
         {data.options.map((opt, index) => {
