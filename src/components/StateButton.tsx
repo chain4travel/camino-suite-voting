@@ -9,7 +9,6 @@ const StateButton = styled(
       color={color}
       className={`${className} StateButton-${color}`}
       disabled
-      sx={{ width: '100%' }}
       {...props}
     >
       <span className="StateButton-text">{children}</span>
