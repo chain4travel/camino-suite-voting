@@ -198,7 +198,7 @@ const Detail = () => {
           Back to all Proposals
         </Button>
       </Stack>
-      <Container sx={{maxWidth: '100% !important' }}>
+      <Container sx={{ maxWidth: '100% !important' }}>
         <Box
           sx={{
             display: 'flex',
