@@ -352,15 +352,14 @@ export const useAddProposal = (
         case 5:
           {
             const startUnixTime = startDate.toUnixInteger();
-
             const THIRTY_DAYS_IN_SECONDS = 2592000;
             const maxEndTime = startUnixTime + THIRTY_DAYS_IN_SECONDS;
             const endUnixTime = Math.min(endDate.toUnixInteger(), maxEndTime);
             proposal = new GeneralProposal(
               startDate.toUnixInteger(),
               endUnixTime,
-              majorityValue / 100,
-              quorum / 100,
+              majorityValue * 10000,
+              quorum * 10000,
               earlyFinish
             );
             votingOptions?.forEach(option => {
