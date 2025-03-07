@@ -1,5 +1,4 @@
 import { ProposalType, ProposalTypes } from '@/types';
-import { useIsFeatureEnabled } from '@/utils/featureFlags/featureFlagUtils';
 import {
   DatasetOutlined,
   HelpCenterOutlined,
@@ -51,7 +50,7 @@ export const votingTypeLoader =
           id: idx,
           name: ProposalTypes[key],
           abbr: key,
-          disabled: !['NewMember', 'ExcludeMember', 'General'].includes(key),
+          disabled: !['NewMember', 'ExcludeMember'].includes(key),
           restricted: !['NewMember'].includes(key),
           isAdminProposal: ['AdminNewMember', 'AdminExcludeMember'].includes(
             key
