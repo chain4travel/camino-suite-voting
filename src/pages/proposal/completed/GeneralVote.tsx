@@ -106,19 +106,17 @@ const GeneralVote = ({ data, voteTypeName }: GeneralVoteProps) => {
                 startIcon={voted.value ? <CheckCircle /> : <Cancel />}
                 color={voted.value ? 'success' : 'error'}
               >
-                {toPastTense(
-                  String(
-                    getOptionLabel({
-                      label: serialization.decoder(
-                        voted.value as string,
-                        'base64',
-                        'base64',
-                        'utf8'
-                      ) as string,
-                      option: voted.option,
-                      value: voted.value,
-                    })
-                  )
+                {String(
+                  getOptionLabel({
+                    label: serialization.decoder(
+                      voted.value as string,
+                      'base64',
+                      'base64',
+                      'utf8'
+                    ) as string,
+                    option: voted.option,
+                    value: voted.value,
+                  })
                 )}{' '}
               </StateButton>
             );
