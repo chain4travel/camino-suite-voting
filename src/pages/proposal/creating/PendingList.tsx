@@ -16,6 +16,7 @@ import ExcludeMemberVoting from '../active/ExcludeMemberVoting';
 import FeeDistributionVoting from '../active/FeeDistributionVoting';
 import GrantProgramVoting from '../active/GrantProgram';
 import NewMemberVoting from '../active/NewMemberVoting';
+import GeneralProposalVoting from '../active/GeneralProposalVoting';
 
 type MultisigProposal = Proposal & { msigTx: PendingMultisigTx };
 interface PendingListProps {
@@ -156,6 +157,22 @@ const PendingList = ({
             Vote = (
               <Stack width="100%">
                 <ExcludeMemberVoting
+                  data={proposal}
+                  multisigFunctions={multisigFunctions}
+                />
+                <ListItemStatus
+                  startTimestamp={proposal.startTimestamp}
+                  endTimestamp={proposal.endTimestamp}
+                  pendingMultisigTx={proposal.pendingMultisigTx}
+                />
+                {pendingMultisigTxActions(proposal.msigTx)}
+              </Stack>
+            );
+            break;
+          case ProposalTypes.General:
+            Vote = (
+              <Stack width="100%" spacing={2}>
+                <GeneralProposalVoting
                   data={proposal}
                   multisigFunctions={multisigFunctions}
                 />

@@ -198,7 +198,7 @@ const Detail = () => {
           Back to all Proposals
         </Button>
       </Stack>
-      <Container>
+      <Container sx={{ maxWidth: '100% !important' }}>
         <Box
           sx={{
             display: 'flex',
@@ -206,6 +206,7 @@ const Detail = () => {
             justifyContent: 'space-between',
             gap: '16px',
             flexWrap: 'wrap',
+            width: '100%',
           }}
         >
           <Stack spacing={2} sx={{ flex: '1' }}>
@@ -327,7 +328,7 @@ const Detail = () => {
         </Box>
       </Container>
       <Divider color="divider" variant="fullWidth" sx={{ my: 4 }} />
-      <Container sx={{ paddingBottom: 5 }}>
+      <Container sx={{ paddingBottom: 5, maxWidth: '100% !important' }}>
         {isAdminProposal ? null : isCompleted ? (
           <CompletedStatistics
             statistics={statistics}

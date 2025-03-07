@@ -123,7 +123,8 @@ export const usePendingMultisigAddProposalTxs = () => {
         isCreaterAlias,
         canExecute,
       };
-    }).filter(
+    });
+    pendingMultisigAddProposalTxs = pendingMultisigAddProposalTxs.filter(
       unsignedTx => unsignedTx.typeId === PlatformVMConstants.ADDPROPOSALTX
     );
   }

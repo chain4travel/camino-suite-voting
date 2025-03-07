@@ -15,14 +15,15 @@ const StateButton = styled(
     </Button>
   )
 )(({ theme }) => ({
+  width: '100%',
   minWidth: '150px',
   padding: theme.spacing(1.25, 2),
   '& .StateButton-text': {
-    display: 'inline-block',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
     maxWidth: '100%',
+    width: '100%',
+    wordBreak: 'break-all',
   },
   '&.Mui-disabled': {
     borderColor: 'inherit',
@@ -32,6 +33,7 @@ const StateButton = styled(
     },
     '&.StateButton-success .MuiButton-startIcon': {
       color: theme.palette.success.main,
+    
     },
     '&.StateButton-error .MuiButton-startIcon': {
       color: theme.palette.error.main,

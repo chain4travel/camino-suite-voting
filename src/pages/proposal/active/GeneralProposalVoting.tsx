@@ -9,6 +9,7 @@ import { Serialization } from '@c4tplatform/caminojs/dist/utils';
 import { useProposalDescription } from '@/hooks/useProposalDescription';
 import sanitizeHtml from 'sanitize-html';
 import { sanitizeOptions } from '@/helpers/util';
+import DOMPurify from 'dompurify';
 
 const serialization = Serialization.getInstance();
 interface BaseFeeVotingProps {
@@ -67,52 +68,76 @@ const GeneralProposalVoting = ({
         gap: '8px',
       }}
     >
-      <Typography
-        variant="body2"
-        dangerouslySetInnerHTML={{
-          __html: sanitizeHtml(
-            data.memo
-              ? serialization.decoder(
-                  data.memo as string,
-                  'base64',
-                  'base64',
-                  'utf8'
-                )
-              : 'No Title Provided',
-            sanitizeOptions
-          ),
-        }}
-      ></Typography>
-      {isLoading ? (
-        <Box
-          sx={{
-            width: '100%',
-            height: '20px',
-            bgcolor: 'action.hover',
-            borderRadius: 1,
-          }}
-        />
-      ) : error ? (
-        <Typography variant="caption" color="error">
-          Failed to load description
-        </Typography>
-      ) : (
-        <Typography
-          component="caption"
-          color="text.secondary"
-          sx={{
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            textOverflow: 'ellipsis',
-            overflow: 'hidden',
-            WebkitBoxOrient: 'vertical',
-            textAlign: 'start',
-          }}
-          variant="caption"
-          dangerouslySetInnerHTML={{
-            __html: description,
-          }}
-        />
+      {(location.pathname === '/dac/active' ||
+        location.pathname === '/dac/upcoming') && (
+        <>
+          <Typography
+            variant="body2"
+            dangerouslySetInnerHTML={{
+              __html: sanitizeHtml(
+                data.memo
+                  ? serialization.decoder(
+                      data.memo as string,
+                      'base64',
+                      'base64',
+                      'utf8'
+                    )
+                  : 'No Title Provided',
+                sanitizeOptions
+              ),
+            }}
+          ></Typography>
+          {isLoading ? (
+            <Box
+              sx={{
+                width: '100%',
+                height: '20px',
+                bgcolor: 'action.hover',
+                borderRadius: 1,
+              }}
+            />
+          ) : error ? (
+            data.description ? (
+              <Typography
+                component="caption"
+                color="text.secondary"
+                sx={{
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
+                  WebkitBoxOrient: 'vertical',
+                  textAlign: 'start',
+                }}
+                variant="caption"
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(data.description),
+                }}
+              />
+            ) : (
+              <Typography variant="caption" color="error">
+                Failed to load description
+              </Typography>
+            )
+          ) : (
+            <Typography
+              component="caption"
+              color="text.secondary"
+              sx={{
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                WebkitBoxOrient: 'vertical',
+                textAlign: 'start',
+              }}
+              variant="caption"
+              dangerouslySetInnerHTML={{
+                __html: description,
+              }}
+            />
+          )}
+        </>
       )}
       <Stack direction="row" sx={{ marginRight: 3 }} spacing={3} width="100%">
         {data.options.map((opt, index) => {
@@ -139,7 +164,14 @@ const GeneralProposalVoting = ({
                 return (
                   <>
                     <Stack direction="row" justifyContent="space-between">
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{
+                          overflow: 'hidden',
+                          wordBreak: 'break-all',
+                        }}
+                      >
                         {serialization.decoder(
                           option.value as string,
                           'base64',

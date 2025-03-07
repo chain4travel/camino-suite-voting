@@ -6,6 +6,7 @@ import type { Proposal } from '@/types';
 import DefaultVotingOptions from './DefaultVotingOptions';
 import { useProposalDescription } from '@/hooks/useProposalDescription';
 import LongString from '@/components/LongString';
+import DOMPurify from 'dompurify';
 
 interface ExcludeMemberVotingProps {
   data: Proposal;
@@ -58,9 +59,28 @@ const ExcludeMemberVoting = ({
             }}
           />
         ) : error ? (
-          <Typography variant="caption" color="error">
-            Failed to load description
-          </Typography>
+          data.description ? (
+            <Typography
+              component="caption"
+              color="text.secondary"
+              sx={{
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                WebkitBoxOrient: 'vertical',
+                textAlign: 'start',
+              }}
+              variant="caption"
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(data.description),
+              }}
+            />
+          ) : (
+            <Typography variant="caption" color="error">
+              Failed to load description
+            </Typography>
+          )
         ) : (
           <Typography
             component="caption"

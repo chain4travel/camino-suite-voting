@@ -352,16 +352,14 @@ export const useAddProposal = (
         case 5:
           {
             const startUnixTime = startDate.toUnixInteger();
-
             const THIRTY_DAYS_IN_SECONDS = 2592000;
             const maxEndTime = startUnixTime + THIRTY_DAYS_IN_SECONDS;
-
             const endUnixTime = Math.min(endDate.toUnixInteger(), maxEndTime);
             proposal = new GeneralProposal(
               startDate.toUnixInteger(),
               endUnixTime,
-              majorityValue * 1000,
-              quorum * 1000,
+              majorityValue * 10000,
+              quorum * 10000,
               earlyFinish
             );
             votingOptions?.forEach(option => {
@@ -407,7 +405,7 @@ export const useAddProposal = (
         const txs = await pchainAPI?.getUTXOs([multisigAlias]);
         const unsignedTx = await pchainAPI.buildAddProposalTx(
           txs.utxos,
-          [multisigAlias, ...multisigWallet.keyData.owner.addresses],
+          [[multisigAlias], multisigWallet.keyData.owner.addresses],
           [],
           serialization.typeToBuffer(description, 'utf8'),
           proposal,
