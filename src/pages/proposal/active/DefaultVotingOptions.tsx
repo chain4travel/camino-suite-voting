@@ -2,6 +2,7 @@ import Button from '@/components/Button';
 import StateButton from '@/components/StateButton';
 import { toPastTense } from '@/helpers/string';
 import { getOptionLabel } from '@/helpers/util';
+import { usePendingMultisigTx } from '@/hooks/useMultisig';
 import useVote from '@/hooks/useVote';
 import type { Proposal, VotingOption } from '@/types';
 import { ModelMultisigTx } from '@c4tplatform/signavaultjs';
@@ -40,6 +41,7 @@ const DefaultVotingOptions = ({
     setConfirmedOption,
     submitVote,
   } = useVote(onVoteSuccess, onRefresh);
+  const { pendingMultisigTxs } = usePendingMultisigTx();
   const { signMultisigTx, abortSignavault, executeMultisigTx } =
     multisigFunctions;
 
@@ -105,7 +107,6 @@ const DefaultVotingOptions = ({
         </StateButton>
       ));
     }
-
     // Multisig pending state
     if (!isVoted && data.pendingMultisigTx) {
       const votedOption = find(data.options, {
@@ -190,7 +191,12 @@ const DefaultVotingOptions = ({
           onClick={triggerVoting(opt)}
           color={opt.value ? 'primary' : 'inherit'}
           fullWidth
-          disabled={!isConsortiumMember || data.inactive || !data.canVote}
+          disabled={
+            !isConsortiumMember ||
+            data.inactive ||
+            !data.canVote ||
+            (!data.pendingMultisigTx && pendingMultisigTxs?.length > 0)
+          }
         >
           {getOptionLabel(opt)}
         </Button>

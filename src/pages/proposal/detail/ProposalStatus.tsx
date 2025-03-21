@@ -18,6 +18,7 @@ import React, { useMemo } from 'react';
 import { Serialization } from '@c4tplatform/caminojs/dist/utils';
 import useWallet from '@/hooks/useWallet';
 import { useWalletStore } from '@/store';
+import { usePendingMultisigTx } from '@/hooks/useMultisig';
 interface ExtraInfo {
   label: string;
   value: number | string;
@@ -132,6 +133,7 @@ const ProposalStatus = ({
   }, [proposal?.type]);
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+  const { pendingMultisigTxs } = usePendingMultisigTx();
   return (
     <Box
       padding={2.5}
@@ -221,6 +223,12 @@ const ProposalStatus = ({
                 ) : isCompleted ? (
                   <Typography variant="body2" color="text.secondary">
                     Did not participate
+                  </Typography>
+                ) : isLoggedIn &&
+                  pendingMultisigTxs &&
+                  pendingMultisigTxs.length > 0 ? (
+                  <Typography variant="body2" color="text.secondary">
+                    Vote needs more signatures from multisig owners to count
                   </Typography>
                 ) : isLoggedIn && isConsortiumMember ? (
                   <Typography variant="body2" color="text.secondary">

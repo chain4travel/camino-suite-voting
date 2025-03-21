@@ -105,7 +105,6 @@ const CompletedVotes = () => {
       endTime: endTime.current?.endOf('day'),
     });
   };
-  console.log({ date: currentDateFormat() });
   return (
     <Paper sx={{ p: 2 }}>
       <Header headline="Completed Proposals" variant="h6">
