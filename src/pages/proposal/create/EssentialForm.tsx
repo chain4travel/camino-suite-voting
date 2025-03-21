@@ -23,6 +23,7 @@ import FormSection from './FormSection';
 import CaminoDatePicker from '@/components/DatePicker';
 import { usePendingMultisigAddProposalTxs } from '@/hooks/useMultisig';
 import useWallet from '@/hooks/useWallet';
+import { currentDateFormat } from '@/utils/moment';
 
 const MINUTES_IN_FUTURE = 15;
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
@@ -345,6 +346,7 @@ const EssentialForm = ({
                         <>
                           <CaminoDatePicker
                             {...field}
+                            format={currentDateFormat()}
                             slotProps={{
                               textField: {
                                 size: 'small',
@@ -409,6 +411,7 @@ const EssentialForm = ({
                           <>
                             <CaminoDatePicker
                               {...field}
+                              format={currentDateFormat()}
                               slotProps={{
                                 textField: {
                                   size: 'small',

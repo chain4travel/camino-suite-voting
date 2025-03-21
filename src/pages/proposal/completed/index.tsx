@@ -27,6 +27,7 @@ import TransactionFeeDistribution from './FeeDistribution';
 import GeneralVote from './GeneralVote';
 import GrantProgram from './GrantProgram';
 import NewMemberVote from './NewMemberVote';
+import { currentDateFormat } from '@/utils/moment';
 
 const CompletedVotes = () => {
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
@@ -104,7 +105,7 @@ const CompletedVotes = () => {
       endTime: endTime.current?.endOf('day'),
     });
   };
-
+  console.log({ date: currentDateFormat() });
   return (
     <Paper sx={{ p: 2 }}>
       <Header headline="Completed Proposals" variant="h6">
@@ -113,6 +114,7 @@ const CompletedVotes = () => {
       <Stack spacing="16px">
         <Box sx={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
           <CaminoDatePicker
+            format={currentDateFormat()}
             label="Voting from"
             sx={{
               flex: 1,
@@ -123,6 +125,7 @@ const CompletedVotes = () => {
           />
           <CaminoDatePicker
             label="Voting till"
+            format={currentDateFormat()}
             sx={{
               flex: 1,
             }}
