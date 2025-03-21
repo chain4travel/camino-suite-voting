@@ -45,7 +45,7 @@ const ActiveVotings = () => {
     let filteredProposals = filter(proposals, proposal => !proposal.inactive);
     if (onlyTodo) {
       filteredProposals = filter(
-        proposals,
+        filteredProposals,
         proposal => !proposal.voted || proposal.voted.length === 0
       );
     }
