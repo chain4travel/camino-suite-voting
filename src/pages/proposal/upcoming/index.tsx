@@ -15,13 +15,19 @@ import NoProposals from '../active/NoProposals';
 import VotingList from '../active/VotingList';
 import GroupHeader from './GroupHeader';
 import { useTheme } from '@mui/material';
+import { Alert } from '@mui/material';
+import { useNetworkStore } from '@/store';
 
 const UpcomingVotings = () => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
   const { proposals, error, refetch, isFetching } = useUpcomingVotings();
+  const { currentNetwork } = useNetworkStore(state => ({
+    currentNetwork: state.currentNetwork,
+  }));
   const groupedProposals = useMemo(() => {
+    if (error) return {};
     return proposals.reduce((result: any, proposal: any) => {
       const proposalType = proposalTypes.find(
         (vtype: ProposalType) => vtype.id === proposal.typeId
@@ -47,17 +53,22 @@ const UpcomingVotings = () => {
       }
       return result;
     }, {});
-  }, [proposals]);
+  }, [proposals, currentNetwork, error]);
   return (
     <Paper sx={{ p: 2 }}>
       <Header headline="Upcoming Proposals" variant="h6">
         <RefreshButton loading={isFetching} onRefresh={refetch} />
       </Header>
-      {Object.entries(groupedProposals ?? {}).length > 0 ? (
+      {error ? (
+        <Alert severity="error" sx={{ mt: 2 }}>
+          {(error as Error)?.message || 'An error occurred'}. Please try again.
+        </Alert>
+      ) : null}
+      {!isFetching && Object.entries(groupedProposals ?? {}).length > 0 ? (
         Object.entries(groupedProposals ?? {}).map(
           ([proposalType, group]: [string, any]) => (
             <Accordion
-              key={proposalType}
+              key={proposalType + currentNetwork}
               defaultExpanded={group.data.length > 0}
               sx={{
                 borderRadius: '12px',

@@ -50,7 +50,6 @@ const Root = (props: RootProps) => {
           <QueryClientProvider client={queryClient}>
             <RouterProvider router={getRoutes(queryClient, isFeatureEnabled)} />
             <Toast />
-
             <ReactQueryDevtools initialIsOpen={false} />
           </QueryClientProvider>
         </LocalizationProvider>
