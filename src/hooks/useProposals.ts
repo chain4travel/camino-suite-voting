@@ -86,7 +86,6 @@ const parseAPIProposals = (
   currentWalletAddress?: string
 ) => {
   if (!proposals) return [];
-  console.log('-----> proposals', proposals);
   return proposals.map(proposalWrapper => {
     const proposal = parseAPIProposal(proposalWrapper.dacProposal);
     const votes = proposalWrapper.dacVotes.map(vote => parseAPIVote(vote));
@@ -193,12 +192,13 @@ export const useCompletedVotes = (
   const proposals = parseAPIProposals(data?.data.dacProposals);
   const sortedProposals = orderBy(proposals, ['startTimestamp'], ['desc']);
 
-
   return {
-    proposals: error ? [] : sortedProposals.map((p, idx) => ({
-      ...p,
-      seq: sortedProposals.length - idx,
-    })),
+    proposals: error
+      ? []
+      : sortedProposals.map((p, idx) => ({
+          ...p,
+          seq: sortedProposals.length - idx,
+        })),
     error,
     isFetching,
     refetch,
