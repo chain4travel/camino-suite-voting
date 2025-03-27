@@ -7,9 +7,8 @@ const axiosInstance = axios.create({
   baseURL: process.env.MAGELLAN_API_HOST ?? '/mock_data/',
 });
 
-export const updateBaseUrl = (url: string) => {
-  return axiosInstance.defaults.baseURL = `${url}/${DEFAULT_API_VERSION}`;
-};
+export const updateBaseUrl = (url: string) =>
+  (axiosInstance.defaults.baseURL = `${url}/${DEFAULT_API_VERSION}`);
 
 export const post = (url: string, data: any, config?: AxiosRequestConfig) => {
   return axiosInstance.post(url, data, config);
