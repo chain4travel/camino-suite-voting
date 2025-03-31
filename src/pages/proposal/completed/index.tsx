@@ -9,6 +9,7 @@ import useToast from '@/hooks/useToast';
 import { useVotingTypeStore } from '@/store';
 import { Proposal, ProposalType, ProposalTypes } from '@/types';
 import {
+  Alert,
   Box,
   FormControlLabel,
   List,
@@ -186,8 +187,13 @@ const CompletedVotes = () => {
             ))}
         </RadioGroup>
       </Stack>
+      {error ? (
+        <Alert severity="error" sx={{ mt: 2 }}>
+          {(error as Error)?.message || 'An error occurred'}. Please try again.
+        </Alert>
+      ) : null}
       <List sx={{ maxWidth: 'none', marginTop: '16px' }}>
-        {proposals.length > 0 ? (
+        {!isFetching && proposals.length > 0 ? (
           proposals.map((proposal, index: number) => {
             return (
               <ListItemButton
