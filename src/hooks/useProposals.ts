@@ -193,10 +193,12 @@ export const useCompletedVotes = (
   const sortedProposals = orderBy(proposals, ['startTimestamp'], ['desc']);
 
   return {
-    proposals: sortedProposals.map((p, idx) => ({
-      ...p,
-      seq: sortedProposals.length - idx,
-    })),
+    proposals: error
+      ? []
+      : sortedProposals.map((p, idx) => ({
+          ...p,
+          seq: sortedProposals.length - idx,
+        })),
     error,
     isFetching,
     refetch,

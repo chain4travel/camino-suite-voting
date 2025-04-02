@@ -28,6 +28,7 @@
     "i18next-scanner": "^4.1.0",
     "lodash": "^4.17.21",
     "luxon": "^3.1.1",
+    "moment": "^2.30.1",
     "randomcolor": "^0.6.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -42,11 +43,11 @@
     "zustand": "^4.1.5"
   },
   "scripts": {
-    "build": "PUBLIC_PATH=https://suite.camino.network/dac/ webpack --config webpack.prod.js",
-    "build:dev": "PUBLIC_PATH=https://dev.suite.camino.network/dac/ webpack --config webpack.prod.js",
-    "build:stage": "PUBLIC_PATH=https://stage.suite.camino.network/dac/ webpack --config webpack.prod.js",
+    "build": "PUBLIC_PATH=https://suite.camino.network/dac/ WALLET_PATH=https://suite.camino.network/wallet/ webpack --config webpack.prod.js",
+    "build:dev": "PUBLIC_PATH=https://dev.suite.camino.network/dac/ WALLET_PATH=https://dev.suite.camino.network/wallet/ webpack --config webpack.prod.js",
+    "build:stage": "PUBLIC_PATH=https://stage.suite.camino.network/dac/ WALLET_PATH=https://stage.suite.camino.network/wallet/ webpack --config webpack.prod.js",
     "build:start": "cd dist && PORT=5003 npx serve",
-    "start": "webpack-dev-server --config webpack.dev.js",
+    "start": "webpack-dev-server WALLET_PATH=http://localhost:5003 --config webpack.dev.js",
     "start:live": "webpack-dev-server --open --config webpack.dev.js --live-reload",
     "dev": "webpack-dev-server --mode development --open",
     "test": "react-scripts test",

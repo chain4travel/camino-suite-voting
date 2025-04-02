@@ -7,10 +7,12 @@ import Checkbox from '@/components/Checkbox';
 import Header from '@/components/Header';
 import Paper from '@/components/Paper';
 import RefreshButton from '@/components/RefreshButton';
+import { Alert } from '@mui/material';
 import { usePendingMultisigAddVoteTxs } from '@/hooks/useMultisig';
 import { useActiveVotings } from '@/hooks/useProposals';
 import useWallet from '@/hooks/useWallet';
 import { useWalletStore } from '@/store';
+import { useNetworkStore } from '@/store';
 import { ProposalType } from '@/types';
 import { ExpandMore } from '@mui/icons-material';
 import { FormControlLabel, Stack, useTheme } from '@mui/material';
@@ -41,14 +43,20 @@ const ActiveVotings = () => {
     refetch: refetchPendingMultisigTxs,
     isFetching: isFetchingPendingMultisigTxs,
   } = usePendingMultisigAddVoteTxs();
+  const { currentNetwork } = useNetworkStore(state => ({
+    currentNetwork: state.currentNetwork,
+  }));
+
   const groupedProposals = useMemo(() => {
+    if (error) return {};
     let filteredProposals = filter(proposals, proposal => !proposal.inactive);
     if (onlyTodo) {
       filteredProposals = filter(
-        proposals,
+        filteredProposals,
         proposal => !proposal.voted || proposal.voted.length === 0
       );
     }
+
     return filteredProposals.reduce((result: any, proposal: any) => {
       const proposalType = proposalTypes.find(
         (vtype: ProposalType) => vtype.id === proposal.typeId && !vtype.disabled
@@ -78,7 +86,8 @@ const ActiveVotings = () => {
       }
       return result;
     }, {});
-  }, [proposals, onlyTodo, pendingMultisigAddVoteTxs]);
+  }, [proposals, onlyTodo, pendingMultisigAddVoteTxs, currentNetwork, error]);
+
   return (
     <Paper sx={{ p: 2 }}>
       <Header headline="Ongoing Proposals" variant="h6">
@@ -104,11 +113,16 @@ const ActiveVotings = () => {
           />
         </Stack>
       </Header>
-      {Object.entries(groupedProposals).length > 0 ? (
+      {error ? (
+        <Alert severity="error" sx={{ mt: 2 }}>
+          {(error as Error)?.message || 'An error occurred'}. Please try again.
+        </Alert>
+      ) : null}
+      {!isFetching && Object.entries(groupedProposals).length > 0 ? (
         Object.entries(groupedProposals ?? {}).map(
           ([proposalType, group]: [string, any]) => (
             <Accordion
-              key={proposalType}
+              key={proposalType + currentNetwork}
               defaultExpanded={group.data.length > 0}
               sx={{
                 borderRadius: '12px',

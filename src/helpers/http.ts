@@ -9,6 +9,7 @@ const axiosInstance = axios.create({
 
 export const updateBaseUrl = (url: string) =>
   (axiosInstance.defaults.baseURL = `${url}/${DEFAULT_API_VERSION}`);
+
 export const post = (url: string, data: any, config?: AxiosRequestConfig) => {
   return axiosInstance.post(url, data, config);
 };

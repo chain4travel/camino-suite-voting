@@ -8,6 +8,7 @@ const webpack = require('webpack');
 const childProcess = require('child_process');
 let GIT_COMMIT_HASH;
 const deps = require('./package.json').dependencies;
+const walletPath = process.env.WALLET_PATH;
 try {
   GIT_COMMIT_HASH = childProcess
     .execSync('git rev-parse --short HEAD')
@@ -65,7 +66,7 @@ module.exports = {
       name: 'dac',
       filename: 'remoteEntry.js',
       remotes: {
-        wallet: 'wallet@http://localhost:5003/remoteEntry.js',
+        wallet: 'wallet@' + walletPath + 'remoteEntry.js',
       },
       exposes: {
         './dac': './src/root.tsx',

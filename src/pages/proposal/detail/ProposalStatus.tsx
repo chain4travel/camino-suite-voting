@@ -17,6 +17,8 @@ import { DateTime } from 'luxon';
 import React, { useMemo } from 'react';
 import { Serialization } from '@c4tplatform/caminojs/dist/utils';
 import useWallet from '@/hooks/useWallet';
+import { useWalletStore } from '@/store';
+import { usePendingMultisigTx } from '@/hooks/useMultisig';
 interface ExtraInfo {
   label: string;
   value: number | string;
@@ -41,6 +43,11 @@ const ProposalStatus = ({
     ).map(opt => ({ ...opt, label: getOptionLabel(opt) }))
   );
   const { signer } = useWallet();
+  const {
+    addressState: { isConsortiumMember },
+  } = useWalletStore(state => ({
+    addressState: state.addressState,
+  }));
   const isSuccess =
     proposal?.status ===
     Object.values(ProposalStatuses).indexOf(ProposalStatuses.Success);
@@ -126,6 +133,7 @@ const ProposalStatus = ({
   }, [proposal?.type]);
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+  const { pendingMultisigTxs } = usePendingMultisigTx();
   return (
     <Box
       padding={2.5}
@@ -216,9 +224,20 @@ const ProposalStatus = ({
                   <Typography variant="body2" color="text.secondary">
                     Did not participate
                   </Typography>
-                ) : isLoggedIn ? (
+                ) : isLoggedIn &&
+                  pendingMultisigTxs &&
+                  pendingMultisigTxs.length > 0 ? (
+                  <Typography variant="body2" color="text.secondary">
+                    Vote needs more signatures from multisig owners to count
+                  </Typography>
+                ) : isLoggedIn && isConsortiumMember ? (
                   <Typography variant="body2" color="text.secondary">
                     You have not voted yet
+                  </Typography>
+                ) : isLoggedIn && !isConsortiumMember ? (
+                  <Typography variant="body2" color="text.secondary">
+                    You must be a consortium member with a running validator to
+                    vote
                   </Typography>
                 ) : (
                   <Button

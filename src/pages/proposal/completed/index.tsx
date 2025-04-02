@@ -9,6 +9,7 @@ import useToast from '@/hooks/useToast';
 import { useVotingTypeStore } from '@/store';
 import { Proposal, ProposalType, ProposalTypes } from '@/types';
 import {
+  Alert,
   Box,
   FormControlLabel,
   List,
@@ -27,6 +28,7 @@ import TransactionFeeDistribution from './FeeDistribution';
 import GeneralVote from './GeneralVote';
 import GrantProgram from './GrantProgram';
 import NewMemberVote from './NewMemberVote';
+import { currentDateFormat } from '@/utils/moment';
 
 const CompletedVotes = () => {
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
@@ -104,7 +106,6 @@ const CompletedVotes = () => {
       endTime: endTime.current?.endOf('day'),
     });
   };
-
   return (
     <Paper sx={{ p: 2 }}>
       <Header headline="Completed Proposals" variant="h6">
@@ -113,6 +114,7 @@ const CompletedVotes = () => {
       <Stack spacing="16px">
         <Box sx={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
           <CaminoDatePicker
+            format={currentDateFormat()}
             label="Voting from"
             sx={{
               flex: 1,
@@ -123,6 +125,7 @@ const CompletedVotes = () => {
           />
           <CaminoDatePicker
             label="Voting till"
+            format={currentDateFormat()}
             sx={{
               flex: 1,
             }}
@@ -184,8 +187,13 @@ const CompletedVotes = () => {
             ))}
         </RadioGroup>
       </Stack>
+      {error ? (
+        <Alert severity="error" sx={{ mt: 2 }}>
+          {(error as Error)?.message || 'An error occurred'}. Please try again.
+        </Alert>
+      ) : null}
       <List sx={{ maxWidth: 'none', marginTop: '16px' }}>
-        {proposals.length > 0 ? (
+        {!isFetching && proposals.length > 0 ? (
           proposals.map((proposal, index: number) => {
             return (
               <ListItemButton

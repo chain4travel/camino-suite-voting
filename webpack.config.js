@@ -4,6 +4,7 @@ const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPl
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const path = require('path');
 const deps = require('./package.json').dependencies;
+const walletPath = process.env.WALLET_PATH;
 module.exports = {
   resolve: {
     fallback: {
@@ -55,7 +56,7 @@ module.exports = {
       name: 'dac',
       filename: 'remoteEntry.js',
       remotes: {
-        wallet: 'wallet@http://localhost:5003/remoteEntry.js',
+        wallet: 'wallet@' + walletPath + 'remoteEntry.js',
       },
       exposes: {
         './dac': './src/root.tsx',
