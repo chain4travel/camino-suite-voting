@@ -12,9 +12,9 @@ import {
 } from '@/types';
 import { Cancel, CheckCircle } from '@mui/icons-material';
 import { Box, Stack, Typography, useTheme } from '@mui/material';
-import { filter, map } from 'lodash';
+import { filter, find, map } from 'lodash';
 import { DateTime } from 'luxon';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Serialization } from '@c4tplatform/caminojs/dist/utils';
 import useWallet from '@/hooks/useWallet';
 import { useWalletStore } from '@/store';
@@ -36,16 +36,19 @@ const ProposalStatus = ({
   isLoggedIn,
   extraInfo,
 }: ProposalStatusProps) => {
+  const [hasValidator, setHasValidator] = React.useState(false);
   const voted = proposal?.voted?.flatMap((v: VotingOption) =>
     filter(
       proposal.options,
       (opt: VotingOption) => opt.option === v.option
     ).map(opt => ({ ...opt, label: getOptionLabel(opt) }))
   );
-  const { signer } = useWallet();
+  const { signer, pchainAPI } = useWallet();
   const {
+    currentWalletAddress,
     addressState: { isConsortiumMember },
   } = useWalletStore(state => ({
+    currentWalletAddress: state.currentWalletAddress,
     addressState: state.addressState,
   }));
   const isSuccess =
@@ -55,6 +58,21 @@ const ProposalStatus = ({
     proposal?.status ===
     Object.values(ProposalStatuses).indexOf(ProposalStatuses.Failed);
   const isCompleted = isSuccess || isFailed;
+  useEffect(() => {
+    setHasValidator(false);
+    if (currentWalletAddress) {
+      pchainAPI?.getCurrentValidators().then(result => {
+        const hasVal = find(
+          (result as { validators: any[] }).validators,
+          validator =>
+            validator.rewardOwner.addresses.includes(currentWalletAddress)
+        );
+        if (hasVal) {
+          setHasValidator(true);
+        }
+      });
+    }
+  }, [currentWalletAddress]);
   const { getVotedState, extraInfoComponent } = useMemo(() => {
     let extraInfoComponent = null;
     let getVotedState = (option: VotingOption) =>
@@ -230,11 +248,11 @@ const ProposalStatus = ({
                   <Typography variant="body2" color="text.secondary">
                     Vote needs more signatures from multisig owners to count
                   </Typography>
-                ) : isLoggedIn && isConsortiumMember ? (
+                ) : isLoggedIn && isConsortiumMember && hasValidator ? (
                   <Typography variant="body2" color="text.secondary">
                     You have not voted yet
                   </Typography>
-                ) : isLoggedIn && !isConsortiumMember ? (
+                ) : isLoggedIn && (!isConsortiumMember || !hasValidator) ? (
                   <Typography variant="body2" color="text.secondary">
                     You must be a consortium member with a running validator to
                     vote
