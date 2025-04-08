@@ -15,35 +15,46 @@ import {
 } from '@/types';
 import { BinTools, Buffer, platformvm } from '@c4tplatform/caminojs/dist';
 import { Serialization } from '@c4tplatform/caminojs/dist/utils/serialization';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { filter, find, orderBy } from 'lodash';
 import { DateTime } from 'luxon';
 import { useMultisig } from './useMultisig';
 import useToast from './useToast';
 import useWallet from './useWallet';
 import { GeneralProposal } from '@c4tplatform/caminojs/dist/apis/platformvm';
-
-const bintools: BinTools = BinTools.getInstance();
+import { useRef, useEffect, useState, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 
 const serialization = Serialization.getInstance();
+
+const QUERY_KEYS = {
+  ACTIVE: 'activeProposals',
+  UPCOMING: 'upcomingProposals',
+  COMPLETED: 'completedProposals',
+  DETAIL: 'proposalDetail',
+};
+
 const parseAPIProposal = (proposal?: APIProposal) => {
-  if (proposal) {
+  if (!proposal) return undefined;
+
+  try {
     const optionsBuf = serialization.typeToBuffer(proposal.options, 'base64');
     const options = JSON.parse(optionsBuf.toString());
+
     let outcome;
     if (proposal.outcome) {
       const outcomeBuf = serialization.typeToBuffer(proposal.outcome, 'base64');
       outcome = JSON.parse(outcomeBuf.toString());
     }
+
     const proposalType =
       Object.values(ProposalTypes)[proposal.type === 3 ? 5 : proposal.type];
+
     let target;
     if (proposal.data) {
       const data = serialization.typeToBuffer(proposal.data, 'base64');
       switch (proposalType) {
         case ProposalTypes.NewMember:
-          target = JSON.parse(data.toString());
-          break;
         case ProposalTypes.ExcludeMember:
           target = JSON.parse(data.toString());
           break;
@@ -51,6 +62,7 @@ const parseAPIProposal = (proposal?: APIProposal) => {
           console.warn('Unknown data of proposal to process', data);
       }
     }
+
     const now = DateTime.now();
     const startTime = DateTime.fromISO(proposal.startTime);
     const endTime = DateTime.fromISO(proposal.endTime);
@@ -59,6 +71,7 @@ const parseAPIProposal = (proposal?: APIProposal) => {
       (Object.values(ProposalStatuses).indexOf(ProposalStatuses.Completed) &
         (proposal.status ?? 0)) >
       0;
+
     return {
       ...proposal,
       outcome,
@@ -78,42 +91,72 @@ const parseAPIProposal = (proposal?: APIProposal) => {
         .typeToBuffer(proposal.memo, 'base64')
         .toString(),
     };
+  } catch (error) {
+    console.error('Error parsing API proposal:', error);
+    return undefined;
   }
-  return;
 };
+
 const parseAPIProposals = (
   proposals?: APIPRoposalWrapper[],
   currentWalletAddress?: string
 ) => {
   if (!proposals) return [];
-  return proposals.map(proposalWrapper => {
-    const proposal = parseAPIProposal(proposalWrapper.dacProposal);
-    const votes = proposalWrapper.dacVotes.map(vote => parseAPIVote(vote));
-    let voted;
-    if (currentWalletAddress) {
-      voted = find(votes, { voterAddr: currentWalletAddress });
-      voted = voted?.votedOptions.map((v: number) => ({ option: v }));
-    }
+
+  return proposals
+    .map(proposalWrapper => {
+      try {
+        const proposal = parseAPIProposal(proposalWrapper.dacProposal);
+        if (!proposal) return null;
+
+        const votes = proposalWrapper.dacVotes
+          .map(vote => parseAPIVote(vote))
+          .filter(Boolean);
+
+        let voted;
+        if (currentWalletAddress) {
+          voted = find(votes, { voterAddr: currentWalletAddress });
+          voted = voted?.votedOptions.map((v: number) => ({ option: v }));
+        }
+
+        return {
+          ...proposal,
+          votes,
+          voted,
+        };
+      } catch (error) {
+        console.error('Error parsing proposal wrapper:', error);
+        return null;
+      }
+    })
+    .filter(Boolean) as Proposal[];
+};
+
+const parseAPIVote = (vote: APIVote) => {
+  try {
+    const votedOptionsBuf = serialization.typeToBuffer(
+      vote.votedOptions,
+      'base64'
+    );
+    const votedOptions = JSON.parse(votedOptionsBuf.toString());
+    const votedDateTime = DateTime.fromISO(vote.votedAt).toUnixInteger();
 
     return {
-      ...proposal,
-      votes,
-      voted,
+      ...vote,
+      votedDateTime,
+      votedOptions,
     };
-  });
+  } catch (error) {
+    console.error('Error parsing API vote:', error);
+    return null;
+  }
 };
-const parseAPIVote = (vote: APIVote) => {
-  const votedOptionsBuf = serialization.typeToBuffer(
-    vote.votedOptions,
-    'base64'
-  );
-  const votedOptions = JSON.parse(votedOptionsBuf.toString());
-  const votedDateTime = DateTime.fromISO(vote.votedAt).toUnixInteger();
-  return {
-    ...vote,
-    votedDateTime,
-    votedOptions,
-  };
+
+export const getViewTypeFromPath = (path: string) => {
+  if (path.includes('/dac/active')) return 'ongoing';
+  if (path.includes('/dac/upcoming')) return 'upcoming';
+  if (path.includes('/dac/completed')) return 'completed';
+  return null;
 };
 
 export const useActiveVotings = (
@@ -121,57 +164,177 @@ export const useActiveVotings = (
   currentWalletAddress?: string,
   page = 0
 ) => {
-  const { data, isInitialLoading, isFetching, refetch, error } = useQuery(
-    ['getActiveVotings', currentWalletAddress, page],
-    async () => {
-      const result = await fetchActiveVotings(page);
-      let proposals = parseAPIProposals(
-        result?.data.dacProposals,
-        currentWalletAddress
-      );
-      if (pchainAPI && currentWalletAddress) {
-        proposals = await Promise.all(
-          proposals.map(async proposal => {
-            const response = await pchainAPI?.getValidatorsAt(
-              proposal.blockHeight
-            );
-            const canVote = !!find(
-              response?.validators,
-              validator =>
-                validator.consortiumMemberAddress === currentWalletAddress
-            );
-            return {
-              ...proposal,
-              canVote: canVote && !proposal.voted,
-            };
-          })
-        );
+  const queryClient = useQueryClient();
+  const location = useLocation();
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const [forceRefetch, setForceRefetch] = useState(0);
+  const isCurrentView = location.pathname.includes('/dac/active');
+
+  useEffect(() => {
+    abortControllerRef.current = new AbortController();
+
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+        abortControllerRef.current = null;
       }
-      return proposals;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isCurrentView) {
+      setForceRefetch(prev => prev + 1);
+    }
+  }, [location.pathname, isCurrentView]);
+
+  const { data, isInitialLoading, isFetching, refetch, error } = useQuery(
+    [QUERY_KEYS.ACTIVE, currentWalletAddress, page, forceRefetch],
+    async () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+        abortControllerRef.current = new AbortController();
+      }
+
+      try {
+        const result = await fetchActiveVotings(page);
+
+        let proposals = parseAPIProposals(
+          result?.data.dacProposals,
+          currentWalletAddress
+        );
+
+        if (pchainAPI && currentWalletAddress) {
+          proposals = await Promise.all(
+            proposals.map(async proposal => {
+              try {
+                if (abortControllerRef.current?.signal.aborted) {
+                  throw new Error('Request aborted');
+                }
+
+                const response = await pchainAPI?.getValidatorsAt(
+                  proposal.blockHeight
+                );
+
+                const canVote = !!find(
+                  response?.validators,
+                  validator =>
+                    validator.consortiumMemberAddress === currentWalletAddress
+                );
+                return {
+                  ...proposal,
+                  canVote: canVote && !proposal.voted,
+                };
+              } catch (error) {
+                return proposal;
+              }
+            })
+          );
+        }
+
+        return proposals.filter(p => !p.inactive);
+      } catch (error) {
+        if ((error as any)?.name === 'AbortError') {
+          return [];
+        }
+        throw error;
+      }
+    },
+    {
+      refetchOnWindowFocus: false,
+      staleTime: 10000, // 10 seconds
+      enabled: isCurrentView,
+      retry: false,
+      onError: err => {
+        console.error('Error fetching active votings:', err);
+        queryClient.setQueryData(
+          [QUERY_KEYS.ACTIVE, currentWalletAddress, page],
+          []
+        );
+      },
     }
   );
+
+  const customRefetch = () => {
+    setForceRefetch(prev => prev + 1);
+    return refetch();
+  };
 
   return {
     isFetching,
     isInitialLoading,
     error,
-    refetch,
-    proposals: data ?? [],
+    refetch: customRefetch,
+    proposals: isCurrentView ? data || [] : [],
   };
 };
 
 export const useUpcomingVotings = (page = 0) => {
-  const { proposals, isFetching, error, refetch } = useActiveVotings(
-    undefined,
-    undefined,
-    page
+  const queryClient = useQueryClient();
+  const location = useLocation();
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const [forceRefetch, setForceRefetch] = useState(0);
+  const isCurrentView = location.pathname.includes('/dac/upcoming');
+
+  useEffect(() => {
+    abortControllerRef.current = new AbortController();
+
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+        abortControllerRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isCurrentView) {
+      setForceRefetch(prev => prev + 1);
+    }
+  }, [location.pathname, isCurrentView]);
+
+  const { data, isInitialLoading, isFetching, refetch, error } = useQuery(
+    [QUERY_KEYS.UPCOMING, page, forceRefetch],
+    async () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+        abortControllerRef.current = new AbortController();
+      }
+
+      try {
+        const result = await fetchActiveVotings(page);
+
+        const proposals = parseAPIProposals(result?.data.dacProposals);
+        return proposals.filter(p => p.inactive);
+      } catch (error) {
+        if ((error as any)?.name === 'AbortError') {
+          return [];
+        }
+        throw error;
+      }
+    },
+    {
+      refetchOnWindowFocus: false,
+      staleTime: 10000,
+      enabled: isCurrentView,
+      retry: false,
+      onError: err => {
+        console.error('Error fetching upcoming votings:', err);
+        queryClient.setQueryData([QUERY_KEYS.UPCOMING, page], []);
+      },
+    }
   );
-  const upcomings = filter(proposals, proposal => proposal.inactive);
+
+  const customRefetch = () => {
+    setForceRefetch(prev => prev + 1);
+    return refetch();
+  };
+
   return {
-    proposals: upcomings,
     isFetching,
+    isInitialLoading,
     error,
-    refetch,
+    refetch: customRefetch,
+    proposals: isCurrentView ? data || [] : [],
   };
 };
 
@@ -181,27 +344,106 @@ export const useCompletedVotes = (
   endTime?: string,
   page = 0
 ) => {
+  const queryClient = useQueryClient();
+  const location = useLocation();
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const [forceRefetch, setForceRefetch] = useState(0);
+  const isCurrentView = location.pathname.includes('/dac/completed');
+
+  useEffect(() => {
+    abortControllerRef.current = new AbortController();
+
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+        abortControllerRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isCurrentView) {
+      setForceRefetch(prev => prev + 1);
+    }
+  }, [location.pathname, isCurrentView, type, startTime, endTime, page]);
+
   const { data, isFetching, error, refetch } = useQuery(
-    ['getCompletedVotes', type === 5 ? 3 : type, startTime, endTime, page],
-    async () => fetchCompletedVotes(type === 5 ? 3 : type, startTime, endTime),
+    [
+      QUERY_KEYS.COMPLETED,
+      type === 5 ? 3 : type,
+      startTime,
+      endTime,
+      page,
+      forceRefetch,
+    ],
+    async () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+        abortControllerRef.current = new AbortController();
+      }
+
+      try {
+        const result = await fetchCompletedVotes(
+          type === 5 ? 3 : type,
+          startTime,
+          endTime
+        );
+
+        return result;
+      } catch (error) {
+        if ((error as any)?.name === 'AbortError') {
+          return { data: { dacProposals: [] } };
+        }
+        throw error;
+      }
+    },
     {
       refetchOnWindowFocus: false,
-      // notifyOnChangeProps: ['data', 'error'],
+      staleTime: 10000,
+      enabled: isCurrentView,
+      retry: false,
+      onError: err => {
+        console.error('Error fetching completed votes:', err);
+        queryClient.setQueryData(
+          [
+            QUERY_KEYS.COMPLETED,
+            type === 5 ? 3 : type,
+            startTime,
+            endTime,
+            page,
+          ],
+          { data: { dacProposals: [] } }
+        );
+      },
     }
   );
-  const proposals = parseAPIProposals(data?.data.dacProposals);
-  const sortedProposals = orderBy(proposals, ['startTimestamp'], ['desc']);
+
+  const proposals = useMemo(() => {
+    if (!isCurrentView || !data || error) return [];
+
+    const parsedProposals = parseAPIProposals(data?.data.dacProposals);
+    const sortedProposals = orderBy(
+      parsedProposals,
+      ['startTimestamp'],
+      ['desc']
+    );
+
+    return sortedProposals.map((p, idx) => ({
+      ...p,
+      seq: sortedProposals.length - idx,
+    }));
+  }, [data, error, isCurrentView]);
+
+  const customRefetch = () => {
+    setForceRefetch(prev => prev + 1);
+    return refetch();
+  };
 
   return {
-    proposals: error
-      ? []
-      : sortedProposals.map((p, idx) => ({
-          ...p,
-          seq: sortedProposals.length - idx,
-        })),
+    proposals,
     error,
     isFetching,
-    refetch,
+    refetch: customRefetch,
   };
 };
 
