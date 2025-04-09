@@ -20,6 +20,7 @@ import PendingList from './PendingList';
 import {
   useMultisig,
   usePendingMultisigAddProposalTxs,
+  usePendingMultisigTx,
 } from '@/hooks/useMultisig';
 import RefreshButton from '@/components/RefreshButton';
 import { useNetworkStore } from '@/store/network';
@@ -39,6 +40,7 @@ const CreatingProposals = () => {
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
   const toast = useToast();
 
+  const { pendingMultisigTxs } = usePendingMultisigTx();
   const groupedPendingProposals = useMemo(() => {
     return pendingMultisigAddProposalTxs.reduce((result: any, msigTx: any) => {
       const proposalType = proposalTypes.find(
@@ -97,17 +99,19 @@ const CreatingProposals = () => {
     <Paper sx={{ p: 2 }}>
       <Header headline="Creating Proposals" variant="h6">
         <Stack direction="row" alignItems="center" spacing={1}>
-          {currentWalletAddress && (
-            <NavLink to={isKycVerified ? '/dac/create' : '#'}>
-              <Button
-                variant="contained"
-                color="primary"
-                disabled={!isKycVerified}
-              >
+          {currentWalletAddress &&
+            (isKycVerified &&
+            !(pendingMultisigTxs && pendingMultisigTxs?.length > 0) ? (
+              <NavLink to="/dac/create">
+                <Button variant="contained" color="primary">
+                  Create new
+                </Button>
+              </NavLink>
+            ) : (
+              <Button variant="contained" color="primary" disabled={true}>
                 Create new
               </Button>
-            </NavLink>
-          )}
+            ))}
           <RefreshButton loading={isFetching} onRefresh={refetch} />
         </Stack>
       </Header>
