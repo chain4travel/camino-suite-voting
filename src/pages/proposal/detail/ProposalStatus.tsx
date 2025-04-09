@@ -152,6 +152,17 @@ const ProposalStatus = ({
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const { pendingMultisigTxs } = usePendingMultisigTx();
+
+  const hasPendingMultisigVote = useMemo(() => {
+    return (
+      isLoggedIn &&
+      pendingMultisigTxs &&
+      pendingMultisigTxs.length &&
+      pendingMultisigTxs.length > 0 &&
+      pendingMultisigTxs[0].proposalId === proposal.id
+    );
+  }, [isLoggedIn, pendingMultisigTxs, proposal?.id]);
+
   return (
     <Box
       padding={2.5}
@@ -242,9 +253,7 @@ const ProposalStatus = ({
                   <Typography variant="body2" color="text.secondary">
                     Did not participate
                   </Typography>
-                ) : isLoggedIn &&
-                  pendingMultisigTxs &&
-                  pendingMultisigTxs.length > 0 ? (
+                ) : hasPendingMultisigVote ? (
                   <Typography variant="body2" color="text.secondary">
                     Vote needs more signatures from multisig owners to count
                   </Typography>
