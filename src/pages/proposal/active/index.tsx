@@ -17,7 +17,7 @@ import { ProposalType } from '@/types';
 import { ExpandMore } from '@mui/icons-material';
 import { FormControlLabel, Stack, useTheme } from '@mui/material';
 import { filter, find } from 'lodash';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { useLoaderData } from 'react-router-dom';
 import GroupHeader from './GroupHeader';
 import NoProposals from './NoProposals';
@@ -34,6 +34,8 @@ const ActiveVotings = () => {
   const isDark = theme.palette.mode === 'dark';
   const { isConsortiumMember } = addressState;
   const [onlyTodo, setOnlyTodo] = useState(false);
+  const initialFetchCompleted = useRef(false);
+
   const { proposals, error, refetch, isFetching } = useActiveVotings(
     wallet.pchainAPI,
     currentWalletAddress
@@ -46,6 +48,32 @@ const ActiveVotings = () => {
   const { currentNetwork } = useNetworkStore(state => ({
     currentNetwork: state.currentNetwork,
   }));
+
+  useEffect(() => {
+    if (!initialFetchCompleted.current) {
+      const timer = setTimeout(() => {
+        refetch()
+          .then(() => {
+            initialFetchCompleted.current = true;
+          })
+          .catch(err => {
+            console.error('Error during initial fetch:', err);
+          });
+
+        // Also fetch pending multisig transactions
+        refetchPendingMultisigTxs();
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (initialFetchCompleted.current) {
+      refetch();
+      refetchPendingMultisigTxs();
+    }
+  }, [currentWalletAddress, currentNetwork]);
 
   const groupedProposals = useMemo(() => {
     if (error) return {};
@@ -88,6 +116,11 @@ const ActiveVotings = () => {
     }, {});
   }, [proposals, onlyTodo, pendingMultisigAddVoteTxs, currentNetwork, error]);
 
+  const handleRefresh = () => {
+    refetch();
+    refetchPendingMultisigTxs();
+  };
+
   return (
     <Paper sx={{ p: 2 }}>
       <Header headline="Ongoing Proposals" variant="h6">
@@ -106,10 +139,7 @@ const ActiveVotings = () => {
           )}
           <RefreshButton
             loading={isFetching || isFetchingPendingMultisigTxs}
-            onRefresh={() => {
-              refetch();
-              refetchPendingMultisigTxs();
-            }}
+            onRefresh={handleRefresh}
           />
         </Stack>
       </Header>
