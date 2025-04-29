@@ -27,7 +27,7 @@ import { useLocation } from 'react-router-dom';
 
 const serialization = Serialization.getInstance();
 
-const QUERY_KEYS = {
+export const QUERY_KEYS = {
   ACTIVE: 'activeProposals',
   UPCOMING: 'upcomingProposals',
   COMPLETED: 'completedProposals',

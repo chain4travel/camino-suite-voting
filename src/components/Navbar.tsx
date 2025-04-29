@@ -5,6 +5,7 @@ import { filter } from 'lodash';
 import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
+import { QUERY_KEYS } from '@/hooks/useProposals';
 
 function a11yProps(index: number) {
   return {
@@ -24,7 +25,7 @@ const ProposalNavbar = () => {
 
   useEffect(() => {
     if (!initialFetchDone.current) {
-      Promise.all([queryClient.invalidateQueries(['getActiveVotings'])])
+      Promise.all([queryClient.invalidateQueries([QUERY_KEYS.ACTIVE])])
         .then(() => {
           initialFetchDone.current = true;
         })
@@ -46,81 +47,14 @@ const ProposalNavbar = () => {
     }
   }, [location.pathname]);
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    if (isNavigating) return;
-
-    const now = Date.now();
-    if (now - lastNavigationTime.current < 300) {
-      return;
-    }
-
-    setValue(newValue);
-    setIsNavigating(true);
-    lastNavigationTime.current = now;
-
-    let destination = '/dac/active';
-    switch (newValue) {
-      case 0:
-        destination = '/dac/active';
-        queryClient.invalidateQueries(['getActiveVotings']);
-        break;
-      case 1:
-        destination = '/dac/upcoming';
-        queryClient.invalidateQueries([
-          'getActiveVotings',
-          undefined,
-          0,
-          'upcoming',
-        ]);
-        break;
-      case 2:
-        destination = '/dac/completed';
-        queryClient.invalidateQueries(['getCompletedVotes']);
-        break;
-      case 3:
-        destination = '/dac/creating';
-        break;
-    }
-
-    setTimeout(() => {
-      navigate(destination);
-      setTimeout(() => {
-        setIsNavigating(false);
-      }, 100);
-    }, 50);
-  };
-
   const theme = useTheme();
-  const { addressState, currentWalletAddress, pendingMultisigTxs } =
-    useWalletStore(state => ({
-      addressState: state.addressState,
-      currentWalletAddress: state.currentWalletAddress,
-      pendingMultisigTxs: state.pendingMultisigTxs,
-    }));
+  const { addressState, currentWalletAddress } = useWalletStore(state => ({
+    addressState: state.addressState,
+    currentWalletAddress: state.currentWalletAddress,
+    pendingMultisigTxs: state.pendingMultisigTxs,
+  }));
 
   const { isKycVerified, isConsortiumAdminProposer } = addressState;
-
-  const { pendingAddProposals, pendingAddVotes } = useMemo(() => {
-    const pendingForCurrentAlias = filter(pendingMultisigTxs, {
-      alias: currentWalletAddress,
-    });
-    const pendingAddProposalCount = filter(
-      pendingForCurrentAlias,
-      tx => tx.typeId === PlatformVMConstants.ADDPROPOSALTX
-    ).length;
-    const pendingAddVoteCount = filter(
-      pendingForCurrentAlias,
-      tx => tx.typeId === PlatformVMConstants.ADDVOTETX
-    ).length;
-    return {
-      pendingAddProposals:
-        pendingAddProposalCount > 0
-          ? `${pendingAddProposalCount} pending`
-          : undefined,
-      pendingAddVotes:
-        pendingAddVoteCount > 0 ? `${pendingAddVoteCount} pending` : undefined,
-    };
-  }, [pendingMultisigTxs]);
 
   const isCreateProposalAllowed = isKycVerified || isConsortiumAdminProposer;
   const enableCreateButton = currentWalletAddress && isCreateProposalAllowed;
@@ -139,18 +73,18 @@ const ProposalNavbar = () => {
 
     switch (tabValue) {
       case 0: // active
-        queryClient.invalidateQueries(['getActiveVotings']);
+        queryClient.invalidateQueries([QUERY_KEYS.ACTIVE]);
         break;
       case 1: // upcoming
         queryClient.invalidateQueries([
-          'getActiveVotings',
+          QUERY_KEYS.ACTIVE,
           undefined,
           0,
           'upcoming',
         ]);
         break;
       case 2: // completed
-        queryClient.invalidateQueries(['getCompletedVotes']);
+        queryClient.invalidateQueries([QUERY_KEYS.COMPLETED]);
         break;
     }
 
@@ -172,7 +106,6 @@ const ProposalNavbar = () => {
     >
       <Tabs
         value={value}
-        onChange={handleChange}
         textColor="secondary"
         sx={{
           '& .MuiTabs-indicator': { display: 'none' },
