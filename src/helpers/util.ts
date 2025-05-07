@@ -2,6 +2,10 @@ import { reduce } from 'lodash';
 import { VotingOption } from '@/types';
 import sanitizeHtml from 'sanitize-html';
 
+export const fractionDenominator = 1000000;
+export const THIRTY_DAYS_IN_SECONDS = 2592000;
+export const SIXTY_DAYS_IN_SECONDS = 5184000;
+
 export const countMultipleOptionsBy = (items: any, byField: string) => {
   return reduce(
     items,
