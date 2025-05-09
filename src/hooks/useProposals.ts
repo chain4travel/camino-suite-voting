@@ -24,8 +24,14 @@ import useWallet from './useWallet';
 import { GeneralProposal } from '@c4tplatform/caminojs/dist/apis/platformvm';
 import { useRef, useEffect, useState, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
+import {
+  fractionDenominator,
+  SIXTY_DAYS_IN_SECONDS,
+  THIRTY_DAYS_IN_SECONDS,
+} from '@/helpers/util';
 
 const serialization = Serialization.getInstance();
+const bintools = BinTools.getInstance();
 
 export const QUERY_KEYS = {
   ACTIVE: 'activeProposals',
@@ -547,7 +553,6 @@ export const useAddProposal = (
         case 2: {
           const startUnixTime = startDate.toUnixInteger();
 
-          const THIRTY_DAYS_IN_SECONDS = 2592000;
           const maxEndTime = startUnixTime + THIRTY_DAYS_IN_SECONDS;
 
           const endUnixTime = Math.min(endDate.toUnixInteger(), maxEndTime);
@@ -562,7 +567,6 @@ export const useAddProposal = (
         case 3:
           {
             const startUnixTime = startDate.toUnixInteger();
-            const SIXTY_DAYS_IN_SECONDS = 5184000;
 
             const endUnixTime = startUnixTime + SIXTY_DAYS_IN_SECONDS;
             const optionIndex = Buffer.alloc(4);
@@ -595,15 +599,18 @@ export const useAddProposal = (
           break;
         case 5:
           {
+            const totalVotedThresholdNominator =
+              ((quorum as number) * fractionDenominator) / 100;
+            const mostVotedThresholdNominator =
+              ((majorityValue as number) * fractionDenominator) / 100;
             const startUnixTime = startDate.toUnixInteger();
-            const THIRTY_DAYS_IN_SECONDS = 2592000;
             const maxEndTime = startUnixTime + THIRTY_DAYS_IN_SECONDS;
             const endUnixTime = Math.min(endDate.toUnixInteger(), maxEndTime);
             proposal = new GeneralProposal(
               startDate.toUnixInteger(),
               endUnixTime,
-              majorityValue * 10000,
-              quorum * 10000,
+              totalVotedThresholdNominator,
+              mostVotedThresholdNominator,
               earlyFinish
             );
             votingOptions?.forEach(option => {
@@ -641,7 +648,7 @@ export const useAddProposal = (
 
       // Multisig Wallet connected
       if (multisigWallet) {
-        const multisigAlias = BinTools.getInstance().addressToString(
+        const multisigAlias = bintools.addressToString(
           multisigWallet.hrp,
           multisigWallet.pchainId,
           multisigWallet.keyData.alias
