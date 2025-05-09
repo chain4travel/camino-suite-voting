@@ -50,7 +50,7 @@ export const votingTypeLoader =
           id: idx,
           name: ProposalTypes[key],
           abbr: key,
-          disabled: !['NewMember', 'ExcludeMember'].includes(key),
+          disabled: !['NewMember', 'ExcludeMember', 'General'].includes(key),
           restricted: !['NewMember'].includes(key),
           isAdminProposal: ['AdminNewMember', 'AdminExcludeMember'].includes(
             key
