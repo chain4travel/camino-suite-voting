@@ -36,6 +36,14 @@ const MajoritySelection = ({ type, value, onChange }) => {
         },
       }}
     >
+      <Typography
+        fontSize={16}
+        fontWeight={600}
+        lineHeight={'24px'}
+        sx={{ mb: '8px' }}
+      >
+        Please select the criteria for the approval of this proposal
+      </Typography>
       <RadioGroup value={type || 'relative'} onChange={handleTypeChange}>
         <Box
           sx={{ mb: 2, display: 'flex', flexDirection: 'column', gap: '8px' }}
@@ -127,8 +135,8 @@ const MajoritySelection = ({ type, value, onChange }) => {
             }
           />
           <Typography variant="overline">
-            In order to win exactly one option must be picked by everyone
-            eligible to vote
+            In order to win, exactly one option must be picked by everyone who
+            votes.
           </Typography>
         </Box>
       </RadioGroup>

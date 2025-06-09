@@ -10,6 +10,7 @@ import { useProposalDescription } from '@/hooks/useProposalDescription';
 import sanitizeHtml from 'sanitize-html';
 import { sanitizeOptions } from '@/helpers/util';
 import DOMPurify from 'dompurify';
+import { CheckCircle } from '@mui/icons-material';
 
 const serialization = Serialization.getInstance();
 interface BaseFeeVotingProps {
@@ -145,7 +146,12 @@ const GeneralProposalVoting = ({
             <VotingOptionCard
               key={`basefee-${data.id}-${opt.option}`}
               option={opt}
-              title={String('Option ' + (index + 1))}
+              // title={serialization.decoder(
+              //   opt.value as string,
+              //   'base64',
+              //   'base64',
+              //   'utf8'
+              // )}
               isConsortiumMember={isConsortiumMember}
               voted={data.voted}
               selected={selectedOption?.option}
@@ -163,10 +169,10 @@ const GeneralProposalVoting = ({
               renderContent={option => {
                 return (
                   <>
-                    <Stack direction="row" justifyContent="space-between">
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      <CheckCircle />
                       <Typography
-                        variant="body2"
-                        color="text.secondary"
+                        variant="h6"
                         sx={{
                           overflow: 'hidden',
                           wordBreak: 'break-all',
