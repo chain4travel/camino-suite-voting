@@ -12,6 +12,7 @@ import {
   Typography,
   FormControl,
   Divider,
+  Alert,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
@@ -52,7 +53,11 @@ export const generalFormSchema = {
     description: z.string().optional(),
     votingOptions: z
       .array(z.string().trim().min(1, 'Voting option must not be empty'))
-      .min(1, 'You must add at least one voting option')
+      .min(1, 'Please add at least one voting option')
+      .max(
+        MAX_OPTIONS,
+        `You cannot add more than ${MAX_OPTIONS} voting options`
+      )
       .refine(
         options => {
           const uniques = uniqBy(options, option => option);
@@ -60,9 +65,17 @@ export const generalFormSchema = {
         },
         { message: 'Each voting option must be unique' }
       ),
-    majorityType: z.enum(['relative', 'qualified', 'unanimous']),
-    majorityValue: z.number().min(0).max(100),
-    quorum: z.number().max(100, 'Quorum cannot exceed 100%'),
+    majorityType: z.enum(['relative', 'qualified', 'unanimous'], {
+      errorMap: () => ({ message: 'Please select a majority type' }),
+    }),
+    majorityValue: z
+      .number()
+      .min(0)
+      .max(100, 'Majority value must be between 0 and 100'),
+    quorum: z
+      .number()
+      .min(0, 'Quorum cannot be negative')
+      .max(100, 'Quorum cannot exceed 100%'),
     earlyFinish: z.boolean(),
     proposalSubject: z
       .string()
@@ -77,7 +90,7 @@ export const generalFormSchema = {
   },
   error: {
     path: ['endDate'],
-    message: 'end date must be between 1 and 30 days after start date',
+    message: 'End date must be between 1 and 30 days after start date',
   },
   endDateRestriction: { minDays: 1, maxDays: 30, fixed: false },
 };
@@ -111,73 +124,26 @@ const GeneralProposalForm = () => {
       append('');
     }
   };
+
   const handleMajorityChange = (type, value) => {
     setValue('majorityType', type);
     setValue('majorityValue', value);
   };
+
+  // Helper function to get voting options error message
+  const getVotingOptionsErrorMessage = () => {
+    if (errors.votingOptions?.message) {
+      return errors.votingOptions.message;
+    }
+    if (errors.votingOptions?.root?.message) {
+      return errors.votingOptions.root.message;
+    }
+    return null;
+  };
+
   return (
     <>
-      <FormSection divider spacing="md">
-        <Typography
-          fontSize={16}
-          fontWeight={600}
-          lineHeight={'24px'}
-          sx={{ mb: '8px' }}
-        >
-          Please select the criteria for the approval of this proposal
-        </Typography>
-
-        {/* Majority Section */}
-        <MajoritySelection
-          value={watch('majorityValue')}
-          type={watch('majorityType')}
-          onChange={handleMajorityChange}
-        />
-
-        <Divider sx={{ my: 2 }} />
-
-        {/* Quorum Section */}
-        <Controller
-          name="quorum"
-          control={control}
-          defaultValue={0}
-          render={({ field }) => (
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="caption">Quorum: {field.value}%</Typography>
-              <Slider
-                {...field}
-                value={field.value}
-                onChange={(_, value) => field.onChange(value)}
-                aria-label="Quorum"
-                step={10}
-                min={0}
-                max={100}
-                valueLabelDisplay="auto"
-                sx={{
-                  '& .MuiSlider-thumb': {
-                    color: '#1976d2',
-                  },
-                  '& .MuiSlider-track': {
-                    color: '#1976d2',
-                  },
-                  '& .MuiSlider-rail': {
-                    color: '#ccc',
-                  },
-                }}
-              />
-              <FormHelperText error={!!errors.quorum}>
-                {errors.quorum?.message}
-              </FormHelperText>
-              <Typography variant="overline">
-                These many votes are necessary for a proposal to be deemed
-                valid.
-              </Typography>
-            </Box>
-          )}
-        />
-
-        <Divider sx={{ my: 2 }} />
-
+      <FormSection spacing="md">
         {/* Early Exit Section */}
         <Box sx={{ mb: 3 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -202,9 +168,9 @@ const GeneralProposalForm = () => {
               )}
             />
           </Box>
-          <FormHelperText error={!!errors.earlyFinish}>
-            {errors.earlyFinish?.message}
-          </FormHelperText>
+          {errors.earlyFinish && (
+            <FormHelperText error>{errors.earlyFinish.message}</FormHelperText>
+          )}
           <Typography variant="overline">
             The voting process can be closed as soon as a winning option has
             been found given the criteria above, or it can run until the end of
@@ -212,6 +178,71 @@ const GeneralProposalForm = () => {
             nature of the proposal.
           </Typography>
         </Box>
+        <Divider sx={{ my: 2 }} />
+
+        {/* Quorum Section */}
+        <Controller
+          name="quorum"
+          control={control}
+          defaultValue={0}
+          render={({ field }) => (
+            <Box sx={{ mb: 3 }}>
+              <Typography
+                fontSize={16}
+                fontWeight={600}
+                lineHeight={'24px'}
+                sx={{ mb: '8px' }}
+              >
+                Please select the criteria for the validity of this proposal
+              </Typography>
+              <Typography variant="caption">Quorum: {field.value}%</Typography>
+              <Slider
+                {...field}
+                value={field.value}
+                onChange={(_, value) => field.onChange(value)}
+                aria-label="Quorum"
+                step={10}
+                min={0}
+                max={100}
+                valueLabelDisplay="auto"
+                sx={{
+                  '& .MuiSlider-thumb': {
+                    color: '#1976d2',
+                  },
+                  '& .MuiSlider-track': {
+                    color: '#1976d2',
+                  },
+                  '& .MuiSlider-rail': {
+                    color: '#ccc',
+                  },
+                }}
+              />
+              {errors.quorum && (
+                <FormHelperText error>{errors.quorum.message}</FormHelperText>
+              )}
+              <Typography variant="overline">
+                These many votes are necessary for a proposal to be deemed
+                valid.
+              </Typography>
+            </Box>
+          )}
+        />
+        {/* Majority Section */}
+        <MajoritySelection
+          value={watch('majorityValue')}
+          type={watch('majorityType')}
+          onChange={handleMajorityChange}
+        />
+        {errors.majorityType && (
+          <FormHelperText error sx={{ mt: 1 }}>
+            {errors.majorityType.message}
+          </FormHelperText>
+        )}
+        {errors.majorityValue && (
+          <FormHelperText error sx={{ mt: 1 }}>
+            {errors.majorityValue.message}
+          </FormHelperText>
+        )}
 
         <Divider sx={{ my: 2 }} />
 
@@ -227,7 +258,7 @@ const GeneralProposalForm = () => {
               lineHeight={'24px'}
               sx={{ mb: '8px' }}
             >
-              subject: keep it clear and concise
+              Subject: keep it clear and concise
             </Typography>
             <Controller
               name="proposalSubject"
@@ -239,7 +270,7 @@ const GeneralProposalForm = () => {
                     variant="outlined"
                     fullWidth
                     error={!!error}
-                    helperText={error ? error.message : ''}
+                    helperText={error?.message || ''}
                     inputProps={{
                       maxLength: 256,
                     }}
@@ -262,31 +293,30 @@ const GeneralProposalForm = () => {
         </Box>
 
         {/* Voting Options Section */}
+        <Typography
+          fontSize={16}
+          fontWeight={600}
+          lineHeight="24px"
+          sx={{ mb: 2 }}
+        >
+          Voting Options
+        </Typography>
+
+        {/* Display voting options array-level errors */}
+        {getVotingOptionsErrorMessage() && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {getVotingOptionsErrorMessage()}
+          </Alert>
+        )}
+
         {fields.map((item, index) => (
           <Paragraph key={item.id} spacing="sm">
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <Typography
-                fontSize={16}
-                fontWeight={600}
-                lineHeight={'24px'}
-                sx={{ mb: '8px' }}
-              >
-                Option {index + 1}
-              </Typography>
-              <IconButton onClick={() => remove(index)}>
-                <DeleteForever color="error" fontSize="small" />
-              </IconButton>
-            </Stack>
             <Controller
               name={`votingOptions.${index}`}
               control={control}
-              render={({ field }) => (
+              render={({ field, fieldState: { error } }) => (
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Typography variant="caption">Option Description</Typography>
+                  <Typography variant="caption">Option Title</Typography>
                   <TextField
                     {...field}
                     sx={{
@@ -301,15 +331,13 @@ const GeneralProposalForm = () => {
                       },
                     }}
                     variant="outlined"
-                    error={!!errors.votingOptions?.[index]}
-                    helperText={
-                      errors.votingOptions?.[index] && (
-                        <FormHelperText error>
-                          {errors.votingOptions?.[index]?.message}
-                        </FormHelperText>
-                      )
-                    }
+                    error={!!error}
+                    helperText={error?.message || ''}
+                    placeholder={`Enter option title`}
                   />
+                  <IconButton onClick={() => remove(index)}>
+                    <DeleteForever color="error" fontSize="small" />
+                  </IconButton>
                 </Box>
               )}
             />
@@ -323,8 +351,9 @@ const GeneralProposalForm = () => {
           onClick={handleAppendOption}
           fullWidth
           sx={{ justifyContent: 'flex-start' }}
+          disabled={fields.length >= MAX_OPTIONS}
         >
-          Add Option
+          Add Option {fields.length > 0 && `(${fields.length}/${MAX_OPTIONS})`}
         </Button>
       </FormSection>
 
@@ -337,8 +366,6 @@ const GeneralProposalForm = () => {
             <>
               <TextEditor
                 {...field}
-                title="Describe the voting"
-                description="Additionally, please provide a detailed description of this voting"
                 onChange={value => field.onChange(value)}
                 error={error}
               />
