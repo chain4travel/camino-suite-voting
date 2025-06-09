@@ -24,18 +24,12 @@ interface RootProps {
 
 const Root = (props: RootProps) => {
   const [load, setLoad] = React.useState(true);
-  function init() {
-    setLoad(true);
+  const setActiveNetwork = useNetworkStore(state => state.setActiveNetwork);
+  useEffect(() => {
     if (props.network) {
       setActiveNetwork(props.network);
       updateBaseUrl(props.network.explorerUrl!);
       setLoad(false);
-    }
-  }
-  const setActiveNetwork = useNetworkStore(state => state.setActiveNetwork);
-  useEffect(() => {
-    if (load) {
-      init();
     }
   }, [props.network]);
   const caminoTheme = CaminoTheme.getThemeOptions('dark');
