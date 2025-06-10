@@ -316,7 +316,7 @@ const GeneralProposalForm = () => {
               control={control}
               render={({ field, fieldState: { error } }) => (
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Typography variant="caption">Option Title</Typography>
+                  <Typography variant="caption"> Option {index + 1}</Typography>
                   <TextField
                     {...field}
                     sx={{
@@ -333,7 +333,6 @@ const GeneralProposalForm = () => {
                     variant="outlined"
                     error={!!error}
                     helperText={error?.message || ''}
-                    placeholder={`Enter option title`}
                   />
                   <IconButton onClick={() => remove(index)}>
                     <DeleteForever color="error" fontSize="small" />
