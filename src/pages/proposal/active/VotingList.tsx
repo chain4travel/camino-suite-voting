@@ -108,13 +108,22 @@ const VotingList = ({ data, isConsortiumMember, refresh }: VotingListProps) => {
             break;
           case ProposalTypes.General:
             Vote = (
-              <GeneralProposalVoting
-                data={proposal}
-                isConsortiumMember={isConsortiumMember}
-                refresh={refresh}
-                onVoteSuccess={onVoteTxSuccess}
-                multisigFunctions={multisigFunctions}
-              />
+              <Stack width="100%">
+                <GeneralProposalVoting
+                  data={proposal}
+                  isConsortiumMember={isConsortiumMember}
+                  refresh={refresh}
+                  onVoteSuccess={onVoteTxSuccess}
+                  multisigFunctions={multisigFunctions}
+                />
+                <Stack sx={{ mt: '8px' }}>
+                  <ListItemStatus
+                    startTimestamp={proposal.startTimestamp}
+                    endTimestamp={proposal.endTimestamp}
+                    pendingMultisigTx={proposal.pendingMultisigTx}
+                  />
+                </Stack>
+              </Stack>
             );
             break;
           case ProposalTypes.GrantProgram:

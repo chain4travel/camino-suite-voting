@@ -213,17 +213,10 @@ const VoteOptions: React.FC<VoteOptionsProps> = ({
         }
         case ProposalTypes.General: {
           label = (
-            <Stack direction="column" spacing={1}>
-              <Stack direction="row" spacing={1}>
-                {opt.value ? <CheckCircle /> : <Cancel />}
-                <Typography variant="h6">
-                  {'Option ' + (+opt.option + 1)}
-                </Typography>
-              </Stack>
+            <Stack direction="row" spacing={1}>
+              {opt.value ? <CheckCircle /> : <Cancel />}
               <Typography
-                variant="body2"
-                fontWeight={600}
-                color="text.secondary"
+                variant="h6"
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHtml(
                     opt.value
@@ -247,9 +240,7 @@ const VoteOptions: React.FC<VoteOptionsProps> = ({
             <Stack direction="column" spacing={1}>
               <Stack direction="row" spacing={1}>
                 {opt.value ? <CheckCircle /> : <Cancel />}
-                <Typography variant="h6">
-                  {'Option ' + (+opt.option + 1)}
-                </Typography>
+                <Typography variant="h6">{'Option'}</Typography>
               </Stack>
               <Typography
                 variant="body2"

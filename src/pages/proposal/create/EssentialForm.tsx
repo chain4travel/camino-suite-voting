@@ -36,20 +36,20 @@ export const essentialSchema = (isAdminProposal: boolean) =>
       .custom<DateTime>()
       .refine(
         (d: DateTime) => d.isValid && d.diffNow(['days', 'hours']).days >= 0,
-        'invalid start date'
+        'Start date is invalid or in the past'
       )
       .refine((d: DateTime) => {
         const diffHours = d.diffNow().as('hours');
         return diffHours <= MAX_FUTURE_HOURS;
-      }, 'start date cannot be more than 14 days in the future'),
+      }, 'Start date cannot be more than 14 days in the future'),
     endDate: z.custom<DateTime>().refine((d: DateTime) => {
       if (isAdminProposal) return true;
       else return d.isValid && d.diffNow(['days']).days > 0;
-    }, 'invalid end date'),
+    }, 'End date is invalid or in the past'),
     forumLink: z.preprocess(url => {
       if (!url || typeof url !== 'string') return undefined;
       return url === '' ? undefined : url;
-    }, z.string().url().optional()),
+    }, z.string().url('Please enter a valid URL').optional()),
   });
 
 interface EssentialFormProps {
@@ -157,10 +157,10 @@ const EssentialForm = ({
   const essentialRefinementError = {
     path: ['endDate'],
     message: isAdminProposal
-      ? 'end date must be exactly 60 days after start date'
+      ? 'End date must be exactly 60 days after start date'
       : endDateRestriction.fixed
-      ? `end date must be exactly ${endDateRestriction.minDays} days after start date`
-      : `end date must be between ${endDateRestriction.minDays} and ${endDateRestriction.maxDays} days after start date`,
+      ? `End date must be exactly ${endDateRestriction.minDays} days after start date`
+      : `End date must be between ${endDateRestriction.minDays} and ${endDateRestriction.maxDays} days after start date`,
   };
 
   const schema = essentialSchema(isAdminProposal)
@@ -285,6 +285,56 @@ const EssentialForm = ({
     }
     return null;
   }, [watchStartDate, watchEndDate]);
+
+  // Helper function to get specific error messages
+  const getSpecificErrorMessages = () => {
+    const errors = formState.errors;
+    const messages: string[] = [];
+
+    // Check for common field errors
+    if (errors.proposalSubject?.message) {
+      messages.push(errors.proposalSubject.message);
+    }
+
+    if (errors.votingOptions?.message) {
+      messages.push(errors.votingOptions.message);
+    }
+
+    if (errors.startDate?.message) {
+      messages.push(errors.startDate.message);
+    }
+
+    if (errors.endDate?.message) {
+      messages.push(errors.endDate.message);
+    }
+
+    if (errors.forumLink?.message) {
+      messages.push(errors.forumLink.message);
+    }
+
+    if (errors.quorum?.message) {
+      messages.push(errors.quorum.message);
+    }
+
+    if (errors.majorityType?.message) {
+      messages.push(errors.majorityType.message);
+    }
+
+    if (errors.majorityValue?.message) {
+      messages.push(errors.majorityValue.message);
+    }
+
+    // Handle array errors for voting options
+    if (Array.isArray(errors.votingOptions)) {
+      errors.votingOptions.forEach((error, index) => {
+        if (error?.message) {
+          messages.push(`Option ${index + 1}: ${error.message}`);
+        }
+      });
+    }
+
+    return messages;
+  };
 
   return (
     <FormProvider {...methods}>
@@ -485,15 +535,30 @@ const EssentialForm = ({
             variant="contained"
             color="primary"
             loading={formState.isSubmitting}
+            disabled={formState.isSubmitting || !formState.isValid}
           >
             Create
           </Button>
         </Stack>
-        {formState.isDirty && !formState.isValid && (
-          <FormHelperText error>
-            please resolve the issue of the fields above
-          </FormHelperText>
-        )}
+        {formState.isDirty &&
+          !formState.isValid &&
+          Object.keys(formState.errors).length > 0 && (
+            <FormHelperText error>
+              {/* Show specific error messages instead of generic message */}
+              {(() => {
+                const specificMessages = getSpecificErrorMessages();
+                if (specificMessages.length > 0) {
+                  return (
+                    specificMessages.slice(0, 3).join(', ') +
+                    (specificMessages.length > 3
+                      ? ` and ${specificMessages.length - 3} more error(s)`
+                      : '')
+                  );
+                }
+                return 'Please resolve the validation errors above';
+              })()}
+            </FormHelperText>
+          )}
       </form>
     </FormProvider>
   );

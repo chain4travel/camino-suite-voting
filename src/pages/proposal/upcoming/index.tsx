@@ -24,7 +24,7 @@ const UpcomingVotings = () => {
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
   const { proposals, error, refetch, isFetching } = useUpcomingVotings();
   const { currentNetwork } = useNetworkStore(state => ({
-    currentNetwork: state.currentNetwork,
+    currentNetwork: state.activeNetwork,
   }));
   const groupedProposals = useMemo(() => {
     if (error) return {};

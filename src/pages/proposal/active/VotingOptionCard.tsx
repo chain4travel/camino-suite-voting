@@ -33,8 +33,7 @@ const StyledCard = styled((props: StyledCardProps & CardProps) => (
     : theme.palette.divider,
 }));
 const StyledCardHeader = styled(MuiCardHeader)(({ theme }) => ({
-  padding: theme.spacing(1.5, 2),
-  paddingBottom: 0,
+  padding: theme.spacing(1.5, 1.5),
   '.MuiCardHeader-title': {
     display: 'initial',
     marginLeft: '0 !important', // we should not use '!important' here, but 'datacharts.css' use '!important' to force overriding this style when integrating with camino-suite
@@ -187,11 +186,13 @@ const VotingOptionCard = ({
   }
   return (
     <StyledCard active={isSelected} isVoted={isVoted}>
-      <StyledCardHeader
-        title={title}
-        titleTypographyProps={{ variant: 'h6' }}
-      />
-      <CardContent sx={{ padding: 2.5, paddingTop: 1.5 }}>
+      {title && (
+        <StyledCardHeader
+          title={title}
+          titleTypographyProps={{ variant: 'h6' }}
+        />
+      )}
+      <CardContent sx={{ padding: '12px !important' }}>
         {renderContent && <Stack spacing={0.5}>{renderContent(option)}</Stack>}
         {isConsortiumMember &&
           (isVoted ? (
