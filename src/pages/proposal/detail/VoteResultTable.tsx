@@ -10,6 +10,7 @@ import {
   TableHead,
   TableRow,
   Typography,
+  Tooltip,
   styled,
   useTheme,
 } from '@mui/material';
@@ -49,12 +50,15 @@ const VirtuosoTableComponents: TableComponents<VoteData> = {
     <TableBody {...props} ref={ref} />
   )),
 };
+
 interface VoteResultTableProps {
   votes?: VoteData[];
 }
+
 const VoteResultTable = ({ votes }: VoteResultTableProps) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+
   return (
     <TablePaper sx={{ width: '100%', height: 400 }}>
       <TableVirtuoso
@@ -87,36 +91,56 @@ const VoteResultTable = ({ votes }: VoteResultTableProps) => {
         itemContent={(_index: number, row: VoteData) => {
           return (
             <>
-              {columns.map((column, idx) => (
-                <TableCell
-                  key={column.dataKey}
-                  align="left"
-                  sx={{
-                    borderColor: 'divider',
-                    color: row.votedDateTime === '-' ? '#999090' : 'inherit',
-                  }}
-                >
-                  <Stack direction="row" alignItems="center" spacing={2}>
-                    {idx === 0 && (
-                      <AccountBalanceWalletOutlined
-                        sx={{
-                          color: 'text.primary',
-                        }}
-                      />
-                    )}
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        overflow: 'hidden',
-                        whiteSpace: 'nowrap',
-                        textOverflow: 'ellipsis',
-                      }}
-                    >
-                      {row[column.dataKey]}
-                    </Typography>
-                  </Stack>
-                </TableCell>
-              ))}
+              {columns.map((column, idx) => {
+                const cellValue = row[column.dataKey];
+                const isOptionColumn = column.dataKey === 'option';
+
+                return (
+                  <TableCell
+                    key={column.dataKey}
+                    align="left"
+                    sx={{
+                      borderColor: 'divider',
+                      color: row.votedDateTime === '-' ? '#999090' : 'inherit',
+                    }}
+                  >
+                    <Stack direction="row" alignItems="center" spacing={2}>
+                      {idx === 0 && (
+                        <AccountBalanceWalletOutlined
+                          sx={{
+                            color: 'text.primary',
+                          }}
+                        />
+                      )}
+                      {isOptionColumn ? (
+                        <Tooltip title={cellValue} placement="top">
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              overflow: 'hidden',
+                              whiteSpace: 'nowrap',
+                              textOverflow: 'ellipsis',
+                            }}
+                          >
+                            {cellValue}
+                          </Typography>
+                        </Tooltip>
+                      ) : (
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            overflow: 'hidden',
+                            whiteSpace: 'nowrap',
+                            textOverflow: 'ellipsis',
+                          }}
+                        >
+                          {cellValue}
+                        </Typography>
+                      )}
+                    </Stack>
+                  </TableCell>
+                );
+              })}
             </>
           );
         }}
@@ -124,4 +148,5 @@ const VoteResultTable = ({ votes }: VoteResultTableProps) => {
     </TablePaper>
   );
 };
+
 export default VoteResultTable;

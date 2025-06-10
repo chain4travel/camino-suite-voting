@@ -146,12 +146,6 @@ const GeneralProposalVoting = ({
             <VotingOptionCard
               key={`basefee-${data.id}-${opt.option}`}
               option={opt}
-              // title={serialization.decoder(
-              //   opt.value as string,
-              //   'base64',
-              //   'base64',
-              //   'utf8'
-              // )}
               isConsortiumMember={isConsortiumMember}
               voted={data.voted}
               selected={selectedOption?.option}

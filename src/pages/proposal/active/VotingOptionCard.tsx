@@ -34,7 +34,6 @@ const StyledCard = styled((props: StyledCardProps & CardProps) => (
 }));
 const StyledCardHeader = styled(MuiCardHeader)(({ theme }) => ({
   padding: theme.spacing(1.5, 1.5),
-  // paddingBottom: 0,
   '.MuiCardHeader-title': {
     display: 'initial',
     marginLeft: '0 !important', // we should not use '!important' here, but 'datacharts.css' use '!important' to force overriding this style when integrating with camino-suite
