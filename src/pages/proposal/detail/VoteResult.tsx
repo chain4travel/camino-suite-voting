@@ -282,14 +282,8 @@ const VoteResult = ({ result, proposalType }: VoteResultProps) => {
           content = (
             <Stack direction="column" spacing={1}>
               <Stack direction="row" spacing={1}>
-                <Typography variant="h6">
-                  {'Option ' + (+result.option + 1)}
-                </Typography>
-              </Stack>
-              <Stack spacing={1} alignItems="flex-start">
                 <Typography
-                  variant="body2"
-                  color="text.secondary"
+                  variant="h6"
                   dangerouslySetInnerHTML={{
                     __html: sanitizeHtml(
                       result.value
@@ -304,6 +298,8 @@ const VoteResult = ({ result, proposalType }: VoteResultProps) => {
                     ),
                   }}
                 ></Typography>
+              </Stack>
+              <Stack spacing={1} alignItems="flex-start">
                 <Tag
                   color={result.value ? 'success' : 'error'}
                   label={result.value ? 'ACCEPTED' : 'DECLINED'}

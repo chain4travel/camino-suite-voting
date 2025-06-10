@@ -122,7 +122,12 @@ const Detail = () => {
                   participant?.votedOptions.includes(opt.option)
                 )?.option;
                 if (op !== undefined) {
-                  option = `Option ${Number(op) + 1}`;
+                  option = serialization.decoder(
+                    proposalWithEligibles.options[op].value,
+                    'base64',
+                    'base64',
+                    'utf8'
+                  );
                 }
                 break;
               case ProposalTypes.NewMember:
