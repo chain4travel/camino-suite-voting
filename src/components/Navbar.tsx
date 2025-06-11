@@ -56,8 +56,10 @@ const ProposalNavbar = () => {
 
   const { isKycVerified, isConsortiumAdminProposer } = addressState;
 
-  const isCreateProposalAllowed = isKycVerified || isConsortiumAdminProposer;
-  const enableCreateButton = currentWalletAddress && isCreateProposalAllowed;
+  const enableCreateButton = useMemo(() => {
+    const isCreateProposalAllowed = isKycVerified || isConsortiumAdminProposer;
+    return currentWalletAddress && isCreateProposalAllowed;
+  }, [currentWalletAddress, isKycVerified, isConsortiumAdminProposer]);
 
   const handleTabClick = (path: string, tabValue: number) => {
     if (isNavigating || value === tabValue) return;
