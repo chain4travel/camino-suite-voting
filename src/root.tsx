@@ -19,6 +19,7 @@ const queryClient = new QueryClient();
 
 interface RootProps {
   network: Network;
+  pChainAddress?: string;
   theme?: Theme;
 }
 
