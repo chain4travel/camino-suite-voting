@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Button from '@/components/Button';
 import DistributionBar from '@/components/DistributionBar';
 import Tag from '@/components/Tag';
@@ -115,7 +115,7 @@ const VoteOptions: React.FC<VoteOptionsProps> = ({
       case ProposalTypes.General:
         return (
           <GeneralProposalVoting
-            data={proposal}
+            data={{ ...proposal, pendingMultisigTx }}
             isConsortiumMember={isConsortiumMember}
             refresh={refresh}
             onVoteSuccess={onVoteTxSuccess}
