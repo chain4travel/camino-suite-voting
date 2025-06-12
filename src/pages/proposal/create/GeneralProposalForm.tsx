@@ -172,10 +172,10 @@ const GeneralProposalForm = () => {
             <FormHelperText error>{errors.earlyFinish.message}</FormHelperText>
           )}
           <Typography variant="overline">
-            The voting process can be closed as soon as a winning option has
-            been found given the criteria above, or it can run until the end of
-            the period anyway as final percentages matter, depending on the
-            nature of the proposal.
+            The voting process can be closed as soon as a winning option can be
+            determined given the criteria set in this page, or it can run until
+            the end of the period anyway as final percentages matter, depending
+            on the nature of the proposal.
           </Typography>
         </Box>
         <Divider sx={{ my: 2 }} />
@@ -221,12 +221,14 @@ const GeneralProposalForm = () => {
                 <FormHelperText error>{errors.quorum.message}</FormHelperText>
               )}
               <Typography variant="overline">
-                These many votes are necessary for a proposal to be deemed
-                valid.
+                Out of the number of elegible voters, this percentage need to
+                have voted for the result to be valid.
               </Typography>
             </Box>
           )}
         />
+
+        <Divider sx={{ my: 2 }} />
         {/* Majority Section */}
         <MajoritySelection
           value={watch('majorityValue')}
