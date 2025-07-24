@@ -7,13 +7,13 @@ import React, { useEffect } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { useIsFeatureEnabled } from '@/utils/featureFlags/featureFlagUtils';
 
-import Toast from '@/components/Toast';
 import { updateBaseUrl } from './helpers/http';
 import './locales/i18n';
 import { getRoutes } from './routes';
 import { useNetworkStore } from './store/network';
 import CaminoTheme from './theme';
-import type { Network } from './types';
+import type { DispatchNotificationFunction, Network } from './types';
+import { useNotificationStore } from './store/notifications';
 
 const queryClient = new QueryClient();
 
@@ -21,11 +21,15 @@ interface RootProps {
   network: Network;
   pChainAddress?: string;
   theme?: Theme;
+  dispatchNotification?: DispatchNotificationFunction;
 }
 
 const Root = (props: RootProps) => {
   const [load, setLoad] = React.useState(true);
   const setActiveNetwork = useNetworkStore(state => state.setActiveNetwork);
+  const setDispatchNotification = useNotificationStore(
+    state => state.setDispatchNotification
+  );
   useEffect(() => {
     if (props.network) {
       setActiveNetwork(props.network);
@@ -33,9 +37,17 @@ const Root = (props: RootProps) => {
       setLoad(false);
     }
   }, [props.network]);
+  useEffect(() => {
+    if (props.dispatchNotification) {
+      setDispatchNotification(props.dispatchNotification);
+    }
+  }, [props.dispatchNotification, setDispatchNotification]);
   const caminoTheme = CaminoTheme.getThemeOptions('dark');
   const theme = props.theme ?? createTheme(caminoTheme);
   const { isFeatureEnabled } = useIsFeatureEnabled();
+  useEffect(() => {
+    isFeatureEnabled('NewMember');
+  }, [isFeatureEnabled]);
   if (load) return;
   return (
     <React.StrictMode>
@@ -44,7 +56,6 @@ const Root = (props: RootProps) => {
         <LocalizationProvider dateAdapter={AdapterLuxon}>
           <QueryClientProvider client={queryClient}>
             <RouterProvider router={getRoutes(queryClient, isFeatureEnabled)} />
-            <Toast />
             <ReactQueryDevtools initialIsOpen={false} />
           </QueryClientProvider>
         </LocalizationProvider>

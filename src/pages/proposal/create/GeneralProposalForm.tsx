@@ -20,10 +20,10 @@ import { AddCircle, DeleteForever } from '@mui/icons-material';
 import FormSection from './FormSection';
 import Paragraph from '@/components/Paragraph';
 import TextEditor from '@/components/TextEditor';
-import useToast from '@/hooks/useToast';
 import { z } from 'zod';
 import { uniqBy } from 'lodash';
 import MajoritySelection from './MajoritySelection';
+import { useNotificationStore } from '@/store/notifications';
 
 // Custom styled switch with color transitions
 const StyledSwitch = styled(MuiSwitch)(({ theme }) => ({
@@ -115,11 +115,13 @@ const GeneralProposalForm = () => {
     setValue('proposalSubject', '');
     setValue('votingOptions', []);
   }, []);
-  const toast = useToast();
-
+  const { dispatchNotification } = useNotificationStore();
   const handleAppendOption = () => {
     if (fields.length === MAX_OPTIONS) {
-      toast.error(`You can't add more than ${MAX_OPTIONS} options`);
+      dispatchNotification({
+        type: 'error',
+        message: `You can't add more than ${MAX_OPTIONS} options`,
+      });
     } else {
       append('');
     }

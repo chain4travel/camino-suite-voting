@@ -19,7 +19,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { filter, find, orderBy } from 'lodash';
 import { DateTime } from 'luxon';
 import { useMultisig } from './useMultisig';
-import useToast from './useToast';
 import useWallet from './useWallet';
 import { GeneralProposal } from '@c4tplatform/caminojs/dist/apis/platformvm';
 import { useRef, useEffect, useState, useMemo } from 'react';
@@ -29,6 +28,7 @@ import {
   SIXTY_DAYS_IN_SECONDS,
   THIRTY_DAYS_IN_SECONDS,
 } from '@/helpers/util';
+import { useNotificationStore } from '@/store/notifications';
 
 const serialization = Serialization.getInstance();
 const bintools = BinTools.getInstance();
@@ -503,7 +503,7 @@ export const useAddProposal = (
   proposalType: number | string,
   option?: { onSuccess?: (data: any) => void; onSettled?: (data: any) => void }
 ) => {
-  const toast = useToast();
+  const { dispatchNotification } = useNotificationStore();
   const { pchainAPI, signer, multisigWallet } = useWallet();
   const { tryToCreateMultisig } = useMultisig();
   const mutation = useMutation({
@@ -566,7 +566,7 @@ export const useAddProposal = (
         }
         case 3:
           {
-            const startUnixTime = startDate.toUnixInteger();
+            const startUnixTime = DateTime.now().toUnixInteger();
 
             const endUnixTime = startUnixTime + SIXTY_DAYS_IN_SECONDS;
             const optionIndex = Buffer.alloc(4);
@@ -583,7 +583,7 @@ export const useAddProposal = (
           break;
         case 4:
           {
-            startDate = startDate.plus({ hours: 2 });
+            startDate = DateTime.now().plus({ hours: 2 });
             endDate = startDate.plus({ days: 7 });
             const optionIndex = Buffer.alloc(4);
             optionIndex.writeInt32BE(0, 0);
@@ -671,9 +671,16 @@ export const useAddProposal = (
     onSuccess: data => {
       option?.onSuccess
         ? option.onSuccess(data)
-        : toast.success(`AddProposalTx sent with TxID: ${data}`);
+        : dispatchNotification({
+            type: 'success',
+            message: `AddProposalTx sent with TxID: ${data}`,
+          });
     },
-    onError: error => toast.error(`Failed to add proposal: ${error}`),
+    onError: error =>
+      dispatchNotification({
+        type: 'error',
+        message: `Failed to add proposal: ${error}`,
+      }),
     onSettled: option && option.onSettled,
   });
 

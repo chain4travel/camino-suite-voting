@@ -3,7 +3,6 @@ import DistributionBar, {
 } from '@/components/DistributionBar';
 import Paragraph from '@/components/Paragraph';
 import TextEditor from '@/components/TextEditor';
-import useToast from '@/hooks/useToast';
 import { VotingOption } from '@/types';
 import { AddCircle, Circle, DeleteForever } from '@mui/icons-material';
 import {
@@ -65,11 +64,14 @@ const FeeDistributionForm = () => {
     name: 'votingOptions',
   });
 
-  const toast = useToast();
+  const { dispatchNotification } = useNotificationStore();
 
   const handleAppendOption = () => {
     if (fields.length === MAX_OPTIONS) {
-      toast.error(`You can't add more than ${MAX_OPTIONS} options`);
+      dispatchNotification({
+        type: 'error',
+        message: `You can't add more than ${MAX_OPTIONS} options`,
+      });
     } else {
       append({
         option: fields.length + 1,
