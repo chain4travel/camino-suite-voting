@@ -13,7 +13,6 @@ import {
   AccordionSummary,
 } from '@/components/Accordion';
 import Button from '@/components/Button';
-import { getTxExplorerUrl } from '@/helpers/string';
 import GroupHeader from './GroupHeader';
 import PendingList from './PendingList';
 import {
@@ -50,7 +49,6 @@ const CreatingProposals = () => {
         const currentData = result[proposalType.id]
           ? result[proposalType.id].data
           : [];
-        // console.log({ result, currentData, msigTx });
         return {
           ...result,
           [proposalType.id]: {
