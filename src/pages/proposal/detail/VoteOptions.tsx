@@ -4,7 +4,6 @@ import DistributionBar from '@/components/DistributionBar';
 import Tag from '@/components/Tag';
 import { getTxExplorerUrl } from '@/helpers/string';
 import { useMultisig, usePendingMultisigAddVoteTxs } from '@/hooks/useMultisig';
-import useToast from '@/hooks/useToast';
 import { useNetworkStore } from '@/store/network';
 import {
   Percentage,
@@ -25,6 +24,7 @@ import DefaultVotingOptions from '../active/DefaultVotingOptions';
 import GrantProgramVotingOptions from '../active/GrantProgram/GrantProgramVotingOptions';
 import GeneralProposalVoting from '../active/GeneralProposalVoting';
 import { sanitizeOptions } from '@/helpers/util';
+import { useNotificationStore } from '@/store/notifications';
 
 type VotedOption = VotingOption & Percentage;
 const serialization = Serialization.getInstance();
@@ -51,27 +51,16 @@ const VoteOptions: React.FC<VoteOptionsProps> = ({
 
   const activeNetwork = useNetworkStore(state => state.activeNetwork);
   const { signMultisigTx, abortSignavault, executeMultisigTx } = useMultisig();
-  const toast = useToast();
   const { pendingMultisigAddVoteTxs } = usePendingMultisigAddVoteTxs();
-
+  const { dispatchNotification } = useNotificationStore();
   const onVoteTxSuccess = React.useCallback(
     (data?: string) => {
-      toast.success(
-        'Successfully voted',
-        data,
-        data ? (
-          <Button
-            href={getTxExplorerUrl(activeNetwork?.name, 'p', data)}
-            target="_blank"
-            variant="outlined"
-            color="inherit"
-          >
-            View on explorer
-          </Button>
-        ) : undefined
-      );
+      dispatchNotification({
+        message: 'Successfully voted',
+        type: 'success',
+      });
     },
-    [activeNetwork?.name, toast]
+    [activeNetwork?.name]
   );
 
   const pendingMultisigTx = React.useMemo(

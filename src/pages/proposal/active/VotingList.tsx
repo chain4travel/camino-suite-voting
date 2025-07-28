@@ -2,7 +2,6 @@ import Button from '@/components/Button';
 import ListItemStatus from '@/components/ListItemStatus';
 import { getTxExplorerUrl } from '@/helpers/string';
 import { useMultisig } from '@/hooks/useMultisig';
-import useToast from '@/hooks/useToast';
 import { useNetworkStore } from '@/store/network';
 import { ProposalTypes, type Applicant, type Proposal } from '@/types';
 import { List, ListItemButton, Stack } from '@mui/material';
@@ -14,6 +13,7 @@ import FeeDistributionVoting from './FeeDistributionVoting';
 import GrantProgramVoting from './GrantProgram';
 import NewMemberVoting from './NewMemberVoting';
 import GeneralProposalVoting from './GeneralProposalVoting';
+import { useNotificationStore } from '@/store/notifications';
 
 interface VotingListProps {
   data: { type: string; typeId: number; name: string; data: Proposal[] };
@@ -22,24 +22,13 @@ interface VotingListProps {
 }
 const VotingList = ({ data, isConsortiumMember, refresh }: VotingListProps) => {
   const navigate = useNavigate();
-  const toast = useToast();
-  const activeNetwork = useNetworkStore(state => state.activeNetwork);
+  const { dispatchNotification } = useNotificationStore();
   const { signMultisigTx, abortSignavault, executeMultisigTx } = useMultisig();
   const onVoteTxSuccess = (data?: string) => {
-    toast.success(
-      'Successfully voted',
-      data,
-      data ? (
-        <Button
-          href={getTxExplorerUrl(activeNetwork?.name, 'p', data)}
-          target="_blank"
-          variant="outlined"
-          color="inherit"
-        >
-          View on explorer
-        </Button>
-      ) : undefined
-    );
+    dispatchNotification({
+      type: 'success',
+      message: 'Successfully voted',
+    });
   };
   const multisigFunctions = {
     signMultisigTx,

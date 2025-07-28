@@ -1,9 +1,7 @@
 import Button from '@/components/Button';
-import Header from '@/components/Header';
 import Paragraph from '@/components/Paragraph';
 import { getTxExplorerUrl } from '@/helpers/string';
 import { useAddProposal } from '@/hooks/useProposals';
-import useToast from '@/hooks/useToast';
 import { useNetworkStore } from '@/store/network';
 import { ProposalTypes } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -24,6 +22,7 @@ import CaminoDatePicker from '@/components/DatePicker';
 import { usePendingMultisigAddProposalTxs } from '@/hooks/useMultisig';
 import useWallet from '@/hooks/useWallet';
 import { currentDateFormat } from '@/utils/moment';
+import { useNotificationStore } from '@/store/notifications';
 
 const MINUTES_IN_FUTURE = 15;
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
@@ -199,7 +198,7 @@ const EssentialForm = ({
   }, [isAdminProposal, proposalType]);
 
   const navigate = useNavigate();
-  const toast = useToast();
+  const { dispatchNotification } = useNotificationStore();
   const activeNetwork = useNetworkStore(state => state.activeNetwork);
   const { refetch } = usePendingMultisigAddProposalTxs();
   const { multisigWallet, pchainAPI } = useWallet();
@@ -210,20 +209,10 @@ const EssentialForm = ({
         refetch();
         navigate('/dac/creating');
       }
-      toast.success(
-        'AddProposalTx sent successfully',
-        data,
-        data && (
-          <Button
-            href={getTxExplorerUrl(activeNetwork?.name, 'p', data)}
-            target="_blank"
-            variant="outlined"
-            color="inherit"
-          >
-            View on explorer
-          </Button>
-        )
-      );
+      dispatchNotification({
+        type: 'success',
+        message: 'AddProposalTx sent successfully',
+      });
       if (!multisigWallet) {
         setTxID(data);
       }
@@ -258,7 +247,10 @@ const EssentialForm = ({
     } catch (error) {
       if (error instanceof Error) {
         console.error('Failed to submit proposal:', error);
-        toast.error(`Cannot create proposal: ${error.message}`);
+        dispatchNotification({
+          type: 'error',
+          message: `Cannot create proposal: ${error.message}`,
+        });
       }
     }
   };

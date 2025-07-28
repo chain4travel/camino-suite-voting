@@ -14,12 +14,12 @@ import { z } from 'zod';
 import Big from 'big.js';
 import { uniqBy } from 'lodash';
 import { useBaseFee } from '@/hooks/useRpc';
-import useToast from '@/hooks/useToast';
 import TextEditor from '@/components/TextEditor';
 import Header from '@/components/Header';
 import Paragraph from '@/components/Paragraph';
 import { VotingOption } from '@/types';
 import FormSection from './FormSection';
+import { useNotificationStore } from '@/store/notifications';
 
 const MAX_OPTIONS = 3;
 export const baseFeeFormSchema = {
@@ -61,12 +61,14 @@ const BaseFeeForm = () => {
     control,
     name: 'votingOptions',
   });
-
-  const toast = useToast();
+  const { dispatchNotification } = useNotificationStore();
 
   const handleAppendOption = () => {
     if (fields.length === MAX_OPTIONS) {
-      toast.error(`You can't add more than ${MAX_OPTIONS} options`);
+      dispatchNotification({
+        type: 'error',
+        message: `You can't add more than ${MAX_OPTIONS} options`,
+      });
     } else {
       append({ option: fields.length + 1, value: baseFee });
     }

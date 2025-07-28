@@ -5,7 +5,6 @@ import Paper from '@/components/Paper';
 import RadioButton from '@/components/RadioButton';
 import RefreshButton from '@/components/RefreshButton';
 import { useCompletedVotes } from '@/hooks/useProposals';
-import useToast from '@/hooks/useToast';
 import { useVotingTypeStore } from '@/store';
 import { Proposal, ProposalType, ProposalTypes } from '@/types';
 import {
@@ -45,11 +44,14 @@ const CompletedVotes = () => {
     filter.startTime?.toUTC().toISO(),
     filter.endTime?.toUTC().toISO()
   );
-  const toast = useToast();
+  const { dispatchNotification } = useNotificationStore();
   const navigate = useNavigate();
   useEffect(() => {
     if (error) {
-      toast.error('Failed to fetch proposals');
+      dispatchNotification({
+        type: 'error',
+        message: 'Failed to fetch proposals',
+      });
     }
   }, [error]);
   const theme = useTheme();

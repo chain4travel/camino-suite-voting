@@ -20,8 +20,8 @@ import { AxiosError } from 'axios';
 import createHash from 'create-hash';
 import { difference, find, map } from 'lodash';
 import { useMemo } from 'react';
-import useToast from './useToast';
 import useWallet from './useWallet';
+import { useNotificationStore } from '@/store/notifications';
 
 export const usePendingMultisigTx = () => {
   const { multisigWallet, signavaultApi, signer } = useWallet();
@@ -168,7 +168,7 @@ export const usePendingMultisigAddVoteTxs = () => {
 
 export const useMultisig = () => {
   const { multisigWallet, signavaultApi } = useWallet();
-  const toast = useToast();
+  const { dispatchNotification } = useNotificationStore();
   const bintools = BinTools.getInstance();
   const { refetch } = usePendingMultisigTx();
 
@@ -229,20 +229,6 @@ export const useMultisig = () => {
           if (!(e instanceof SignatureError)) throw e;
         }
 
-        // This is the place where we can need to do some signavault activities
-        // - check if the tx is already in signavault
-        // - if so:
-        // -- pull signatures, and insert them into mskeychain
-        // -- call buildSignatureIndices again
-        // -- if successful, tx can be signed
-        // - if not:
-        // -- serialize tx into hex bytes (hexm)
-        // -- serialize utx.getTransaction().getOutputOwners (hexo)
-        // -- send hexbytes, transaction.outputowners, txID to signavault
-        // -- for every wallet here send the signature (loop)
-
-        // ToDo: On init time there should be set if this is an existing
-        // or new TX, for this little test we assume new TX
         const alias = bintools.addressToString(
           multisigWallet.hrp,
           multisigWallet.pchainId,
@@ -270,7 +256,10 @@ export const useMultisig = () => {
           const data = (e as AxiosError).response?.data;
           if (data) {
             console.error('failed to create multisig tx on signavault: ', e);
-            toast.error('Failed to create the vote');
+            dispatchNotification({
+              message: 'Failed to create the vote',
+              type: 'error',
+            });
           }
           // throw e
         }
@@ -303,10 +292,16 @@ export const useMultisig = () => {
               }
             }
           }
-          toast.success('The transaction has been signed');
+          dispatchNotification({
+            message: 'The transaction has been signed',
+            type: 'success',
+          });
         } catch (error) {
           console.error('failed to sign transaction on signavault: ', error);
-          toast.error('Failed to sign the transaction');
+          dispatchNotification({
+            message: 'Failed to sign the transaction',
+            type: 'error',
+          });
         }
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await refetch();
@@ -333,10 +328,16 @@ export const useMultisig = () => {
             signature: signatureAliasTimestamp,
             id: tx?.id,
           });
-          toast.success('The transaction has been cancelled successfully');
+          dispatchNotification({
+            message: 'The transaction has been cancelled successfully',
+            type: 'success',
+          });
         } catch (error) {
           console.error('failed to cancel the tx on signavault: ', error);
-          toast.error('Failed to cancel the transaction');
+          dispatchNotification({
+            message: 'Failed to cancel the transaction',
+            type: 'error',
+          });
         }
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await refetch();
@@ -445,10 +446,12 @@ export const useMultisig = () => {
           onSuccess && onSuccess(txID);
         } catch (error) {
           console.error('failed to issueMultisigTx on SignaVault', error);
-          toast.error(
-            error.response.data.error,
-            'Failed to execute the multisig transaction'
-          );
+          dispatchNotification({
+            message:
+              'Failed to execute the multisig transaction ' +
+              error.response.data.error,
+            type: 'error',
+          });
         }
       };
     }
