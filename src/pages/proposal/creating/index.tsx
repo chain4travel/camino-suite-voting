@@ -12,9 +12,7 @@ import {
   AccordionDetails,
   AccordionSummary,
 } from '@/components/Accordion';
-import useToast from '@/hooks/useToast';
 import Button from '@/components/Button';
-import { getTxExplorerUrl } from '@/helpers/string';
 import GroupHeader from './GroupHeader';
 import PendingList from './PendingList';
 import {
@@ -25,6 +23,7 @@ import {
 import RefreshButton from '@/components/RefreshButton';
 import { useNetworkStore } from '@/store/network';
 import { useWalletStore } from '@/store';
+import { useNotificationStore } from '@/store/notifications';
 
 const CreatingProposals = () => {
   const navigate = useNavigate();
@@ -38,7 +37,7 @@ const CreatingProposals = () => {
   const { pendingMultisigAddProposalTxs, refetch, isFetching } =
     usePendingMultisigAddProposalTxs();
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
-  const toast = useToast();
+  const { dispatchNotification } = useNotificationStore();
 
   const { pendingMultisigTxs } = usePendingMultisigTx();
   const groupedPendingProposals = useMemo(() => {
@@ -77,20 +76,10 @@ const CreatingProposals = () => {
   }, [pendingMultisigAddProposalTxs]);
 
   const onAddProposalTxSuccess = (data?: string) => {
-    toast.success(
-      'Proposal successfully created',
-      data,
-      data ? (
-        <Button
-          href={getTxExplorerUrl(activeNetwork?.name, 'p', data)}
-          target="_blank"
-          variant="outlined"
-          color="inherit"
-        >
-          View on explorer
-        </Button>
-      ) : undefined
-    );
+    dispatchNotification({
+      type: 'success',
+      message: 'Proposal successfully created',
+    });
     navigate('/dac/upcoming');
   };
   const theme = useTheme();

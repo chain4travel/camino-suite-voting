@@ -70,7 +70,8 @@ const GeneralProposalVoting = ({
       }}
     >
       {(location.pathname === '/dac/active' ||
-        location.pathname === '/dac/upcoming') && (
+        location.pathname === '/dac/upcoming' ||
+        location.pathname === '/dac/creating') && (
         <>
           <Typography
             variant="body2"

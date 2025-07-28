@@ -2,15 +2,15 @@ import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { BinTools } from '@c4tplatform/caminojs/dist';
 import { VotingOption } from '@/types';
-import useToast from './useToast';
 import useWallet from './useWallet';
 import { useMultisig } from './useMultisig';
+import { useNotificationStore } from '@/store/notifications';
 
 const useSubmitVote = (option?: {
   onSuccess?: (d: any) => void;
   onSettled?: () => void;
 }) => {
-  const toast = useToast();
+  const { dispatchNotification } = useNotificationStore();
   const { pchainAPI, signer, multisigWallet } = useWallet();
   const { tryToCreateMultisig } = useMultisig();
   const mutation = useMutation({
@@ -66,8 +66,16 @@ const useSubmitVote = (option?: {
     },
     onSuccess:
       (option && option.onSuccess) ||
-      (() => toast.success('Successfully voted')),
-    onError: error => toast.error(`Failed to vote: ${error}`),
+      (() =>
+        dispatchNotification({
+          type: 'success',
+          message: 'Successfully voted',
+        })),
+    onError: error =>
+      dispatchNotification({
+        type: 'error',
+        message: `Failed to vote: ${error}`,
+      }),
     onSettled: option && option.onSettled,
   });
 
