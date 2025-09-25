@@ -66,13 +66,16 @@ jobs:
         if: github.event_name == 'push'
         run: |
           aws ecr get-login-password --region ${{ env.aws_region }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.aws_region }}.amazonaws.com
-  
+    
 
       - name: create module docker image
+        run: |   
+            docker build . -t ${{ env.module_docker_image }}:${{ github.ref_name }} --build-arg BUILD_ENV=build:${{ steps.setDefaults.outputs.build_env }}
+  
+      - name: push module docker image
         if: github.event_name == 'push'
-        run: | 
-          docker build . -t ${{ env.module_docker_image }}:${{ github.ref_name }} --build-arg BUILD_ENV=build:${{ steps.setDefaults.outputs.build_env }}
-          docker push ${{ env.module_docker_image }}:${{ github.ref_name }}
+        run: |   
+            docker push ${{ env.module_docker_image }}:${{ github.ref_name }}
 
       - name: create suite docker image
         run: |
