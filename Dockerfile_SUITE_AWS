@@ -8,9 +8,9 @@ WORKDIR /app/camino-suite-voting
 COPY ./ /app/camino-suite-voting/
 RUN yarn install
 RUN yarn $BUILD_ENV
-FROM 278308921038.dkr.ecr.eu-central-1.amazonaws.com/camino-suite-host:$SUITE_BRANCH as stage-suite
-FROM 278308921038.dkr.ecr.eu-central-1.amazonaws.com/camino-suite-wallet:$WALLET_BRANCH  as stage-wallet
-FROM 278308921038.dkr.ecr.eu-central-1.amazonaws.com/camino-suite-explorer:$EXPLORER_BRANCH  as stage-explorer
+FROM public.ecr.aws/n0m7j6i5/camino-suite-host:$SUITE_BRANCH as stage-suite
+FROM public.ecr.aws/n0m7j6i5/camino-suite-wallet:$WALLET_BRANCH  as stage-wallet
+FROM public.ecr.aws/n0m7j6i5/camino-suite-explorer:$EXPLORER_BRANCH  as stage-explorer
 FROM nginx:1.18
 COPY --from=stage-suite /app/camino-suite/dist/ /usr/share/nginx/html
 COPY --from=stage-voting /app/camino-suite-voting/dist/ /usr/share/nginx/html/dac

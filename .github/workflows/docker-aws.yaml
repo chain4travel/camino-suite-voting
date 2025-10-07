@@ -14,7 +14,7 @@ on:
       - suite-c4t
 env:
   node_version: 18
-  module_docker_image: "278308921038.dkr.ecr.eu-central-1.amazonaws.com/camino-suite-voting"
+  module_docker_image: "public.ecr.aws/n0m7j6i5/camino-suite-voting"
   aws_region: "eu-central-1"
 
 jobs:
