@@ -14,7 +14,7 @@ on:
       - suite-c4t
 env:
   node_version: 18
-  module_docker_image: "278308921038.dkr.ecr.eu-central-1.amazonaws.com/camino-suite-voting"
+  module_docker_image: "public.ecr.aws/n0m7j6i5/camino-suite-voting"
   aws_region: "eu-central-1"
 
 jobs:
@@ -60,7 +60,6 @@ jobs:
           fi
 
       - name: Configure AWS credentials
-        if: github.event_name == 'push'
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -68,10 +67,9 @@ jobs:
           aws-region: ${{ env.aws_region }}
         
       - name: Login to Amazon ECR
-        if: github.event_name == 'push'
         run: |
           aws ecr get-login-password --region ${{ env.aws_region }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.aws_region }}.amazonaws.com
-    
+          aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
 
       - name: create module docker image
         run: |   
@@ -85,9 +83,9 @@ jobs:
       - name: create suite docker image
         run: |
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            docker build . -f Dockerfile_SUITE -t ${{ steps.setDefaults.outputs.docker_image }} --build-arg BUILD_ENV=build:${{ steps.setDefaults.outputs.build_env }} --build-arg SUITE_BRANCH=${{ github.base_ref }} --build-arg EXPLORER_BRANCH=${{ github.base_ref }}
+            docker build . -f Dockerfile_SUITE_AWS -t ${{ steps.setDefaults.outputs.docker_image }} --build-arg BUILD_ENV=build:${{ steps.setDefaults.outputs.build_env }} --build-arg SUITE_BRANCH=${{ github.base_ref }} --build-arg EXPLORER_BRANCH=${{ github.base_ref }}
           else
-            docker build . -f Dockerfile_SUITE -t ${{ steps.setDefaults.outputs.docker_image }} --build-arg BUILD_ENV=build:${{ steps.setDefaults.outputs.build_env }} --build-arg SUITE_BRANCH=${{ github.ref_name }} --build-arg EXPLORER_BRANCH=${{ github.ref_name }}
+            docker build . -f Dockerfile_SUITE_AWS -t ${{ steps.setDefaults.outputs.docker_image }} --build-arg BUILD_ENV=build:${{ steps.setDefaults.outputs.build_env }} --build-arg SUITE_BRANCH=${{ github.ref_name }} --build-arg EXPLORER_BRANCH=${{ github.ref_name }}
           fi
 
       - name: push and deploy docker
