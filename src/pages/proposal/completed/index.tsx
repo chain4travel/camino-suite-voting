@@ -28,6 +28,7 @@ import GeneralVote from './GeneralVote';
 import GrantProgram from './GrantProgram';
 import NewMemberVote from './NewMemberVote';
 import { currentDateFormat } from '@/utils/moment';
+import { useNotificationStore } from '@/store/notifications';
 
 const CompletedVotes = () => {
   const { data: proposalTypes } = useLoaderData() as { data: ProposalType[] };
