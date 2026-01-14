@@ -32,7 +32,7 @@ const CreatingProposals = () => {
     currentWalletAddress: state.currentWalletAddress,
     addressState: state.addressState,
   }));
-  const { isKycVerified } = addressState;
+  const { isKycVerified, isConsortiumAdminProposer } = addressState;
   const { signMultisigTx, executeMultisigTx, abortSignavault } = useMultisig();
   const { pendingMultisigAddProposalTxs, refetch, isFetching } =
     usePendingMultisigAddProposalTxs();
@@ -89,7 +89,7 @@ const CreatingProposals = () => {
       <Header headline="Creating Proposals" variant="h6">
         <Stack direction="row" alignItems="center" spacing={1}>
           {currentWalletAddress &&
-            (isKycVerified &&
+            ((isKycVerified || isConsortiumAdminProposer) &&
             !(pendingMultisigTxs && pendingMultisigTxs?.length > 0) ? (
               <NavLink to="/dac/create">
                 <Button variant="contained" color="primary">
